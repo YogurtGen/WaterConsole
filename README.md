@@ -109,4 +109,3 @@ If the project helps your game night, you can [support its development via yapp.
 ## License
 
 WaterConsole source and original project artwork are licensed under [MIT](LICENSE). Third-party components retain their own licenses; see [asset provenance](assets/ASSET-LICENSES.md) and the notices bundled with releases. No ownership or redistribution rights to third-party games are granted.
-

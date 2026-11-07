@@ -64,4 +64,3 @@ A virtual gamepad visible in Windows or a passing helper probe does not prove th
 `scripts/capture-docs.mjs` renders the real React interface with simulated documentation-only state. It generates the images in `docs/media/` and visibly marks them **Documentation preview**. Its URLs use `example.invalid` and its pairing code is `PREVIEW`; it must not connect to a real console or publish a live invitation.
 
 These images show the interface, not device compatibility or performance. Regenerate them after relevant UI changes and visually inspect desktop and phone captures. See [docs/media/README.md](media/README.md).
-

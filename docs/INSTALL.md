@@ -117,4 +117,3 @@ The e2e runner uses installed [Google Chrome](https://www.google.com/chrome/) by
 Keep your downloaded release checksums with the package. Close the app before updating, then use the new installer or extract a new portable folder. Settings belong to the Core profile. Copy only settings you understand; never share pairing/session state between running instances.
 
 Uninstall the desktop app through Windows Settings, or remove an extracted portable folder after closing it. Optional system drivers have their own Windows uninstall entries and lifecycle; removing WaterConsole does not automatically remove a driver used by other software.
-

@@ -22,4 +22,3 @@ node scripts/run-local.mjs scripts/capture-docs.mjs
 ```
 
 Run `npm run build` first. The script uses installed Google Chrome by default; set `WATERCONSOLE_BROWSER=chromium` to use an installed Playwright Chromium fallback as described in [TESTING.md](../TESTING.md). It keeps generated files under this checkout; do not replace the fixture with a live session just to capture a QR. Inspect all screenshots before committing them. Original WaterConsole UI/images use the repository's MIT license.
-

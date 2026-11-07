@@ -177,4 +177,3 @@ run meaningful input/recovery tests; do not change unrelated game bindings.
 - `npm run typecheck`, `npm test`, `npm run build`, and relevant e2e checks pass; physical-device/game tests are recorded separately.
 
 Keep a general-purpose adapter framework separate from private game configuration. Publishing an integration does not give permission to redistribute its game.
-

@@ -6,7 +6,7 @@ $taskRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..')).TrimEnd('\')
 $taskOutput = [IO.Path]::GetFullPath($OutputPath)
 if (-not $taskOutput.StartsWith($taskRoot + '\releases\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Source archive must be under project releases.' }
 if (Test-Path -LiteralPath $taskOutput) { throw 'Refusing to overwrite an archive.' }
-$taskRootNames = @('AGENTS.md','CLAUDE.md','README.md','CONTRIBUTING.md','LICENSE','SECURITY.md','.gitignore','.npmrc','package.json','package-lock.json','tsconfig.json','vite.config.ts','vitest.config.ts')
+$taskRootNames = @('AGENTS.md','CLAUDE.md','README.md','CONTRIBUTING.md','LICENSE','SECURITY.md','.gitattributes','.gitignore','.npmrc','package.json','package-lock.json','tsconfig.json','vite.config.ts','vitest.config.ts')
 $taskFolders = @('assets','docs','scripts','src','tests','toolkit','.github')
 $taskFiles = [Collections.Generic.List[IO.FileInfo]]::new()
 function Add-PublicFiles([string]$Directory) {
