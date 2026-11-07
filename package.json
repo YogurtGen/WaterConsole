@@ -1,0 +1,111 @@
+{
+  "name": "waterconsole-core",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Open-source local multiplayer console. Playing together should be free.",
+  "author": "WaterConsole contributors",
+  "license": "MIT",
+  "type": "module",
+  "main": "build/electron/main.cjs",
+  "scripts": {
+    "setup": "node scripts/run-local.mjs --install",
+    "dev": "node scripts/run-local.mjs scripts/dev.mjs",
+    "start": "node scripts/run-local.mjs node_modules/electron/cli.js .",
+    "build": "node scripts/run-local.mjs scripts/build.mjs",
+    "typecheck": "node scripts/run-local.mjs node_modules/typescript/bin/tsc --noEmit",
+    "test": "node scripts/run-local.mjs node_modules/vitest/vitest.mjs run",
+    "test:e2e": "node scripts/run-local.mjs scripts/e2e.mjs",
+    "format": "node scripts/run-local.mjs node_modules/prettier/bin/prettier.cjs --write src scripts tests *.ts *.json",
+    "pack": "npm run build && node scripts/run-local.mjs node_modules/electron-builder/cli.js --win --x64 --dir",
+    "dist": "npm run build && node scripts/run-local.mjs node_modules/electron-builder/cli.js --win nsis zip --x64 && npm run release:organize",
+    "release:organize": "node scripts/run-local.mjs scripts/organize-release.mjs",
+    "build:native": "node scripts/run-local.mjs scripts/build-native.mjs",
+    "test:native": "node scripts/run-local.mjs scripts/test-native-toolkit.mjs",
+    "tools:download": "node scripts/run-local.mjs scripts/fetch-optional-tools.mjs"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.10",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/nunito-sans": "^5.3.0",
+    "fastify": "^5.12.7",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "ws": "^8.22.0"
+  },
+  "build": {
+    "appId": "org.waterconsole.core",
+    "productName": "WaterConsole Core",
+    "copyright": "Copyright © 2026 WaterConsole contributors",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "build/**/*",
+      "package.json",
+      "LICENSE",
+      "assets/icon.ico"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "build/native/*.{exe,dll}"
+    ],
+    "extraResources": [
+      {
+        "from": "scripts/configure-firewall.ps1",
+        "to": "configure-firewall.ps1"
+      },
+      {
+        "from": "docs",
+        "to": "help",
+        "filter": [
+          "**/*.md",
+          "media/*.png"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "assets/icon.ico",
+      "signExecutable": false,
+      "artifactName": "WaterConsole-Core-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "artifactName": "WaterConsole-Core-Setup-${version}-${arch}.${ext}",
+      "include": "scripts/installer.nsh"
+    },
+    "publish": null
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/ws": "^8.18.2",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "homepage": "https://yogurtgen.github.io/WaterConsole/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YogurtGen/WaterConsole.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YogurtGen/WaterConsole/issues"
+  }
+}

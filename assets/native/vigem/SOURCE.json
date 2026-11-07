@@ -1,0 +1,12 @@
+{
+  "version": "1.21.231.0",
+  "copyright": "Copyright (c) 2018 Benjamin Höglinger-Stelzer",
+  "license": "MIT",
+  "sha256": "5fd323a2ddb39e2966d55eb595b782ba1a5e71b01db07b3a780d9b242fe6dace",
+  "architecture": "windows-x64",
+  "name": "ViGEmClient",
+  "source": "https://raw.githubusercontent.com/nefarius/ViGEm.NET/2197a9a6200a1cc4cbefc19e4ef6c9bbb63ff567/ViGEmClient/costura64/ViGEmClient.dll",
+  "upstreamCommit": "2197a9a6200a1cc4cbefc19e4ef6c9bbb63ff567",
+  "note": "User-mode client only. Requires separately installed ViGEmBus driver. Driver installation is never automatic; upstream retired in 2023.",
+  "bytes": 141312
+}
