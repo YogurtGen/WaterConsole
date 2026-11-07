@@ -46,7 +46,7 @@
       type="font/woff2"
       crossorigin
     />
-    <link rel="stylesheet" href="site.css" />
+    <link rel="stylesheet" href="site.css?v=support-cta" />
     <script src="site.js" defer></script>
   </head>
   <body>
@@ -91,8 +91,13 @@
             ><svg class="icon" aria-hidden="true">
               <use href="#i-download" /></svg
             >Download for Windows</a
-          ><a class="button secondary" href="#preview"
-            >Take a look <span aria-hidden="true">↓</span></a
+          ><a
+            class="button secondary support"
+            href="https://yapp.ink/fensulix"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><svg class="icon" aria-hidden="true"><use href="#i-heart" /></svg
+            >Support WaterConsole<span aria-hidden="true">↗</span></a
           >
         </div>
         <div class="hero-meta hero-in">
@@ -500,12 +505,23 @@
         <p class="kicker">ONE LOCAL CONSOLE. A SHARED START.</p>
         <h2>Let's get everyone<br />on the same screen.</h2>
         <p>Free to download. Free to change. Free to build on.</p>
-        <a
-          class="button primary"
-          href="https://github.com/YogurtGen/WaterConsole/releases/latest"
-          ><svg class="icon" aria-hidden="true"><use href="#i-download" /></svg
-          >Download WaterConsole</a
-        >
+        <div class="download-actions">
+          <a
+            class="button primary"
+            href="https://github.com/YogurtGen/WaterConsole/releases/latest"
+            ><svg class="icon" aria-hidden="true">
+              <use href="#i-download" /></svg
+            >Download WaterConsole</a
+          >
+          <a
+            class="button secondary support"
+            href="https://yapp.ink/fensulix"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><svg class="icon" aria-hidden="true"><use href="#i-heart" /></svg
+            >Support WaterConsole<span aria-hidden="true">↗</span></a
+          >
+        </div>
         <div class="hero-meta">
           <span>Windows x64</span><i></i><span>Installer & portable ZIP</span>
         </div>
@@ -659,6 +675,11 @@
       <defs>
         <symbol id="i-download" viewBox="0 0 24 24">
           <path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4" />
+        </symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24">
+          <path
+            d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"
+          />
         </symbol>
         <symbol id="i-code" viewBox="0 0 24 24">
           <path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18" />

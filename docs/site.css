@@ -236,7 +236,8 @@ h1 > span {
   margin-top: 12px;
   line-height: 1.7;
 }
-.hero-actions {
+.hero-actions,
+.download-actions {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -281,6 +282,10 @@ h1 > span {
   border-color: #3b473e;
   background: #1b241e;
   color: #e1e9e1;
+}
+.button.support {
+  color: var(--mint);
+  border-color: #42634b;
 }
 .button.secondary:hover {
   background: #263329;
@@ -1109,7 +1114,7 @@ h3 {
   color: #acc6b4;
   margin-top: 20px;
 }
-.download-section > .button {
+.download-section > .download-actions {
   margin-top: 30px;
 }
 .download-section .hero-meta {
@@ -1730,7 +1735,7 @@ h3 {
     height: 49px;
     margin-bottom: 20px;
   }
-  .download-section > .button {
+  .download-section > .download-actions {
     margin-top: 24px;
   }
   .faq-section {
@@ -1807,7 +1812,15 @@ h3 {
     max-width: 285px;
     margin-inline: auto;
   }
-  .hero-actions .button {
+  .hero-actions,
+  .download-actions {
+    flex-direction: column;
+    width: min(100%, 320px);
+    margin-inline: auto;
+  }
+  .hero-actions .button,
+  .download-actions .button {
+    width: 100%;
     padding-inline: 13px;
   }
   .hero-actions .button.secondary {
