@@ -1,11 +1,11 @@
-# Proposed WaterConsole game and controller builder
+# WaterConsole game and controller builder specification
 
-**Planning only. These features are not part of the current Core download.**
+Core 0.3.0 includes the first working implementation. [Shipped feature guide](../CONTROLLER-STUDIO.md) · [Validation and remaining limits](../releases/0.3.0.md).
 
 - [Product Requirements Document](PRD-GAME-BUILDER.md): Add Game, crops, tags, Controller Studio, themes, shapes, analog/drag, grids, responsive fitting, native input and release gates.
 - [UI wireframe](UI-WIREFRAMES.svg): original placement study for Home/library and Controller Studio.
 - [Icon research](CONTROLLER-ICON-CATALOG.md) and [verified metadata seed](controller-icon-catalog.json).
 
-The next step is feasibility/design review, followed by the staged implementation in the PRD. No new installer release is created by this planning update.
+The PRD preserves wider design targets and future extensions; it is not a claim that manual hardware/usability targets have been measured.
 
 ![Proposed Home library and Controller Studio layout](UI-WIREFRAMES.svg)

@@ -167,6 +167,7 @@ internal sealed class VirtualGamepad : IDisposable
         if (acceptFeedback) Interlocked.Exchange(ref motors, largeMotor | (smallMotor << 8));
     }
     public int ReadMotors() { return Interlocked.CompareExchange(ref motors, 0, 0); }
+    public void WantReport(Report report) { wanted = report; }
     public void Apply() { Submit(wanted); }
     public void Reset() { wanted = new Report(); Interlocked.Exchange(ref motors, 0); Submit(wanted); }
     void Fail(string error)

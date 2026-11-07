@@ -1,12 +1,12 @@
 # PRD — Game Library Builder and Controller Studio
 
-**Status:** Draft proposal; not implemented or included in the current download.
+**Status:** Implemented baseline for Core 0.3.0. This document retains the broader design targets; see [the shipped feature guide](../CONTROLLER-STUDIO.md) and [validation/remaining limits](../releases/0.3.0.md) for the exact release scope.
 
 **Document version:** 0.1 · 7 November 2026.
 
 **Baseline:** WaterConsole Core 0.2.0; source baseline `6d01b08`.
 
-**Proposed milestone:** 0.3, subject to the release gates below.
+**Release milestone:** 0.3.0. Physical-device and first-time usability targets remain separate manual validation.
 
 **Product language:** English. Local operation, no PHP, no AI subscription required.
 

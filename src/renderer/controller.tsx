@@ -1,3 +1,4 @@
+import {StudioPhone} from "./studio-phone";
 import {
   useCallback,
   useEffect,
@@ -103,6 +104,7 @@ function ControllerApp() {
   }, []);
   const sendInput = useCallback(() => {
     const s = current.current;
+    if(s?.studio)return;
     if (
       !s ||
       !enteredRef.current ||
@@ -885,6 +887,7 @@ function ControllerApp() {
         </footer>
       </main>
     );
+  if(state.studio)return <StudioPhone state={state} player={player} token={token} connection={connection} send={send} nextSequence={()=>seq.current++} haptics={haptics} error={error} onFullscreen={()=>{neutral();if(document.fullscreenElement)void document.exitFullscreen().catch(()=>{});else void enter();}}/>;
   return (
     <main
       className={`phone-controller ${nativeProfile ? "profile-lab profile-gamepad" : `profile-${state.profile}`}`}

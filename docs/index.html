@@ -46,7 +46,7 @@
       type="font/woff2"
       crossorigin
     />
-    <link rel="stylesheet" href="site.css?v=support-cta" />
+    <link rel="stylesheet" href="site.css?v=studio-030" />
     <script src="site.js" defer></script>
   </head>
   <body>
@@ -363,10 +363,10 @@
             <span class="feature-icon"
               ><svg class="icon" aria-hidden="true"><use href="#i-code" /></svg
             ></span>
-            <h3>A foundation to build on.</h3>
+            <h3>Your games. Your controls.</h3>
             <p>
-              MIT-licensed source, extension contracts, an adapter template, and
-              practical guides for your next game integration.
+              Add an installed game, crop its cover and banner, and design your
+              phone controller visually. Source and AI extensions stay available.
             </p>
           </article>
         </div>
@@ -452,6 +452,13 @@
         </div>
       </section>
 
+      <section class="section wrap reveal studio-release" aria-labelledby="studio-release-title">
+        <p class="kicker">NEW IN 0.3 · NO PAID AI REQUIRED</p>
+        <h2 id="studio-release-title">Make the controller yours.</h2>
+        <p>Add your installed game, crop its cover and banner, then arrange controls, colors and linked actions in Controller Studio. Specialized source integrations remain available.</p>
+        <img src="media/controller-studio.png" alt="WaterConsole Controller Studio showing editable racing controls, grid and appearance inspector in a documentation fixture" loading="lazy" width="1440" height="900" />
+      </section>
+
       <section id="build" class="build-section section wrap reveal">
         <div class="build-art" aria-hidden="true">
           <span class="code-label">YOUR NEXT INTEGRATION</span>
@@ -467,9 +474,9 @@
           <p class="kicker">OPEN SOURCE, FROM THE START</p>
           <h2>Make room<br />for your ideas.</h2>
           <p>
-            This public edition is the raw console foundation, with Controller
-            Lab included. Add games through your own controller profiles and
-            adapters.
+            Add your own installed games without code or a paid AI subscription.
+            Controller Studio lets you shape buttons, link actions, choose icons
+            and tune colors for every player. Only Controller Lab is bundled.
           </p>
           <p>
             Use the contributor guide yourself, or give it to Codex or Claude
@@ -557,8 +564,8 @@
             </summary>
             <p>
               Controller Lab is the only built-in entry in the public edition.
-              It tests controllers and viewports. Other games need a separately
-              developed adapter and an installation you are entitled to use. See
+              It tests controllers and viewports. Add an installation you are entitled
+              to use through Add Game, or build a specialized source adapter. See
               the
               <a
                 href="https://github.com/YogurtGen/WaterConsole/blob/main/docs/ADDING-GAMES.md"
@@ -589,7 +596,7 @@
               No separate phone app is needed. Open the local controller in your
               browser. Vibration is opt-in and uses your browser's Vibration API
               where supported. Touch feedback is distinct from game rumble;
-              native rumble needs an adapter and may need optional PC gamepad
+              native rumble needs a supported gamepad callback and optional PC gamepad
               tools.
             </p>
           </details>

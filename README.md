@@ -8,9 +8,9 @@
 
 Turn your Windows PC into a local console. Connect up to four phones, approve them on the big screen, and play together on your own network.
 
-**WaterConsole Core** is the free, MIT-licensed foundation: the console interface, PC-approved pairing flow, touch controllers, vibration controls, and Controller Lab. Bring your own games and build adapters when you are ready. No account, subscription, cloud backend, or internet connection is needed to run the installed core.
+**WaterConsole Core** is the free, MIT-licensed foundation: the console interface, PC-approved pairing flow, touch controllers, vibration controls, and Controller Lab. Add your installed games with the visual Game Builder and Controller Studio, or write a specialized adapter when you need one. No account, subscription, cloud backend, or internet connection is needed to run the installed core.
 
-[**Download for Windows**](https://github.com/YogurtGen/WaterConsole/releases/latest) · [**Website**](https://yogurtgen.github.io/WaterConsole/) · [Installation](docs/INSTALL.md) · [Add a game with AI](docs/ADDING-GAMES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
+[**Download for Windows**](https://github.com/YogurtGen/WaterConsole/releases/latest) · [**Website**](https://yogurtgen.github.io/WaterConsole/) · [Installation](docs/INSTALL.md) · [Add your games](docs/ADDING-GAMES.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ![WaterConsole Home with the built-in Controller Lab](docs/media/home.png)
 
@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.2.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.2.0/WaterConsole-Core-Setup-0.2.0-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.2.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.2.0/WaterConsole-Core-0.2.0-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.2.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.2.0/WaterConsole-Core-Source-0.2.0.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.2.0/WaterConsole-Optional-Controller-Tools-0.2.0.zip) | Native adapter development only; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.2.0/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-Setup-0.3.0-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-0.3.0-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-Source-0.3.0.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Optional-Controller-Tools-0.3.0.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## What is included
 
@@ -34,6 +34,10 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 - **Controller Lab:** inspect buttons and movement in shared, two-viewport, or four-viewport layouts. The directional pad supports dragging between directions and simultaneous button presses.
 - **Per-phone vibration:** an on/off preference, a Test button, and bounded touch feedback on supported browsers. An extension can forward real native game rumble.
 - **Local operation:** bundled fonts, graphics, audio synthesis, and scripts; an app-managed HTTP/WebSocket server; reconnect and input recovery.
+- **Add your games without code or paid AI:** pick an original `.exe`, edit title/description/tags and player/connection labels, and upload separate cover/banner artwork with reversible crops.
+- **Controller Studio:** Menu/Standard/Fight/Race presets, draggable analog and cross D-pad, adjustable shapes/sizes/colors, 6,257 offline icons, text/images, grid/snap, undo, player themes, and safe phone previews.
+- **A guide when you need it:** skippable spotlight tutorials for setup, crop and controller design, with a **?** button to replay.
+- **Linked actions:** hold Drift + Throttle from one button, keep separately held sources active, and let each phone choose Classic or Assisted.
 - **An extension foundation:** semantic input contracts, an empty native adapter registry, and an optional Windows virtual-gamepad toolkit.
 
 Only **Controller Lab** ships. Commercial games, launchers, game binaries, extracted artwork, and game-specific adapters are not included. Selecting a display mode does not add split-screen support to another game.
@@ -45,7 +49,7 @@ Only **Controller Lab** ships. Commercial games, launchers, game binaries, extra
 3. Scan the current QR code on the PC. Enter your name, compare the verification code, and approve the request on the PC.
 4. On the phone, tap **Enter controller**. Open Controller Lab and try the directions, buttons, and layouts.
 
-The installed app includes Electron and its runtime. **Players do not need Node.js, Git, an AI subscription, or a gamepad driver.** See the [download checklist](docs/INSTALL.md#what-to-download) for developer and optional native tools.
+The installed app includes Electron and its runtime. **Controller Lab players do not need Node.js, Git, an AI subscription, or a gamepad driver.** Added PC games may need optional virtual-gamepad support. See the [download checklist](docs/INSTALL.md#what-to-download) for developer and optional native tools.
 
 <details>
 <summary><strong>More of the interface</strong></summary>
@@ -88,11 +92,15 @@ Automated browser checks cannot establish physical vibration, Android fullscreen
 
 ## Extend your console
 
+Use **Add game** next to the library search, then **Open Controller Studio**. Read the [visual editor guide](docs/CONTROLLER-STUDIO.md) for crops, modes, linked actions and local data.
+
 Read [ADDING-GAMES.md](docs/ADDING-GAMES.md) for the file map, adapter lifecycle, touch layout guidance, haptics, and ready-to-paste prompts for **Codex** or **Claude Code**. `AGENTS.md` and `CLAUDE.md` keep coding agents aligned with the project.
 
 A native integration must launch the user's own installation, provide tested input mappings, and release every held input when focus or a connection is lost. A card in the library alone does not make a game playable. Optional AI services have their own installation, account, network, and billing requirements; WaterConsole itself has no AI dependency.
 
-**Proposed next feature:** [Add Game and Controller Studio PRD](docs/planning/PRD-GAME-BUILDER.md), with custom library artwork and visual phone-controller editing. This is a design proposal, not a feature in the current download.
+![WaterConsole Controller Studio with configurable game controls](docs/media/controller-studio.png)
+
+[Product specification](docs/planning/PRD-GAME-BUILDER.md) · [0.3 validation and remaining limits](docs/releases/0.3.0.md)
 
 ## Network and device limits
 

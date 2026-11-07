@@ -69,7 +69,7 @@ async function launchDesktop() {
   desktop = await _electron.launch({
     executablePath,
     args: [
-      ...(process.env.WATERCONSOLE_EXECUTABLE ? [] : ["."]),
+      ...(process.env.WATERCONSOLE_APP_ROOT ? [process.env.WATERCONSOLE_APP_ROOT] : process.env.WATERCONSOLE_EXECUTABLE ? [] : ["."]),
       "--force-device-scale-factor=1",
     ],
     env,
@@ -164,6 +164,7 @@ try {
     "command",
     "getFullscreen",
     "getState",
+    "library",
     "minimize",
     "onState",
     "quit",

@@ -4,7 +4,7 @@ WaterConsole is an English-language, MIT-licensed Windows console foundation. Wo
 
 ## Product scope
 
-Only Controller Lab ships. Preserve QR pairing and PC approval, four phone slots, Home/library/search/favorites/recent, local navigation audio, fullscreen, independent multi-touch, draggable directions, input recovery and per-phone Vibration/Test. Native adapters are empty by default. A manifest alone does not make a game playable. Player limits and shared/split-screen layouts must follow each runtime's actual capability.
+Only Controller Lab ships. Preserve QR pairing and PC approval, four phone slots, Home/library/search/favorites/recent, local navigation audio, fullscreen, independent multi-touch, draggable directions, input recovery and per-phone Vibration/Test. The developer adapter registry is empty by default; the reviewed user-configured runtime supports local PC entries. Preserve both no-code and source/AI routes. A manifest alone does not make a game playable. Player limits and shared/split-screen layouts must follow each runtime's actual capability.
 
 Public presentation: WaterConsole. Slogan: **Playing together should be free.** Palette: mint green and dark gray. Product UI is English. Core has its own app ID and settings profile. Keep every runtime font, script and asset local; no CDN/account dependency for installed core features.
 
@@ -25,3 +25,13 @@ The stack is Electron, React/TypeScript, Vite, Fastify/ws and an optional C# gam
 Use npm run setup for dependencies; project commands route caches/temp through scripts/run-local.mjs. Source is in src/, original assets in assets/, help/site in docs/, generic native sources in toolkit/native/, installers in Setup/ and other artifacts in releases/<version>/. Do not move generated files to a different drive. Gitignore and the source ZIP allowlist must both exclude private/generated additions.
 
 For code changes run npm run typecheck, npm test and npm run build, then npm run test:e2e when host/phone flows change. Native mapping changes also need npm run test:native; it opens no game/device. Run appropriate focused checks once and broaden only for a new concern. Report the actual evidence and remaining limits. Browser mocks cannot prove physical vibration, Android fullscreen, four real phones, sustained Wi-Fi RTT, clean-machine installation or native game compatibility.
+
+## Add games and custom controllers with AI
+
+Read [docs/ADDING-GAMES.md](docs/ADDING-GAMES.md) and [docs/CONTROLLER-STUDIO.md](docs/CONTROLLER-STUDIO.md). The GUI is a complete alternative for users without an AI subscription; do not remove it when adding specialized source integrations. Reserve `local-*` IDs for validated library records. Source adapters use their own explicit IDs and factories; never redirect every game through one genre mapping.
+
+Use declarative ControllerDefinition profiles when their controls/actions are sufficient. For specialized UI/telemetry/launchers, isolate the adapter/profile, add allowed semantic actions and a safe phone layout, and keep private bindings on PC. Phones never get native keycodes or executable paths. UserBridge v2 is separate from the original semantic toolkit. Do not load JS/DLL plugins from library records.
+
+Linked actions are simultaneous holds: a source can hold Accelerate + Drift, while releasing it must preserve Accelerate if another source still holds it. Use the existing union engine; no last-event-wins, timed macros, automatic repeats, or global keyboard shortcuts. Preserve per-slot true analog values.
+
+Record menu and gameplay bindings separately, actual player limits, the multiplayer menu route, offline evidence, launcher requirements, focus/watchdog recovery, and clean stop. Reuse per-phone Vibration/Test and slot/epoch rumble gates. Test native input with an owned lightweight fixture before opening a third-party game. Do not claim physical-phone vibration or real-game compatibility from browser mocks.

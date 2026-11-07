@@ -65,3 +65,19 @@ Closing stdin releases only helper-owned devices. The adapter remains responsibl
 `assets/native/vigem/` contains the pinned MIT ViGEmClient DLL, full license, source URL, commit and SHA-256. The client is not the driver. Native device creation additionally needs the third-party **ViGEmBus 1.22.0** system driver, whose upstream project was retired in 2023. It is a deliberate optional dependency, not part of base setup.
 
 `npm run tools:download` retrieves and verifies the exact official installer and its BSD-3-Clause license into `.local/optional-tools/`; it does **not** install it. The release's separate Optional Controller Tools ZIP carries that installer, compiled helper/client, provenance and notices. Read [INSTALL.md](../../docs/INSTALL.md) before choosing it. System installation requires the user's administrator approval. Never trigger installation over LAN or during tests.
+
+## User-configured runtime v2
+
+The build also bundles **WaterConsole.UserBridge.exe** for Add Game / Controller Studio. The original semantic v1 InputBridge above remains available to source adapters. They have different contracts; do not interchange them.
+
+PC-only launch arguments: `--pid 0|PID --exe ABSOLUTE_EXE_PATH --players 1..4 --backend keyboard|gamepad`. With PID 0, the helper prepares devices before the PC launches a game; trusted stdin then sends `{"type":"attach","pid":PID}`. The process executable must exactly match. `--find ABSOLUTE_EXE_PATH` lists matching local windows for the PC chooser; `--probe` checks capabilities; `--self-test` runs pure parser/mapping checks without creating a device. No network listener or shell execution is exposed.
+
+The PC resolves semantic actions and writes complete reports:
+
+```json
+{"type":"output","version":2,"epoch":1,"seq":0,"players":[{"slot":1,"buttons":["a"],"keys":[],"axes":{"lx":0.4,"ly":0,"rx":0,"ry":0,"lt":0,"rt":1}}]}
+```
+
+Exactly the configured number of distinct slots is required. Button names are bounded standard Xbox names; key names use the fixed source allowlist. Sticks are finite [-1,1], triggers [0,1]. Reports above 16 KiB, invalid fields, stale sequences and flooding are rejected/neutralized. An epoch change introduces a neutral barrier. The exact foreground process, 300 ms watchdog, EOF and helper failure release outputs. `focus` and normal `close` commands target only that verified process. Do not use these trusted-stdin commands as a LAN API.
+
+Rumble is slot/epoch-tagged from the real virtual-controller callback. The parent additionally checks game state and phone ownership. Keyboard output is a shared OS keyboard with held-source union, not four independent keyboard devices. The PC router coalesces four-phone updates before sending helper reports. No timing macros or arbitrary plugins are accepted.

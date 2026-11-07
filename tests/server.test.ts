@@ -952,3 +952,105 @@ describe("generic native extension boundary", () => {
     expect(server.getState().phase).toBe("home");
   });
 });
+
+// Draft previews use the same authenticated input path as saved profiles, without native injection.
+describe("Controller Studio sessions", () => {
+  it("keeps four approved preview inputs separate and clears them on watchdog and mode changes", async () => {
+    const { createController } = await import("../src/shared/studio-model");
+    const def = createController();
+    const players = [];
+    for (let i = 1; i <= 4; i++) {
+      const approved = await approve("Studio " + i);
+      players.push(await connect(approved.token));
+    }
+    expect(
+      server.previewController(
+        "local-00000000-0000-4000-8000-000000000001",
+        def,
+        "race",
+      ).ok,
+    ).toBe(true);
+    const combo = def.modes
+      .find((m) => m.id === "race")!
+      .controls.find((c) => c.variant === "assisted")!;
+    const epoch = server.getState().epoch;
+    for (const p of players)
+      p.socket.send(
+        JSON.stringify({
+          type: "studio-input",
+          version: 1,
+          epoch,
+          seq: 1,
+          input: {
+            revision: 1,
+            modeId: "race",
+            variant: "assisted",
+            pressed: [combo.id],
+            values: {},
+          },
+        }),
+      );
+    await waitUntil(() =>
+      server.getState().players.every((p) => p.studio?.pressed[0] === combo.id),
+    );
+    await waitUntil(() => server.getState().players.every((p) => !p.studio));
+    expect(
+      (await server.command({ type: "studioMode", modeId: "menu" })).ok,
+    ).toBe(true);
+    expect(server.getState().epoch).not.toBe(epoch);
+    expect(server.getState().players.every((p) => !p.studio)).toBe(true);
+  });
+  it("rejects stale or malformed profile revisions and keeps mode switching with the navigator", async () => {
+    const { createController } = await import("../src/shared/studio-model");
+    const def = createController();
+    const a = await approve("Navigator"),
+      b = await approve("Player");
+    const first = await connect(a.token),
+      second = await connect(b.token);
+    server.previewController(
+      "local-00000000-0000-4000-8000-000000000001",
+      def,
+      "race",
+    );
+    const denied = receive(second.socket, "error");
+    second.socket.send(
+      JSON.stringify({ type: "studio-mode", modeId: "fight" }),
+    );
+    expect((await denied).type).toBe("error");
+    expect(server.getState().studio?.modeId).toBe("race");
+    const closing = closed(first.socket);
+    first.socket.send(
+      JSON.stringify({
+        type: "studio-input",
+        version: 1,
+        epoch: server.getState().epoch,
+        seq: 1,
+        input: {
+          revision: 999,
+          modeId: "race",
+          variant: "assisted",
+          pressed: [],
+          values: {},
+        },
+      }),
+    );
+    expect(await closing).toBe(1008);
+    expect(server.getState().players.every((p) => !p.studio)).toBe(true);
+  });
+  it("does not allow a socket to send controller data before authentication", async () => {
+    const socket = openSocket();
+    await new Promise<void>((resolve) => socket.once("open", resolve));
+    const closing = closed(socket);
+    socket.send(
+      JSON.stringify({
+        type: "studio-input",
+        version: 1,
+        epoch: 1,
+        seq: 1,
+        input: {},
+      }),
+    );
+    expect(await closing).toBe(1008);
+    expect(server.getState().players).toHaveLength(0);
+  });
+});

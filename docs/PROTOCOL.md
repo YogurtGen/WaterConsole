@@ -74,3 +74,11 @@ The implementation rejects foreign Origin/Host values, unknown fields/types/acti
 Public assets are resolved within the real public directory; traversal must not access source, preferences, toolkit, or host files. Keep controller assets self-contained, CSP-compatible, and local.
 
 Native bridge JSON is a separate **desktop-only** contract documented in `toolkit/native/README.md`. Never pass its executable/process configuration through the phone protocol.
+
+## Controller Studio extension (0.3)
+
+The foundation protocol remains version 1. Approved phones may receive `SessionState.studio` with a sanitized declarative definition, active mode and preview flag; only the active mode's controls are transmitted. Native launch paths, private bindings and OS keys never appear in that definition.
+
+`studio-input` carries `{type,version:1,epoch,seq,input:{revision,modeId,variant,pressed,values}}`. IDs must exist in the active mode and chosen variant, analog values must be finite/bounded, sequence increases within the epoch, and the definition revision must match. Normal session/slot/focus/watchdog gates still apply. Preview accepts valid state for visual inspection without native injection. `studio-mode` requests a mode; only the Navigator may use it. PC library editing/crops/launch configuration stay behind restricted Electron IPC.
+
+Custom images are fetched from `/api/controller-assets/<sha256>` with the approved connected device's bearer token and only when referenced by its active definition. Paths are resolved/contained in managed image storage. Icon SVGs are trusted, pinned local assets; arbitrary user SVG is not accepted.

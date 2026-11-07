@@ -1,3 +1,4 @@
+import type { ArtworkSlot, ControllerDefinition, StudioInput, StudioSession, LibraryCommand, LibraryResult } from "./studio-model";
 export const PROTOCOL_VERSION = 1 as const;
 export const COLORS = ["#32e49e", "#55a5ff", "#ffb95e", "#cf88ff"] as const;
 export const ACTIONS = [
@@ -39,7 +40,8 @@ export interface GameManifest {
   launchRequirement?: { label: string; description: string };
   offlineNote?: string;
   requiresGamepad?: boolean;
-  connection?: "online" | "offline-online";
+  connection?: "offline" | "online" | "offline-online";
+  local?: boolean; tags?: string[]; cover?:ArtworkSlot; banner?:ArtworkSlot; setup?:string;
 }
 export const GAMES: GameManifest[] = [
   {
@@ -124,7 +126,7 @@ export interface NativeRumble {
 export interface NativeInputSnapshot {
   epoch: number;
   controls: NativeControls;
-  players: Array<{ slot: number; buttons: Action[] }>;
+  players: Array<{ slot: number; buttons: Action[]; studio?:StudioInput }>;
 }
 export interface InputFrame {
   type: "input";
@@ -135,6 +137,7 @@ export interface InputFrame {
   axes: { x: number; y: number };
 }
 export interface Player {
+  studio?:StudioInput;
   id: string;
   slot: number;
   name: string;
@@ -154,6 +157,7 @@ export interface Preferences {
   networkAddress?: string;
 }
 export interface SessionState {
+  catalog?: GameManifest[]; studio?:StudioSession;
   version: 1;
   epoch: number;
   phase: Phase;
@@ -216,7 +220,8 @@ export type HostCommand =
   | { type: "toggleFavorite"; gameId: string }
   | { type: "toggleMute" }
   | { type: "setNetwork"; address: string }
-  | { type: "navigate"; action: Action };
+  | { type: "navigate"; action: Action }
+  | { type:"studioMode"; modeId:string };
 export interface CommandResult {
   ok: boolean;
   error?: string;
@@ -224,6 +229,7 @@ export interface CommandResult {
 export interface HostBridge {
   getState(): Promise<HostState>;
   command(command: HostCommand): Promise<CommandResult>;
+  library?(command:LibraryCommand):Promise<LibraryResult>;
   onState(listener: (state: HostState) => void): () => void;
   toggleFullscreen(): Promise<boolean>;
   getFullscreen(): Promise<boolean>;
@@ -233,6 +239,8 @@ export interface HostBridge {
 export type ClientMessage =
   | { type: "auth"; version: 1; token: string }
   | InputFrame
+  | {type:"studio-input";version:1;epoch:number;seq:number;input:StudioInput}
+  | {type:"studio-mode";modeId:string}
   | { type: "rename"; name: string }
   | { type: "ready"; ready: boolean }
   | { type: "nav"; action: ToolbarAction; query?: string }

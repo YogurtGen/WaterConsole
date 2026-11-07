@@ -75,3 +75,5 @@ await writeFile(
 console.log(
   `Included license notices for ${packages.length} runtime packages.`,
 );
+
+await writeFile("build/notices/Tabler-Icons-LICENSE.txt",await readFile("assets/public/assets/controller-icons/LICENSE.txt"));

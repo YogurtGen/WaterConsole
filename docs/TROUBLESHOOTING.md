@@ -102,3 +102,16 @@ verified results separately from physical-device/game checks I still need to run
 ```
 
 For suspected vulnerabilities, use the reporting route in [SECURITY.md](../SECURITY.md) rather than publishing a working exploit or secrets in an ordinary issue.
+
+## Added game or custom controller
+
+- **Saved but not playable:** open Edit game and verify the original executable/working directory. A card or checkmark does not make an unsupported game compatible. For a launcher-owned process, choose Connect to a game I open myself and select the matching window.
+- **Menus work, gameplay does not:** select the matching gamepad inside the original game. Compare the player's Menu and gameplay bindings in Studio. Confirm the PC output backend and each slot's actual device; never broadcast all phones into P1.
+- **A combined action releases unexpectedly:** inspect While held, also hold… and each action's PC output for the current player/mode. The union engine preserves other held sources; reproduce in safe phone preview and check for profile/focus/connection resets.
+- **Layout does not fit:** use the Studio device previews and actual phone, rotate/fullscreen, reduce controls or create a simpler mode. The fit fallback deliberately avoids clipped or microscopic controls.
+- **Color differs between players:** base → mode → Navigator/Other-player → P1–P4 → selected-control overrides apply. Reset a more specific override to inherit. PC preview has its own theme; it is not the Navigator phone.
+- **Artwork missing:** restore the complete library folder including images, not only catalog.json. Use Re-crop from its normalized source or replace the file. Keep cover and banner separate. A different manual ratio can leave letterboxing with Fit.
+- **Native helper stopped:** controls neutralize automatically. Close the owned game normally on PC, then choose Return Home again. Do not kill unrelated games or delete their settings. Reinstall the matching app version if its helper/client is missing.
+- **Restore a backup:** close WaterConsole, copy the whole library folder somewhere safe, then inspect catalog.previous.json and preserved recovery files. Do not overwrite the only copy of images or a working catalog. The app can load a validated previous catalog after corruption.
+
+For an AI-assisted fix, include the WaterConsole version, selected mode/variant/backend, affected player slots, exact held combination, reproduction steps and sanitized errors. Omit personal paths, live invitations/tokens and commercial media. Ask it to read AGENTS.md and reproduce the issue before editing either controller route.

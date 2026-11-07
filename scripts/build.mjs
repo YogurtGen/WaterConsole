@@ -37,5 +37,6 @@ await Promise.all([
   }),
   viteBuild(),
 ]);
+if(process.platform==="win32")await import("./build-native.mjs");
 await import("./notices.mjs");
 console.log("Built offline host, controller, and local server.");

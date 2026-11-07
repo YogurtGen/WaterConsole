@@ -4,6 +4,12 @@ WaterConsole Core ships **Controller Lab only**. This guide describes building a
 
 Read [AGENTS.md](../AGENTS.md), [SECURITY.md](../SECURITY.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [PROTOCOL.md](PROTOCOL.md) first. Keep launch paths and input injection on the trusted PC. Never accept shell commands, executable paths, arbitrary Windows keycodes, or driver installation requests from a phone.
 
+## Two ways to add games
+
+**No code / no paid AI:** click **Add game** beside the Home library search. Choose your own installation, edit its metadata/artwork and configure controls in Controller Studio. Follow [the visual editor guide](CONTROLLER-STUDIO.md). The app bundles the generic PC helper; virtual gamepads need separately installed optional support. A saved entry remains **Ready to test** until you record gameplay observations.
+
+**Source / AI:** keep reading for specialized launchers, custom phone interfaces, game-specific behavior or verified feedback sources. Codex and Claude Code remain optional. The user-configured runtime and specialized adapters coexist; do not replace one with the other.
+
 ## Before writing code
 
 Record the following in a short integration note. Use **unknown** when something has not been tested.
@@ -28,6 +34,9 @@ Do not bypass game authentication, DRM, anti-cheat, or platform checks. If norma
 | `src/server/index.ts` | Authoritative slots, pairing/authorization, profile validation, sequence/epoch handling, input recovery, and session routing. |
 | `src/server/entry.ts` | Server utility-process IPC. |
 | `src/electron/adapters.ts` | **Empty by default:** explicit native adapter registration and desktop-only adapter contract. |
+| `src/electron/native-router.ts`, `library-store.ts`, `library-ipc.ts` | Generic local-game routing, private catalog, images and restricted PC editor IPC. |
+| `src/shared/studio-model.ts`, `studio-validation.ts`, `studio-engine.ts` | Versioned declarative controls, allowlisted bindings, held-source unions, themes and responsive geometry. |
+| `src/renderer/studio-surface.tsx`, `controller-studio.tsx` | Shared safe touch runtime and PC visual editor. |
 | `src/electron/native-game.ts` | Desktop native-runtime facade and registered adapter lifecycle. |
 | `src/electron/main.ts`, `preload.ts` | Restricted host bridge, desktop lifecycle, and trusted IPC. |
 | `src/renderer/host.tsx` | Host library, game detail, Controller Lab, and session management. |
@@ -177,3 +186,11 @@ run meaningful input/recovery tests; do not change unrelated game bindings.
 - `npm run typecheck`, `npm test`, `npm run build`, and relevant e2e checks pass; physical-device/game tests are recorded separately.
 
 Keep a general-purpose adapter framework separate from private game configuration. Publishing an integration does not give permission to redistribute its game.
+
+## Declarative profiles and the user-configured helper
+
+`local-*` records are managed by the PC library and validated against `studio-model.ts` / `studio-validation.ts`. Do not hand-edit a live catalog. Prototype a declarative profile in Studio or create it in an isolated fixture; apply it through the same validated PC save path. A phone receives only the sanitized active controller definition, never launch paths, arguments or bindings.
+
+`WaterConsole.UserBridge.exe` uses a separate **v2** private stdin contract with complete standard button/axis/key reports. It is built alongside the v1 semantic `InputBridge`, not substituted for it. Read [the native contract](../toolkit/native/README.md#user-configured-runtime-v2). Keep output coalescing, the neutral epoch barrier, process/foreground validation, EOF/watchdog cleanup and independent devices. Do not make a gamepad label promise a virtual PlayStation device.
+
+For a custom AI-built controller, ask the agent to preserve both development paths, inspect `AGENTS.md`, list the intended semantic actions and per-player outputs, implement the smallest isolated profile/adapter, and demonstrate real held combinations and recovery. Include a compatibility note and avoid shipping the user's commercial art or executable.

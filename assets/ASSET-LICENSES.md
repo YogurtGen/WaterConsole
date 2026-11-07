@@ -24,3 +24,7 @@ When adding an asset, record its exact source/creator, license, any required att
 `assets/native/vigem/SOURCE.json` pins ViGEmClient **1.21.231.0**, upstream commit, Windows x64 architecture, and SHA-256. The sibling `LICENSE` is part of its distribution. Check the hash before replacing the binary; update source, license, and hash together.
 
 The optional driver archive has its own provenance and checksums. A checksum establishes file integrity relative to a published value; it does not extend upstream support or replace publisher-signature review. [ViGEmBus upstream](https://github.com/nefarius/ViGEmBus) is archived; the driver was retired in November 2023.
+
+## Offline controller icons
+
+`assets/public/assets/controller-icons/` bundles 6,257 Tabler icons (outline and filled), MIT, copyright Paweł Kuna. Source is pinned to upstream commit `ed177a085b652fe04ec4f37ced867c94621e7840`; exact provenance and the complete license are in `SOURCE.json` and `LICENSE.txt` beside the icons. Catalog aliases/categories are local editor metadata. SVG paths were checked for executable/external content; arbitrary uploaded SVG is not accepted. Icons work offline.

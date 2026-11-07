@@ -18,6 +18,7 @@ for (const file of [driver, "ViGEmBus-LICENSE.txt", "ViGEmBus-SOURCE.json"])
   await copyFile(path.join(source, file), path.join(stage, file));
 for (const file of [
   "WaterConsole.InputBridge.exe",
+  "WaterConsole.UserBridge.exe",
   "ViGEmClient.dll",
   "ViGEmClient-LICENSE.txt",
   "ViGEmClient-SOURCE.json",
@@ -26,7 +27,7 @@ for (const file of [
 await copyFile("LICENSE", path.join(stage, "WaterConsole-LICENSE.txt"));
 await writeFile(
   path.join(stage, "README.txt"),
-  `WaterConsole optional native controller tools ${version}\n\nNot required for Controller Lab or phone touch vibration.\nNo game integrations are included. Developers must implement and verify an adapter.\n\nViGEmBus 1.22.0 is a third-party Windows system driver retired upstream in 2023.\nInstall only if you need compatible virtual Xbox controllers and accept that legacy dependency.\nThe signed upstream installer requires administrator approval. Nothing installs automatically.\nReview ViGEmBus-LICENSE.txt and ViGEmBus-SOURCE.json first.\n\nViGEmClient.dll is the MIT client library, not the bus driver.\nWaterConsole.InputBridge.exe provides a standard semantic gamepad transport.\nIt never launches a game, has no network listener, checks exact PID/executable and foreground focus,\nneutralizes after 300 ms, and routes per-slot/epoch motor feedback.\n\nDocs: https://github.com/YogurtGen/WaterConsole/blob/main/docs/INSTALL.md\nAdapter guide: https://github.com/YogurtGen/WaterConsole/blob/main/docs/ADDING-GAMES.md\n`,
+  `WaterConsole optional native controller tools ${version}\n\nNot required for Controller Lab or phone touch vibration.\nNo game integrations are included. Use Add Game / Controller Studio or implement a specialized adapter; verify actual gameplay.\n\nViGEmBus 1.22.0 is a third-party Windows system driver retired upstream in 2023.\nInstall only if you need compatible virtual Xbox controllers and accept that legacy dependency.\nThe signed upstream installer requires administrator approval. Nothing installs automatically.\nReview ViGEmBus-LICENSE.txt and ViGEmBus-SOURCE.json first.\n\nViGEmClient.dll is the MIT client library, not the bus driver.\nWaterConsole.UserBridge.exe is the configured v2 keyboard/analog/gamepad helper, also bundled in the app.\nWaterConsole.InputBridge.exe provides a standard semantic gamepad transport for source adapters.\nIt never launches a game, has no network listener, checks exact PID/executable and foreground focus,\nneutralizes after 300 ms, and routes per-slot/epoch motor feedback.\n\nDocs: https://github.com/YogurtGen/WaterConsole/blob/main/docs/INSTALL.md\nAdapter guide: https://github.com/YogurtGen/WaterConsole/blob/main/docs/ADDING-GAMES.md\n`,
 );
 const output = path.resolve(
   "releases",

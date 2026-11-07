@@ -2084,3 +2084,5 @@ h3 {
     height: 44px;
   }
 }
+
+.studio-release>p:not(.kicker){max-width:780px;color:#aabdb1;line-height:1.8;margin:22px 0 32px}.studio-release>img{display:block;width:100%;height:auto;border:1px solid #3e6953;border-radius:18px;background:#122017;box-shadow:0 26px 80px #0004}

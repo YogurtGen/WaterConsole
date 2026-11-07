@@ -1,0 +1,300 @@
+import { _electron, expect } from "playwright/test";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
+import fs from "node:fs/promises";
+const root = process.cwd(),
+  output = path.join(root, ".local", "editor-test");
+await fs.mkdir(output, { recursive: true });
+execFileSync(
+  path.join(
+    process.env.WINDIR || "C:/Windows",
+    "Microsoft.NET/Framework64/v4.0.30319/csc.exe",
+  ),
+  [
+    "/nologo",
+    "/target:winexe",
+    "/platform:x64",
+    "/reference:System.Windows.Forms.dll",
+    "/reference:System.Drawing.dll",
+    "/reference:System.Web.Extensions.dll",
+    "/out:" + path.join(output, "WaterConsole.InputFixture.exe"),
+    path.join(root, "tests/fixtures/InputFixture.cs"),
+  ],
+  { windowsHide: true },
+);
+const data = output + "/ui-" + Date.now();
+const env = {
+  ...process.env,
+  WATERCONSOLE_TEST: "1",
+  WATERCONSOLE_WINDOWED: "1",
+  WATERCONSOLE_ADDRESS: "127.0.0.1",
+  WATERCONSOLE_DATA_DIR: data,
+  WATERCONSOLE_DISABLE_NATIVE: "1",
+};
+delete env.ELECTRON_RUN_AS_NODE;
+const executablePath =
+  process.env.WATERCONSOLE_EXECUTABLE || (await import("electron")).default;
+const appArgs = process.env.WATERCONSOLE_APP_ROOT
+  ? [process.env.WATERCONSOLE_APP_ROOT]
+  : process.env.WATERCONSOLE_EXECUTABLE
+    ? []
+    : [root];
+let app;
+const checks = [],
+  errors = [];
+try {
+  app = await _electron.launch({
+    executablePath,
+    args: [...appArgs, "--force-device-scale-factor=1"],
+    env,
+    timeout: 35000,
+  });
+  const page = await app.firstWindow();
+  page.on("pageerror", (e) => errors.push(e.message));
+  await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].setContentSize(1440, 900),
+  );
+  await page
+    .getByRole("button", { name: "Continue to Home", exact: true })
+    .click();
+  const art = await page.evaluate(() => {
+    const c = document.createElement("canvas");
+    c.width = 1600;
+    c.height = 1000;
+    const x = c.getContext("2d");
+    x.fillStyle = "#214734";
+    x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = "#83e8b3";
+    x.fillRect(0, 0, 800, 500);
+    return c.toDataURL("image/png").split(",")[1];
+  });
+  await fs.writeFile(output + "/art.png", Buffer.from(art, "base64"));
+  await page.getByRole("button", { name: "Add game", exact: false }).click();
+  await expect(
+    page.getByRole("heading", { name: "Add a game", exact: true }),
+  ).toBeVisible();
+  checks.push("Add Game opens on the actual host");
+  await expect(page.locator(".guide-card")).toBeVisible();
+  await expect(page.locator(".guide-card")).toContainText(
+    "Choose your own game",
+  );
+  await page
+    .getByRole("button", { name: "Skip tutorial", exact: true })
+    .click();
+  await expect(page.locator(".guided-tour")).toHaveCount(0);
+  checks.push("First-use spotlight can be skipped");
+  await page
+    .getByRole("button", { name: "Replay game setup guide", exact: true })
+    .click();
+  for (let i = 0; i < 3; i++)
+    await page
+      .locator(".guide-card")
+      .getByRole("button", { name: "Next", exact: true })
+      .click();
+  await expect(page.locator(".guide-card")).toContainText(
+    "Gamepad or keyboard?",
+  );
+  await expect(page.locator(".guide-highlight")).toHaveAttribute(
+    "data-guide-target",
+    '[data-guide="pc-output"]',
+  );
+  await page.locator('[data-guide="pc-output"]').selectOption("keyboard");
+  await expect(page.locator('[data-guide="pc-output"]')).toHaveValue(
+    "keyboard",
+  );
+  await page.locator('[data-guide="pc-output"]').selectOption("gamepad");
+  const location = await page.locator(".builder-storage small").innerText();
+  await page
+    .locator(".builder-storage small")
+    .evaluate((el) => (el.textContent = "Your chosen local data folder"));
+  await page.screenshot({ path: output + "/tutorial-output.png" });
+  await page
+    .locator(".builder-storage small")
+    .evaluate((el, text) => (el.textContent = text), location);
+  await page
+    .getByRole("button", { name: "Skip tutorial", exact: true })
+    .click();
+  await page.locator(".builder-steps button").nth(0).click();
+  checks.push(
+    "Question-mark replay explains output choice and allows the highlighted control to change",
+  );
+
+  await app.evaluate(({ dialog }, file) => {
+    dialog.showOpenDialog = async () => ({
+      canceled: false,
+      filePaths: [file],
+    });
+  }, output + "/WaterConsole.InputFixture.exe");
+  await page.getByRole("button", { name: "Browse .exe", exact: true }).click();
+  await expect(page.getByLabel("Game title", { exact: true })).toHaveValue(
+    "WaterConsole.InputFixture",
+  );
+  await page.getByLabel("Game title", { exact: true }).fill("My Fixture Game");
+  checks.push("Native picker stores a validated executable and editable title");
+  await page.locator(".builder-steps button").nth(1).click();
+  await page
+    .getByLabel("Description", { exact: true })
+    .fill("A local test setup, not a bundled game.");
+  await page.getByRole("button", { name: "Racing", exact: true }).click();
+  await page.getByLabel("Connection label").selectOption("offline");
+  await page.locator(".builder-steps button").nth(2).click();
+  await app.evaluate(({ dialog }, file) => {
+    dialog.showOpenDialog = async () => ({
+      canceled: false,
+      filePaths: [file],
+    });
+  }, output + "/art.png");
+  await page
+    .getByRole("button", { name: "Upload image", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "Crop cover", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".guide-card")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Skip tutorial", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Replay crop guide", exact: true })
+    .click();
+  for (let i = 0; i < 3; i++) {
+    await expect(page.locator(".guide-highlight")).toBeVisible();
+    await page
+      .locator(".guide-card")
+      .getByRole("button", { name: "Next", exact: true })
+      .click();
+  }
+  await page
+    .locator(".guide-card")
+    .getByRole("button", { name: "Finish", exact: true })
+    .click();
+  checks.push(
+    "Crop spotlight replays all four steps and finishes without applying a crop",
+  );
+  await expect(page.getByLabel("Crop ratio", { exact: true })).toHaveValue(
+    "recommended",
+  );
+  await expect(
+    page.getByRole("button", { name: "Use this crop", exact: true }),
+  ).toBeEnabled();
+  await page.screenshot({ path: output + "/crop-editor.png" });
+  await page
+    .getByRole("button", { name: "Use this crop", exact: true })
+    .click();
+  checks.push(
+    "Cover crop GUI defaults to its own recommended size and saves artwork",
+  );
+  await page.locator(".builder-steps button").nth(3).click();
+  await page
+    .getByRole("button", { name: "Open Controller Studio", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Controller Studio", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".guide-card")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".guide-card")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Controller Studio", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Replay controller studio guide",
+      exact: true,
+    })
+    .click();
+  for (let i = 0; i < 9; i++) {
+    await expect(page.locator(".guide-highlight")).toBeVisible();
+    await page
+      .locator(".guide-card")
+      .getByRole("button", { name: "Next", exact: true })
+      .click();
+  }
+  await page
+    .locator(".guide-card")
+    .getByRole("button", { name: "Finish", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  checks.push(
+    "Studio spotlight covers ten targets, replays and Escape dismisses only the guide",
+  );
+  await page.getByRole("button", { name: "Race", exact: true }).click();
+  await page.getByLabel("View", { exact: true }).selectOption("390x844");
+  await page.screenshot({ path: output + "/studio-phone-preview.png" });
+  await page.getByLabel("View", { exact: true }).selectOption("design");
+  await page.screenshot({ path: output + "/studio-default.png" });
+  checks.push("Studio opens with modes and device preview");
+  await page
+    .getByRole("button", { name: "Button", exact: false })
+    .filter({ hasText: "＋ Button" })
+    .click();
+  await page.getByLabel("Label / accessible name").fill("Inventory");
+  await page.getByLabel("Shape", { exact: true }).selectOption("triangle");
+  await page.getByLabel("Show", { exact: true }).selectOption("icon-text");
+  await page.getByRole("button", { name: "Choose icon", exact: false }).click();
+  await page.getByLabel("Search icons").fill("backpack");
+  await expect(
+    page.getByRole("button", { name: "backpack · outline", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "backpack · outline", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Use icon", exact: true }).click();
+  await page.getByLabel("Edit theme for").selectOption("navigator");
+  await page.getByLabel("Button fill HEX").fill("#235c44");
+  await page.getByLabel("Button fill HEX").blur();
+  await page.screenshot({ path: output + "/studio-editor.png" });
+  checks.push("Shapes, labels, offline icon search and Navigator colors edit");
+  await page
+    .getByRole("button", { name: "Save controller", exact: true })
+    .click();
+  await page.waitForTimeout(300);
+  const saved = await page.evaluate(() =>
+    window.waterconsole.library({ type: "list" }),
+  );
+  if (!saved.ok || saved.games.length !== 1)
+    throw new Error(JSON.stringify(saved));
+  if (saved.games[0].title !== "My Fixture Game")
+    throw new Error("Saved title mismatch");
+  checks.push("GUI setup persists through the restricted library API");
+  await page.getByRole("button", { name: "Game setup", exact: false }).click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(
+    page.getByRole("button", {
+      name: "Show My Fixture Game details",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.screenshot({ path: output + "/home-library.png" });
+  checks.push("Saved game appears in the dynamic Home catalog");
+  await page.getByRole("button", { name: "Add game", exact: false }).click();
+  await expect(
+    page.getByRole("heading", { name: "Add a game", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".guided-tour")).toHaveCount(0);
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  checks.push(
+    "Skipped first-use guide stays dismissed when the workspace reopens",
+  );
+  console.log(JSON.stringify({ checks, errors, data }, null, 2));
+  await fs.writeFile(
+    output + "/ui-result.json",
+    JSON.stringify({ checks, errors, data }, null, 2),
+  );
+  if (errors.length) process.exitCode = 1;
+} catch (error) {
+  console.error(error.stack);
+  if (app) {
+    const page = await app.firstWindow().catch(() => null);
+    if (page) {
+      console.error(
+        "Editor UI check failed; see the private failure screenshot.",
+      );
+      await page.screenshot({ path: output + "/failure.png" }).catch(() => {});
+    }
+  }
+  process.exitCode = 1;
+} finally {
+  await app?.close();
+}

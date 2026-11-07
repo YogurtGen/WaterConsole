@@ -1,6 +1,8 @@
+import {ASSET_ID,type ControllerDefinition,type StudioInput} from "../shared/studio-model";
+import {validateController,validStudioInput,controllerAssets} from "../shared/studio-validation";
 import Fastify, { type FastifyInstance } from "fastify";
 import { WebSocket, WebSocketServer } from "ws";
-import { randomBytes, randomInt, timingSafeEqual } from "node:crypto";
+import { randomBytes, randomInt, timingSafeEqual, createHash } from "node:crypto";
 import { networkInterfaces } from "node:os";
 import { readFile, mkdir, rename, writeFile, realpath } from "node:fs/promises";
 import path from "node:path";
@@ -104,6 +106,8 @@ export interface ServerOptions {
   dataDir: string;
   onState?: (state: HostState) => void;
   catalog?: readonly GameManifest[];
+  controllerDefinitions?:Record<string,ControllerDefinition>;
+  libraryAssetsDir?:string;
   initialNativeState?: NativeRuntimeState;
   onNativeCommand?: (command: NativeCommand) => Promise<CommandResult>;
   onNativeInput?: (snapshot: NativeInputSnapshot) => void;
@@ -124,7 +128,8 @@ interface PairRecord extends PairTicket {
 }
 
 export async function createWaterConsoleServer(options: ServerOptions) {
-  const catalog = options.catalog ?? GAMES;
+  let catalog = options.catalog ?? GAMES;
+  let definitions = options.controllerDefinitions ?? {};
   let preferences: Preferences = { favorites: [], recent: [], muted: false };
   const preferencesFile = path.join(options.dataDir, "preferences.json");
   try {
@@ -230,6 +235,8 @@ export async function createWaterConsoleServer(options: ServerOptions) {
   function publicSession(): SessionState {
     return structuredClone({
       ...state,
+      catalog:[...structuredClone(catalog)],
+      studio:state.studio?{...state.studio,definition:{...state.studio.definition,modes:state.studio.definition.modes.map(m=>({...m,controls:m.id===state.studio!.modeId?m.controls:[]}))}}:undefined,
       players: [...devices.values()].map((device) => device.player),
       serverTime: Date.now(),
     });
@@ -334,6 +341,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
     send(device.socket, { type: "haptics", epoch: state.epoch, durationMs });
   }
   function neutral(device: Device) {
+    device.player.studio = undefined;
     device.player.buttons = [];
     device.player.axes = { x: 0, y: 0 };
   }
@@ -358,6 +366,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
         );
         return {
           slot,
+          studio:live && device?.player.connected && now-device.lastInput<INPUT_TIMEOUT && nativeSlotAllowed(state.native,state.displayMode,slot)?device?.player.studio:undefined,
           buttons:
             live &&
             nativeSlotAllowed(state.native, state.displayMode, slot) &&
@@ -440,6 +449,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
       )
         changeEpoch();
       if (ended) {
+        state.studio = undefined;
         state.phase = "home";
         state.profile = "menu";
         relayNativeInput(true);
@@ -491,6 +501,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
     };
     state.phase = "home";
     state.profile = "menu";
+    state.studio = undefined;
     nativeStopping = false;
     return result;
   }
@@ -538,7 +549,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
         (state.libraryView !== "favorites" ||
           state.favorites.includes(game.id)) &&
         (state.libraryView !== "recent" || state.recent.includes(game.id)) &&
-        `${game.title} ${game.subtitle}`
+        `${game.title} ${game.subtitle} ${game.description} ${(game.tags??[]).join(" ")}`
           .toLowerCase()
           .includes(state.search.toLowerCase()),
     );
@@ -579,6 +590,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
       if (!stopped.ok) return stopped;
     }
     state.selectedGameId = game.id;
+    state.studio = definitions[game.id]?{definition:definitions[game.id],modeId:"menu",preview:false}:undefined;
     state.phase = game.runtime === "native" ? "native" : "lab";
     state.profile = game.controllerProfile;
     state.displayMode = game.displayModes[0] ?? "shared";
@@ -705,7 +717,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
       );
       reply.header(
         "Content-Security-Policy",
-        `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws://${address}:${port}; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`,
+        `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' ws://${address}:${port}; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`,
       );
       reply.header("Cache-Control", "no-store");
       if (request.headers.host !== expectedHost())
@@ -781,6 +793,13 @@ export async function createWaterConsoleServer(options: ServerOptions) {
       } catch {
         return reply.code(404).send();
       }
+    });
+    app.get("/api/controller-assets/:id",async(request,reply)=>{
+      const id=(request.params as {id:string}).id;const credential=request.headers.authorization?.replace(/^Bearer /,"");
+      const device=credential?[...devices.values()].find(d=>d.player.connected&&safeEqual(credential,d.token)):undefined;
+      if(!device||!state.studio||!ASSET_ID.test(id)||!controllerAssets(state.studio.definition).includes(id)||!options.libraryAssetsDir)return reply.code(404).send();
+      if(!useRate("asset:"+device.player.id,120,60000))return reply.code(429).send();
+      try{const root=await realpath(options.libraryAssetsDir),file=await realpath(path.join(root,id+".png"));if(!file.startsWith(root+path.sep))return reply.code(404).send();const bytes=await readFile(file);if(bytes.length>32*1024*1024||createHash("sha256").update(bytes).digest("hex")!==id)return reply.code(404).send();return reply.header("Cache-Control","private, max-age=3600").type("image/png").send(bytes);}catch{return reply.code(404).send();}
     });
     app.get("/api/public", async () => ({
       version: PROTOCOL_VERSION,
@@ -957,7 +976,18 @@ export async function createWaterConsoleServer(options: ServerOptions) {
           socket.close(1008, "Session ended");
           return;
         }
-        if (message.type === "input") {
+        if(message.type==="studio-input") {
+          if(!keys(message,["type","version","epoch","seq","input"])||message.version!==1||!Number.isSafeInteger(message.seq)||Number(message.seq)<0||!Number.isSafeInteger(message.epoch)) {socket.close(1008,"Invalid controller frame");return;}
+          if(message.epoch!==state.epoch||Number(message.seq)<=device.lastSeq)return;
+          const session=state.studio;
+          if(!session||!validStudioInput(message.input,session.definition,session.modeId)){socket.close(1008,"Controller changed; reload the current layout");return;}
+          device.lastSeq=Number(message.seq);device.lastInput=now;
+          if(!session.preview&&(state.phase!=="native"||nativeStopping||state.native.quitting||!state.native.focused||state.native.status!=="running"||!nativeSlotAllowed(state.native,state.displayMode,device.player.slot))){neutral(device);relayNativeInput();return;}
+          device.player.studio=structuredClone(message.input);needsPublish=true;relayNativeInput();
+        } else if(message.type==="studio-mode"&&keys(message,["type","modeId"])&&typeof message.modeId==="string") {
+          if(!device.player.canNavigate||!state.studio){send(socket,{type:"error",code:"not_navigator",message:"Only the navigator can switch game modes."});return;}
+          void command({type:"studioMode",modeId:message.modeId});
+        } else if (message.type === "input") {
           if (!validInputEnvelope(message)) {
             socket.close(1008, "Invalid input frame");
             return;
@@ -971,6 +1001,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
             socket.close(1008, "Invalid input frame");
             return;
           }
+          if(state.studio){neutral(device);return;}
           const frame = message as unknown as InputFrame;
           device.lastSeq = frame.seq;
           device.lastInput = now;
@@ -1271,6 +1302,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
           changeEpoch();
           break;
         case "openHome": {
+          endPreview();
           const stopped = await stopNativeGame();
           if (!stopped.ok) return stopped;
           state.phase = "home";
@@ -1357,6 +1389,14 @@ export async function createWaterConsoleServer(options: ServerOptions) {
             publish();
           }
           return result;
+        }
+        case "studioMode": {
+          const studio=state.studio;
+          const mode=studio?.definition.modes.find(m=>m.id===cmd.modeId);
+          if(!studio||!mode)return {ok:false,error:"Controller mode not found."};
+          studio.modeId=mode.id;changeEpoch();publish();
+          if(!studio.preview){const result=await invokeNative({type:"controls",mode:mode.purpose==="menu"?"menu":"game"});if(!result.ok)return result;}
+          break;
         }
         case "nativeControls": {
           if (state.phase !== "native" || !["menu", "game"].includes(cmd.mode))
@@ -1503,7 +1543,7 @@ export async function createWaterConsoleServer(options: ServerOptions) {
         now - device.lastInput >= INPUT_TIMEOUT &&
         (device.player.buttons.length ||
           device.player.axes.x ||
-          device.player.axes.y)
+          device.player.axes.y || device.player.studio)
       ) {
         neutral(device);
         relayNativeInput();
@@ -1569,7 +1609,23 @@ export async function createWaterConsoleServer(options: ServerOptions) {
   }, 5000);
   networkMonitor.unref();
   publish();
+  async function updateCatalog(next:GameManifest[],controllers:Record<string,ControllerDefinition>,assetsDirectory?:string) {
+    if(state.phase==="native")return {ok:false,error:"Stop the game before applying library edits."};
+    if(!Array.isArray(next)||!next.length||next.length>201||next.some(g=>!validGameId(g.id))||new Set(next.map(g=>g.id)).size!==next.length)return {ok:false,error:"Invalid local catalog."};
+    for(const def of Object.values(controllers))validateController(def);
+    if(assetsDirectory)options.libraryAssetsDir=assetsDirectory;
+    catalog=structuredClone(next);definitions=structuredClone(controllers);state.studio=undefined;state.profile="menu";
+    if(!catalog.some(g=>g.id===state.selectedGameId))state.selectedGameId=catalog[0].id;
+    preferences.favorites=preferences.favorites.filter(id=>catalog.some(g=>g.id===id));preferences.recent=preferences.recent.filter(id=>catalog.some(g=>g.id===id));state.favorites=[...preferences.favorites];state.recent=[...preferences.recent];changeEpoch();await persist();publish();return {ok:true};
+  }
+  function previewController(gameId:string,definition:ControllerDefinition,modeId:string){
+    if(state.phase==="native")return {ok:false,error:"Stop the game before opening a safe preview."};validateController(definition);
+    if(!validGameId(gameId)||!definition.modes.some(m=>m.id===modeId))return {ok:false,error:"Preview entry or mode not found."};
+    state.phase="home";state.profile="gamepad";state.studio={definition:structuredClone(definition),modeId,preview:true};changeEpoch();publish();return {ok:true};
+  }
+  function endPreview(){if(state.studio?.preview){state.studio=undefined;state.profile="menu";changeEpoch();publish();}return {ok:true};}
   return {
+    updateCatalog,previewController,endPreview,
     getState,
     command,
     updateNativeState,

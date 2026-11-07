@@ -1,3 +1,5 @@
+import {NativeRouter} from "./native-router";
+import {LibraryCoordinator} from "./library-ipc";
 import {
   app,
   BrowserWindow,
@@ -10,7 +12,7 @@ import {
   type UtilityProcess,
 } from "electron";
 import { readFile } from "node:fs/promises";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { CommandResult, HostCommand, HostState } from "../shared/types";
 import type { NativeCommand, NativeInputSnapshot } from "../shared/types";
@@ -43,7 +45,8 @@ let snapshot: HostState | null = null;
 let quitting = false;
 let requestId = 0;
 let startPromise: Promise<void> | null = null;
-let nativeGame: NativeGame | null = null;
+let nativeGame: NativeRouter | null = null;
+let library:LibraryCoordinator;
 const requests = new Map<
   number,
   {
@@ -65,7 +68,7 @@ const mime: Record<string, string> = {
   ".ico": "image/x-icon",
 };
 const csp =
-  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 
 function broadcast() {
   if (snapshot && window && !window.isDestroyed())
@@ -115,10 +118,13 @@ async function startService() {
       publicDir: path.join(app.getAppPath(), "build", "renderer"),
       dataDir: process.env.WATERCONSOLE_DATA_DIR || app.getPath("userData"),
       initialNativeState: nativeGame?.getState(),
+      ...library.config(),
     };
+    const configFile=path.join(app.getPath("userData"),"server-config.json");
+    writeFileSync(configFile,JSON.stringify(config),{mode:0o600});
     const child = utilityProcess.fork(
       path.join(app.getAppPath(), "build", "server", "entry.cjs"),
-      ["--config", JSON.stringify(config)],
+      ["--config-file", configFile],
       { stdio: "pipe", serviceName: "WaterConsole LAN server" },
     );
     service = child;
@@ -239,6 +245,9 @@ async function request(command?: HostCommand): Promise<unknown> {
   });
 }
 
+async function serviceCall(type:string,payload:Record<string,unknown>):Promise<any>{
+ if(!service)throw new Error("The local server is unavailable.");const id=++requestId;return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{requests.delete(id);reject(new Error("The library session did not respond."));},20000);requests.set(id,{resolve,reject,timer});service!.postMessage({type,id,...payload});});
+}
 function validSender(
   event: Electron.IpcMainInvokeEvent | Electron.IpcMainEvent,
 ) {
@@ -339,9 +348,11 @@ if (singleInstance)
           "native",
           "WaterConsole.InputBridge.exe",
         );
-    nativeGame = new NativeGame(
+    library=new LibraryCoordinator(()=>nativeGame,validSender,(catalog,definitions,assetsDirectory)=>serviceCall("catalog",{catalog,definitions,assetsDirectory}),(gameId,definition,modeId)=>serviceCall("studio-preview",{preview:{gameId,definition,modeId}}),()=>serviceCall("studio-preview-end",{}));
+    await library.initialize();library.register();
+    const legacyNative = new NativeGame(
       helperPath,
-      (state) => service?.postMessage({ type: "native-state", state }),
+      (state) => nativeGame?.legacyState(state),
       () => {
         if (!quitting && process.env.WATERCONSOLE_TEST !== "1")
           window?.minimize();
@@ -353,8 +364,13 @@ if (singleInstance)
           window.focus();
         }
       },
-      (feedback) => service?.postMessage({ type: "native-rumble", feedback }),
+      (feedback) => nativeGame?.legacyRumble(feedback),
     );
+    nativeGame=new NativeRouter(legacyNative,library.store,helperPath.replace("WaterConsole.InputBridge.exe","WaterConsole.UserBridge.exe"),
+      state=>service?.postMessage({type:"native-state",state}),
+      ()=>{if(!quitting&&process.env.WATERCONSOLE_TEST!=="1")window?.minimize();},
+      ()=>{if(!quitting&&window&&process.env.WATERCONSOLE_TEST!=="1"){window.restore();window.show();window.focus();}},
+      feedback=>service?.postMessage({type:"native-rumble",feedback}));
     await nativeGame.initialize();
     const rendererRoot = path.join(app.getAppPath(), "build", "renderer");
     const gameArtwork = await loadLocalGameArtwork(
@@ -367,6 +383,10 @@ if (singleInstance)
         if (url.hostname !== "app" || request.method !== "GET")
           return new Response("Not found", { status: 404 });
         const relative = decodeURIComponent(url.pathname).replace(/^\/+/, "");
+        if(relative.startsWith("user-assets/")){
+          const id=relative.slice("user-assets/".length);const bytes=await library.store.readAsset(id);
+          return new Response(new Uint8Array(bytes),{headers:{"Content-Type":"image/png","X-Content-Type-Options":"nosniff","Content-Security-Policy":csp,"Cache-Control":"private, max-age=3600"}});
+        }
         if (relative.startsWith("library-art/")) {
           const bytes = gameArtwork.get(relative);
           return bytes

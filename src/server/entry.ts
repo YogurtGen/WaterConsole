@@ -1,3 +1,4 @@
+import {readFile} from "node:fs/promises";
 import { createWaterConsoleServer, type ServerOptions } from "./index";
 import type {
   CommandResult,
@@ -70,9 +71,10 @@ process.on("disconnect", () => void shutdown());
 
 async function main() {
   try {
-    if (configIndex < 0 || !process.argv[configIndex + 1])
+    const fileIndex=process.argv.indexOf("--config-file");
+    if ((configIndex < 0 || !process.argv[configIndex + 1]) && (fileIndex<0||!process.argv[fileIndex+1]))
       throw new Error("Server configuration is missing.");
-    const config = JSON.parse(process.argv[configIndex + 1]) as ServerOptions;
+    const config = JSON.parse(fileIndex>=0?await readFile(process.argv[fileIndex+1],"utf8"):process.argv[configIndex + 1]) as ServerOptions;
     if (!config.publicDir || !config.dataDir)
       throw new Error("Controller and data directories are required.");
     server = await createWaterConsoleServer({
@@ -90,7 +92,15 @@ async function main() {
         state?: NativeRuntimeState;
         feedback?: unknown;
         result?: CommandResult;
+        catalog?: import("../shared/types").GameManifest[];
+        definitions?:Record<string,import("../shared/studio-model").ControllerDefinition>;
+        assetsDirectory?:string;
+        preview?:{gameId:string;definition:import("../shared/studio-model").ControllerDefinition;modeId:string};
       };
+      if(["catalog","studio-preview","studio-preview-end"].includes(message.type??"")&&typeof message.id==="number"){
+        const task=message.type==="catalog"?server!.updateCatalog(message.catalog!,message.definitions!,message.assetsDirectory):Promise.resolve(message.type==="studio-preview"?server!.previewController(message.preview!.gameId,message.preview!.definition,message.preview!.modeId):server!.endPreview());
+        void task.then(result=>parentPort.postMessage({type:"response",id:message.id,result})).catch(()=>parentPort.postMessage({type:"response",id:message.id,result:{ok:false,error:"Library session could not update."}}));return;
+      }
       if (message.type === "native-result" && typeof message.id === "string") {
         const pending = nativeRequests.get(message.id);
         if (pending) {

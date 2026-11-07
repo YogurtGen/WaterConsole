@@ -11,7 +11,7 @@ WaterConsole Core targets **Windows 10/11 x64**. The PC displays the console and
 | Build or modify the console | [Git for Windows](https://git-scm.com/downloads/win), [Node.js 24 LTS, Windows x64](https://nodejs.org/en/download), and this repository | npm comes with Node.js. `npm run setup` installs the locked project dependencies, including Electron. |
 | Run automated UI checks | Developer setup, then the browser selected by `scripts/e2e.mjs` | Browser testing does not replace tests on real phones. |
 | Ask Codex or Claude Code to add a game | One optional AI coding tool and its own account/authentication | Neither AI tool is required to run WaterConsole. See [ADDING-GAMES.md](ADDING-GAMES.md#use-codex-or-claude-code). |
-| Develop a Windows virtual-gamepad adapter | The optional native toolkit and, if the adapter requires it, ViGEmBus | Core ships no native adapters and does not automatically install a driver. Browser touch vibration needs neither. |
+| Develop a Windows virtual-gamepad adapter | The optional native toolkit and, if the adapter requires it, ViGEmBus | The configurable runtime is bundled; specialized game adapters are not. The app does not automatically install a driver. Browser touch vibration needs neither. |
 
 The initial download and source dependency installation require internet. Once installed, the core's Home, pairing, and Controller Lab operate locally. Future games, launchers, updates, and optional AI services may have their own internet requirements.
 
@@ -21,7 +21,7 @@ The initial download and source dependency installation require internet. Once i
 2. Compare the SHA-256 hash with the release checksum before opening the download:
 
    ```powershell
-   Get-FileHash -Algorithm SHA256 -LiteralPath 'E:\Downloads\WaterConsole-Core-Setup-0.2.0-x64.exe'
+   Get-FileHash -Algorithm SHA256 -LiteralPath 'E:\Downloads\WaterConsole-Core-Setup-0.3.0-x64.exe'
    ```
 
    Adjust the path to the file you downloaded. A matching hash detects a changed download; it is not a publisher signature.
@@ -53,9 +53,9 @@ On the phone, tap **Enter controller**, open **Controller settings** using the g
 
 This uses the browser's [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API). Support depends on browser, phone hardware, OS settings, and user interaction. A browser may expose the API while declining to vibrate. Unsupported browsers keep working with **Vibration unavailable**. No separate phone app, driver, or desktop helper is needed for these cues.
 
-### Native gamepad and game rumble: optional developer path
+### Native gamepad and game rumble: optional PC support
 
-The optional Windows toolkit is for adapters that create independent Xbox-compatible virtual controllers. It contains a generic bridge, its source, and the pinned **ViGEmClient** user-mode library and MIT license. It is not an adapter for an arbitrary game.
+The optional Windows support is used when an added game or source adapter needs independent Xbox-compatible virtual controllers. It contains a generic bridge, its source, and the pinned **ViGEmClient** user-mode library and MIT license. It is not an adapter for an arbitrary game.
 
 The separate **optional native tools** release ZIP contains the upstream **ViGEmBus 1.22.0** installer, its BSD-3-Clause license, provenance, and SHA-256 checksum. The [upstream project](https://github.com/nefarius/ViGEmBus) is archived and the driver was retired in November 2023. Evaluate it before installing a system-level component; it is unnecessary for Controller Lab or phone vibration.
 
@@ -117,3 +117,9 @@ The e2e runner uses installed [Google Chrome](https://www.google.com/chrome/) by
 Keep your downloaded release checksums with the package. Close the app before updating, then use the new installer or extract a new portable folder. Settings belong to the Core profile. Copy only settings you understand; never share pairing/session state between running instances.
 
 Uninstall the desktop app through Windows Settings, or remove an extracted portable folder after closing it. Optional system drivers have their own Windows uninstall entries and lifecycle; removing WaterConsole does not automatically remove a driver used by other software.
+
+## Add installed games
+
+Use **Home → Add game** and follow [Controller Studio](CONTROLLER-STUDIO.md). Cover recommends **900 × 1200**, banner **1920 × 1080**; they have independent crops. The app keeps your catalog, original normalized artwork, derivatives and drafts outside the application folder, in the shown local data location. Use **Change data folder** to copy it to another drive; the old folder is preserved. Back up the whole `library` directory while the app is closed. No commercial game is included, and an added game keeps its own launcher/internet/input requirements.
+
+The packaged Core library defaults to the sibling `WaterConsole-Core-data` folder, separate from custom/private WaterConsole builds. Its previous catalog and images survive normal application upgrades. The wizard shows the actual selected location.

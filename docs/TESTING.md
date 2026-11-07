@@ -64,3 +64,13 @@ A virtual gamepad visible in Windows or a passing helper probe does not prove th
 `scripts/capture-docs.mjs` renders the real React interface with simulated documentation-only state. It generates the images in `docs/media/` and visibly marks them **Documentation preview**. Its URLs use `example.invalid` and its pairing code is `PREVIEW`; it must not connect to a real console or publish a live invitation.
 
 These images show the interface, not device compatibility or performance. Regenerate them after relevant UI changes and visually inspect desktop and phone captures. See [docs/media/README.md](media/README.md).
+
+## Controller Studio integration fixture
+
+`npm run test:studio` compiles an owned lightweight Windows fixture, tests crop outputs and four approved browser controllers in a safe preview, analog dragging, rotation bounds and the explicit vibration test. It opens no third-party game. It uses installed Google Chrome and an isolated local data folder. Build the application first.
+
+To additionally create virtual controllers and launch only that owned fixture, deliberately set `$env:WATERCONSOLE_STUDIO_NATIVE='1'` before running it. Existing optional PC controller support and free XInput slots are required; no driver installs automatically. Clear the variable afterward. The native path verifies independent real XInput reports, linked holds, release and normal exit. It is an opt-in device test, not a commercial-game compatibility check.
+
+For a packaged app, set `WATERCONSOLE_EXECUTABLE` to its exact executable; for a custom development Electron runtime also set `WATERCONSOLE_APP_ROOT` to this checkout. All caches/reports remain in the checkout. Do not publish live pairing state or its local data folder.
+
+`npm run test:editor` checks the native file picker through a controlled owned fixture, first-use spotlight/Skip/replay/persistence, target interaction, keyboard dismissal, all crop and Studio guide steps, icon/shape/color editing and library persistence. It does not launch the selected fixture or third-party games. Screenshot connection/path values are sanitized before public documentation use.

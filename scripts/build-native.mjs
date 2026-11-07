@@ -54,3 +54,6 @@ copyFileSync(
 console.log(
   "Built optional Windows gamepad toolkit; no adapters or driver installed.",
 );
+
+const userBridge = spawnSync(compiler, ["/nologo", "/optimize+", "/target:exe", "/platform:x64", "/reference:System.Web.Extensions.dll", "/out:"+path.resolve("build/native/WaterConsole.UserBridge.exe"),path.resolve("toolkit/native/UserBridge.cs"),path.resolve("toolkit/native/VirtualGamepad.cs")], {stdio:"inherit",windowsHide:true});
+if(userBridge.status!==0)throw new Error("User game input bridge did not compile.");

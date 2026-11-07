@@ -1,6 +1,6 @@
 # Controller icon catalog — planning research
 
-**Proposed, not shipped.** Checked 7 November 2026. This is the icon-picker specification and a verified metadata seed, not an installed icon package.
+**Bundled in Core 0.3.0.** The full pinned catalog contains 6,257 offline SVGs; the metadata below preserves the original research seed. See `assets/public/assets/controller-icons/SOURCE.json` and its MIT license.
 
 ## Primary collection
 

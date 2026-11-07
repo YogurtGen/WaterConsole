@@ -57,6 +57,7 @@ export function nativeHapticsAllowed(
 export class ControllerHaptics {
   readonly supported = typeof navigator.vibrate === "function";
   enabled = savedPreference();
+  suspended = false;
   private activated = false;
   private lastRumble = -Infinity;
   private lastAttack = -Infinity;
@@ -76,7 +77,7 @@ export class ControllerHaptics {
   }
 
   private play(durationMs: number) {
-    if (!this.supported || !this.enabled || !this.activated) return;
+    if (!this.supported || !this.enabled || !this.activated || this.suspended) return;
     try {
       navigator.vibrate(durationMs);
     } catch {
@@ -105,9 +106,17 @@ export class ControllerHaptics {
     this.play(Math.min(durationMs, MAX_RUMBLE_MS));
   }
 
+  cue(durationMs:number) {
+    if(!Number.isFinite(durationMs)||durationMs<=0)return;
+    const now=performance.now();if(now-this.lastAttack<60)return;this.lastAttack=now;this.play(Math.min(100,Math.round(durationMs)));
+  }
+
   test() {
     this.activate();
+    const suspended=this.suspended;
+    this.suspended=false;
     this.play(50);
+    this.suspended=suspended;
   }
 
   stop() {
