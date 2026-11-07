@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1580" viewBox="0 0 1600 1580"><title>Proposed WaterConsole library builder and Controller Studio</title><desc>Original design wireframe showing Add Game beside library controls, editable title/banner/cover, and a three-column controller editor with shapes, analog/D-pad, grid snapping, role colors, icons and combined actions.</desc><rect width="1600" height="1580" fill="#0b110e"/><g font-family="Segoe UI,Arial,sans-serif"><text x="40" y="43" font-size="25" fill="#83e8b3" font-weight="700">WATERCONSOLE / GAME LIBRARY + CONTROLLER STUDIO</text>
+<text x="40" y="73" font-size="14" fill="#a0b3a5" font-weight="400">PLACEMENT WIREFRAME · PROPOSED DESIGN · NOT A SHIPPED FEATURE</text>
+<rect x="28" y="98" width="1544" height="578" rx="20" fill="#111813" stroke="#35463b"/>
+<text x="54" y="133" font-size="24" fill="#f0f5ef" font-weight="700">WaterConsole</text>
+<text x="1035" y="132" font-size="17" fill="#9becc0" font-weight="400">P1 · P2 · P3 · P4</text>
+<rect x="1240" y="109" width="140" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="1254" y="135" font-size="16" fill="#dbe6dd" font-weight="600">Add phones</text>
+<rect x="1394" y="109" width="140" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="1408" y="135" font-size="16" fill="#dbe6dd" font-weight="600">Settings</text>
+<rect x="54" y="159" width="1480" height="238" rx="16" fill="#202a23" stroke="#35463b"/>
+<text x="80" y="189" font-size="12" fill="#83e8b3" font-weight="700">SELECTED GAME — EDIT EACH FIELD</text>
+<text x="80" y="230" font-size="36" fill="#f1f6ee" font-weight="700">Your Racing Game</text>
+<text x="82" y="263" font-size="18" fill="#dbe6dd" font-weight="400">1–4 players  ·  Offline &amp; Online  ·  Racing</text>
+<text x="82" y="295" font-size="17" fill="#b1c0b4" font-weight="400">Your description and local multiplayer instructions.</text>
+<rect x="82" y="320" width="150" height="40" rx="9" fill="#83e8b3" stroke="#83e8b3"/>
+<text x="96" y="346" font-size="16" fill="#11271b" font-weight="600">Start game</text>
+<rect x="246" y="320" width="175" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="260" y="346" font-size="16" fill="#dbe6dd" font-weight="600">Connect phones</text>
+<rect x="435" y="320" width="130" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="449" y="346" font-size="16" fill="#dbe6dd" font-weight="600">Edit game</text>
+<text x="82" y="379" font-size="15" fill="#a8baa9" font-weight="400">Shared screen · Controller: Race · Ready to test</text>
+<rect x="840" y="174" width="674" height="208" rx="14" fill="#234638" stroke="#41664b"/>
+<path d="M870 350 1030 205 1170 350 1320 205 1480 350" fill="none" stroke="#4b896c" stroke-width="18"/>
+<text x="995" y="268" font-size="29" fill="#ccf2d7" font-weight="700">YOUR BANNER</text>
+<text x="1022" y="301" font-size="17" fill="#b0d9bb" font-weight="400">Independent crop / Fit / Fill</text>
+<text x="56" y="439" font-size="25" fill="#f0f5ef" font-weight="700">Your local library</text>
+<rect x="773" y="409" width="154" height="40" rx="9" fill="#83e8b3" stroke="#83e8b3"/>
+<text x="787" y="435" font-size="16" fill="#11271b" font-weight="600">+ Add game</text>
+<rect x="941" y="409" width="237" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="955" y="435" font-size="16" fill="#dbe6dd" font-weight="600">All  /  Favorites  /  Recent</text>
+<rect x="1192" y="409" width="342" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="1206" y="435" font-size="16" fill="#dbe6dd" font-weight="600">Find a game</text>
+<text x="58" y="472" font-size="15" fill="#a4b7a9" font-weight="400">Filters: Tags · Players · Connection · Setup status</text>
+<rect x="58" y="489" width="250" height="117" rx="12" fill="#234436" stroke="#35463b"/>
+<text x="78" y="550" font-size="22" fill="#d9eedc" font-weight="700">CONTROLLER LAB</text>
+<text x="58" y="634" font-size="17" fill="#e0eee1" font-weight="600">Controller Lab</text>
+<rect x="333" y="489" width="250" height="117" rx="12" fill="#293d49" stroke="#35463b"/>
+<text x="353" y="550" font-size="22" fill="#d9eedc" font-weight="700">YOUR COVER</text>
+<text x="333" y="634" font-size="17" fill="#e0eee1" font-weight="600">Your Racing Game</text>
+<rect x="608" y="489" width="250" height="117" rx="12" fill="#413a31" stroke="#35463b"/>
+<text x="628" y="550" font-size="22" fill="#d9eedc" font-weight="700">YOUR COVER</text>
+<text x="608" y="634" font-size="17" fill="#e0eee1" font-weight="600">Another game</text>
+<rect x="883" y="489" width="250" height="117" rx="12" fill="#3d3447" stroke="#35463b"/>
+<text x="903" y="550" font-size="22" fill="#d9eedc" font-weight="700">YOUR COVER</text>
+<text x="883" y="634" font-size="17" fill="#e0eee1" font-weight="600">Another game</text>
+<rect x="28" y="704" width="1544" height="815" rx="20" fill="#111813" stroke="#35463b"/>
+<text x="56" y="746" font-size="26" fill="#edf5ef" font-weight="700">Controller Studio</text>
+<text x="58" y="773" font-size="15" fill="#9aaf9e" font-weight="400">Game: Your Racing Game</text>
+<rect x="454" y="725" width="95" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="468" y="751" font-size="16" fill="#dbe6dd" font-weight="600">Menu</text>
+<rect x="560" y="725" width="95" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="574" y="751" font-size="16" fill="#dbe6dd" font-weight="600">Fight</text>
+<rect x="666" y="725" width="95" height="40" rx="9" fill="#83e8b3" stroke="#83e8b3"/>
+<text x="680" y="751" font-size="16" fill="#11271b" font-weight="600">Race</text>
+<rect x="1125" y="725" width="160" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="1139" y="751" font-size="16" fill="#dbe6dd" font-weight="600">Undo / Redo</text>
+<rect x="1298" y="725" width="235" height="40" rx="9" fill="#83e8b3" stroke="#83e8b3"/>
+<text x="1312" y="751" font-size="16" fill="#11271b" font-weight="600">Save controller</text>
+<rect x="48" y="797" width="235" height="692" rx="12" fill="#1c2620" stroke="#35463b"/>
+<text x="68" y="832" font-size="15" fill="#83e8b3" font-weight="700">CONTROLS</text>
+<rect x="66" y="860" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="886" font-size="16" fill="#dbe6dd" font-weight="600">Button</text>
+<rect x="66" y="916" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="942" font-size="16" fill="#dbe6dd" font-weight="600">Analog stick</text>
+<rect x="66" y="972" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="998" font-size="16" fill="#dbe6dd" font-weight="600">D-pad +</text>
+<rect x="66" y="1028" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="1054" font-size="16" fill="#dbe6dd" font-weight="600">Trigger / slider</text>
+<rect x="66" y="1084" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="1110" font-size="16" fill="#dbe6dd" font-weight="600">Label / spacer</text>
+<rect x="66" y="1140" width="199" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="80" y="1166" font-size="16" fill="#dbe6dd" font-weight="600">Groups / layers</text>
+<text x="68" y="1255" font-size="14" fill="#83e8b3" font-weight="700">SHAPES</text>
+<circle cx="95" cy="1291" r="17" fill="#344b3b" stroke="#56725e"/>
+<rect x="129" y="1274" width="34" height="34" rx="0" fill="#344b3b" stroke="#35463b"/>
+<rect x="177" y="1274" width="34" height="34" rx="10" fill="#344b3b" stroke="#35463b"/>
+<path d="M95 1324 114 1358H76Z" fill="#344b3b" stroke="#56725e"/>
+<text x="68" y="1411" font-size="14" fill="#afc2b1" font-weight="400">Drag onto the canvas</text>
+<text x="68" y="1435" font-size="14" fill="#afc2b1" font-weight="400">or use exact values.</text>
+<rect x="300" y="797" width="865" height="692" rx="12" fill="#18221c" stroke="#35463b"/>
+<text x="322" y="830" font-size="15" fill="#83e8b3" font-weight="700">LIVE PHONE PREVIEW</text>
+<rect x="321" y="845" width="230" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="335" y="871" font-size="16" fill="#dbe6dd" font-weight="600">Landscape / Portrait</text>
+<rect x="564" y="845" width="200" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="578" y="871" font-size="16" fill="#dbe6dd" font-weight="600">Device size</text>
+<rect x="777" y="845" width="366" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="791" y="871" font-size="16" fill="#dbe6dd" font-weight="600">Navigator / Other players · P1</text>
+<rect x="325" y="917" width="815" height="432" rx="26" fill="#1b2b23" stroke="#60836b"/>
+<rect x="343" y="932" width="779" height="41" rx="12" fill="#203e2d" stroke="#35463b"/>
+<text x="360" y="960" font-size="16" fill="#83e8b3" font-weight="600">P1 · Navigator</text>
+<text x="838" y="960" font-size="13" fill="#dbe6dd" font-weight="400">Connection · Settings · Return</text>
+<path d="M354 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M378 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M402 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M426 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M450 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M474 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M498 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M522 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M546 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M570 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M594 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M618 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M642 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M666 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M690 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M714 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M738 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M762 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M786 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M810 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M834 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M858 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M882 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M906 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M930 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M954 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M978 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M1002 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M1026 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M1050 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M1074 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M1098 988V1327" stroke="#34513d" opacity=".38"/>
+<path d="M354 988H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1012H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1036H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1060H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1084H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1108H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1132H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1156H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1180H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1204H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1228H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1252H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1276H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1300H1110" stroke="#34513d" opacity=".38"/>
+<path d="M354 1324H1110" stroke="#34513d" opacity=".38"/>
+<rect x="354" y="987" width="756" height="340" rx="12" fill="none" stroke="#83e8b3" stroke-dasharray="7 7" opacity=".65"/>
+<text x="374" y="1014" font-size="12" fill="#abc8b4" font-weight="400">SAFE AREA · fully contained hit targets</text>
+<circle cx="488" cy="1148" r="94" fill="#253e30" stroke="#6c9478"/>
+<circle cx="488" cy="1148" r="42" fill="#83e8b3" stroke="#56725e"/>
+<text x="468" y="1154" font-size="21" fill="#123321" font-weight="700">L</text>
+<text x="429" y="1274" font-size="17" fill="#c0dbc8" font-weight="400">Analog / drag</text>
+<path d="M655 1093H695V1133H735V1173H695V1213H655V1173H615V1133H655Z" fill="#38513f" stroke="#83e8b3"/>
+<text x="630" y="1274" font-size="17" fill="#c0dbc8" font-weight="400">D-pad + / slide</text>
+<rect x="818" y="1045" width="263" height="40" rx="9" fill="#83e8b3" stroke="#83e8b3"/>
+<text x="832" y="1071" font-size="16" fill="#11271b" font-weight="600">BOOST</text>
+<rect x="818" y="1100" width="263" height="114" rx="22" fill="#d0eaaa" stroke="#a8cd86"/>
+<text x="854" y="1148" font-size="24" fill="#263d22" font-weight="700">DRIFT + GAS</text>
+<text x="884" y="1182" font-size="17" fill="#304c2c" font-weight="400">Hold both</text>
+<rect x="818" y="1234" width="126" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="832" y="1260" font-size="16" fill="#dbe6dd" font-weight="600">Brake</text>
+<rect x="955" y="1234" width="126" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="969" y="1260" font-size="16" fill="#dbe6dd" font-weight="600">Pause</text>
+<text x="330" y="1386" font-size="17" fill="#bdd2c2" font-weight="400">✓ Show grid     ✓ Snap to grid     Spacing: 8     Align / Distribute</text>
+<rect x="326" y="1410" width="270" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="340" y="1436" font-size="16" fill="#dbe6dd" font-weight="600">Preview on my phone</text>
+<rect x="612" y="1410" width="239" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="626" y="1436" font-size="16" fill="#dbe6dd" font-weight="600">Test in game</text>
+<text x="328" y="1470" font-size="14" fill="#9fb8a7" font-weight="400">Preview cannot control a game. Compact and portrait layouts keep controls in view.</text>
+<rect x="1182" y="797" width="351" height="692" rx="12" fill="#1c2620" stroke="#35463b"/>
+<text x="1202" y="832" font-size="18" fill="#83e8b3" font-weight="700">DRIFT + GAS</text>
+<text x="1202" y="863" font-size="17" fill="#e7f1e8" font-weight="400">Appearance / Action</text>
+<text x="1202" y="903" font-size="16" fill="#dbe6dd" font-weight="400">Shape: Rounded rectangle</text>
+<text x="1202" y="939" font-size="16" fill="#dbe6dd" font-weight="400">Width  ·  Height  ·  Position</text>
+<text x="1202" y="977" font-size="16" fill="#dbe6dd" font-weight="400">Theme: Navigator  /  P1</text>
+<rect x="1202" y="993" width="38" height="31" rx="7" fill="#83e8b3" stroke="#35463b"/>
+<rect x="1254" y="993" width="38" height="31" rx="7" fill="#1b2b23" stroke="#35463b"/>
+<rect x="1306" y="993" width="38" height="31" rx="7" fill="#d0eaaa" stroke="#35463b"/>
+<rect x="1358" y="993" width="38" height="31" rx="7" fill="#55a5ff" stroke="#35463b"/>
+<rect x="1410" y="993" width="38" height="31" rx="7" fill="#cf88ff" stroke="#35463b"/>
+<text x="1202" y="1059" font-size="18" fill="#83e8b3" font-weight="600">Icon + text</text>
+<text x="1202" y="1091" font-size="15" fill="#dbe6dd" font-weight="400">Icon only / Text only / Image</text>
+<rect x="1202" y="1108" width="308" height="40" rx="9" fill="#28362c" stroke="#506953"/>
+<text x="1216" y="1134" font-size="16" fill="#dbe6dd" font-weight="600">Search icons / Upload image</text>
+<text x="1202" y="1188" font-size="13" fill="#83e8b3" font-weight="700">WHILE HELD</text>
+<text x="1202" y="1222" font-size="19" fill="#dbe6dd" font-weight="400">✓ Accelerate</text>
+<text x="1202" y="1254" font-size="19" fill="#dbe6dd" font-weight="400">✓ Drift</text>
+<text x="1202" y="1305" font-size="15" fill="#a9bfaf" font-weight="400">Release both on lift/cancel.</text>
+<text x="1202" y="1346" font-size="15" fill="#dbe6dd" font-weight="400">Normal / Pressed / Disabled</text>
+<text x="1202" y="1384" font-size="15" fill="#dbe6dd" font-weight="400">Vibration: Short press cue</text>
+<text x="1202" y="1448" font-size="13" fill="#9eb4a5" font-weight="400">Changes stay on this PC.</text>
+<text x="42" y="1556" font-size="14" fill="#9db0a2" font-weight="400">Original planning diagram · WaterConsole contributors · MIT · No third-party game assets</text></g></svg>

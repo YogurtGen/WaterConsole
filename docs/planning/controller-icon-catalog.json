@@ -1,0 +1,1032 @@
+{
+  "status": "Planning seed; not an installed application feature",
+  "checked": "2026-11-07",
+  "collection": "Tabler Icons",
+  "license": "MIT",
+  "source": "https://github.com/tabler/tabler-icons",
+  "commit": "ed177a085b652fe04ec4f37ced867c94621e7840",
+  "available": {
+    "outline": 5203,
+    "filled": 1054
+  },
+  "groups": [
+    {
+      "category": "Inventory and items",
+      "icons": [
+        {
+          "id": "backpack",
+          "label": "Backpack",
+          "style": "outline",
+          "aliases": ["inventory", "bag", "items", "tas", "inventori"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/backpack.svg"
+        },
+        {
+          "id": "briefcase",
+          "label": "Briefcase",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/briefcase.svg"
+        },
+        {
+          "id": "box",
+          "label": "Box",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/box.svg"
+        },
+        {
+          "id": "package",
+          "label": "Package",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/package.svg"
+        },
+        {
+          "id": "packages",
+          "label": "Packages",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/packages.svg"
+        },
+        {
+          "id": "archive",
+          "label": "Archive",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/archive.svg"
+        },
+        {
+          "id": "key",
+          "label": "Key",
+          "style": "outline",
+          "aliases": ["interact", "use"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/key.svg"
+        },
+        {
+          "id": "coin",
+          "label": "Coin",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/coin.svg"
+        },
+        {
+          "id": "coins",
+          "label": "Coins",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/coins.svg"
+        },
+        {
+          "id": "diamond",
+          "label": "Diamond",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/diamond.svg"
+        },
+        {
+          "id": "gift",
+          "label": "Gift",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/gift.svg"
+        },
+        {
+          "id": "flask",
+          "label": "Flask",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flask.svg"
+        },
+        {
+          "id": "bottle",
+          "label": "Bottle",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/bottle.svg"
+        },
+        {
+          "id": "book",
+          "label": "Book",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/book.svg"
+        },
+        {
+          "id": "book-2",
+          "label": "Book 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/book-2.svg"
+        },
+        {
+          "id": "map",
+          "label": "Map",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/map.svg"
+        },
+        {
+          "id": "compass",
+          "label": "Compass",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/compass.svg"
+        }
+      ]
+    },
+    {
+      "category": "Racing and vehicles",
+      "icons": [
+        {
+          "id": "car",
+          "label": "Car",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/car.svg"
+        },
+        {
+          "id": "car-4wd",
+          "label": "Car 4wd",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/car-4wd.svg"
+        },
+        {
+          "id": "steering-wheel",
+          "label": "Steering Wheel",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/steering-wheel.svg"
+        },
+        {
+          "id": "engine",
+          "label": "Engine",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/engine.svg"
+        },
+        {
+          "id": "gas-station",
+          "label": "Gas Station",
+          "style": "outline",
+          "aliases": ["fuel", "petrol", "bensin"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/gas-station.svg"
+        },
+        {
+          "id": "gauge",
+          "label": "Gauge",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/gauge.svg"
+        },
+        {
+          "id": "automatic-gearbox",
+          "label": "Automatic Gearbox",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/automatic-gearbox.svg"
+        },
+        {
+          "id": "manual-gearbox",
+          "label": "Manual Gearbox",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/manual-gearbox.svg"
+        },
+        {
+          "id": "flag",
+          "label": "Flag",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flag.svg"
+        },
+        {
+          "id": "flag-2",
+          "label": "Flag 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flag-2.svg"
+        },
+        {
+          "id": "flag-check",
+          "label": "Flag Check",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flag-check.svg"
+        },
+        {
+          "id": "traffic-lights",
+          "label": "Traffic Lights",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/traffic-lights.svg"
+        },
+        {
+          "id": "road",
+          "label": "Road",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/road.svg"
+        },
+        {
+          "id": "route",
+          "label": "Route",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/route.svg"
+        },
+        {
+          "id": "cone",
+          "label": "Cone",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/cone.svg"
+        },
+        {
+          "id": "wind",
+          "label": "Wind",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/wind.svg"
+        },
+        {
+          "id": "bolt",
+          "label": "Bolt",
+          "style": "outline",
+          "aliases": ["boost", "nitro"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/bolt.svg"
+        },
+        {
+          "id": "flame",
+          "label": "Flame",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flame.svg"
+        },
+        {
+          "id": "shoe",
+          "label": "Shoe",
+          "style": "outline",
+          "aliases": ["pedal", "throttle", "accelerate", "gas"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/shoe.svg"
+        },
+        {
+          "id": "rotate-clockwise",
+          "label": "Rotate Clockwise",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/rotate-clockwise.svg"
+        }
+      ]
+    },
+    {
+      "category": "Movement and arrows",
+      "icons": [
+        {
+          "id": "arrow-up",
+          "label": "Arrow Up",
+          "style": "outline",
+          "aliases": ["up", "atas"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-up.svg"
+        },
+        {
+          "id": "arrow-down",
+          "label": "Arrow Down",
+          "style": "outline",
+          "aliases": ["down", "bawah"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-down.svg"
+        },
+        {
+          "id": "arrow-left",
+          "label": "Arrow Left",
+          "style": "outline",
+          "aliases": ["left", "kiri"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-left.svg"
+        },
+        {
+          "id": "arrow-right",
+          "label": "Arrow Right",
+          "style": "outline",
+          "aliases": ["right", "kanan"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-right.svg"
+        },
+        {
+          "id": "arrow-up-left",
+          "label": "Arrow Up Left",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-up-left.svg"
+        },
+        {
+          "id": "arrow-up-right",
+          "label": "Arrow Up Right",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-up-right.svg"
+        },
+        {
+          "id": "arrow-down-left",
+          "label": "Arrow Down Left",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-down-left.svg"
+        },
+        {
+          "id": "arrow-down-right",
+          "label": "Arrow Down Right",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-down-right.svg"
+        },
+        {
+          "id": "arrows-move",
+          "label": "Arrows Move",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrows-move.svg"
+        },
+        {
+          "id": "arrows-horizontal",
+          "label": "Arrows Horizontal",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrows-horizontal.svg"
+        },
+        {
+          "id": "arrows-vertical",
+          "label": "Arrows Vertical",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrows-vertical.svg"
+        },
+        {
+          "id": "chevron-up",
+          "label": "Chevron Up",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/chevron-up.svg"
+        },
+        {
+          "id": "chevron-down",
+          "label": "Chevron Down",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/chevron-down.svg"
+        },
+        {
+          "id": "chevron-left",
+          "label": "Chevron Left",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/chevron-left.svg"
+        },
+        {
+          "id": "chevron-right",
+          "label": "Chevron Right",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/chevron-right.svg"
+        },
+        {
+          "id": "player-track-next",
+          "label": "Player Track Next",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/player-track-next.svg"
+        },
+        {
+          "id": "run",
+          "label": "Run",
+          "style": "outline",
+          "aliases": ["sprint", "dash"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/run.svg"
+        },
+        {
+          "id": "walk",
+          "label": "Walk",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/walk.svg"
+        },
+        {
+          "id": "jump-rope",
+          "label": "Jump Rope",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/jump-rope.svg"
+        },
+        {
+          "id": "stairs-up",
+          "label": "Stairs Up",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/stairs-up.svg"
+        },
+        {
+          "id": "stairs-down",
+          "label": "Stairs Down",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/stairs-down.svg"
+        }
+      ]
+    },
+    {
+      "category": "Combat and aim",
+      "icons": [
+        {
+          "id": "sword",
+          "label": "Sword",
+          "style": "outline",
+          "aliases": ["attack", "light attack"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/sword.svg"
+        },
+        {
+          "id": "swords",
+          "label": "Swords",
+          "style": "outline",
+          "aliases": ["heavy attack", "fight"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/swords.svg"
+        },
+        {
+          "id": "shield",
+          "label": "Shield",
+          "style": "outline",
+          "aliases": ["block", "defend"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/shield.svg"
+        },
+        {
+          "id": "shield-check",
+          "label": "Shield Check",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/shield-check.svg"
+        },
+        {
+          "id": "target",
+          "label": "Target",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/target.svg"
+        },
+        {
+          "id": "crosshair",
+          "label": "Crosshair",
+          "style": "outline",
+          "aliases": ["aim", "target"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/crosshair.svg"
+        },
+        {
+          "id": "bow",
+          "label": "Bow",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/bow.svg"
+        },
+        {
+          "id": "bomb",
+          "label": "Bomb",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/bomb.svg"
+        },
+        {
+          "id": "hand-grab",
+          "label": "Hand Grab",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/hand-grab.svg"
+        },
+        {
+          "id": "hand-stop",
+          "label": "Hand Stop",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/hand-stop.svg"
+        },
+        {
+          "id": "karate",
+          "label": "Karate",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/karate.svg"
+        },
+        {
+          "id": "skull",
+          "label": "Skull",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/skull.svg"
+        },
+        {
+          "id": "focus",
+          "label": "Focus",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/focus.svg"
+        },
+        {
+          "id": "focus-2",
+          "label": "Focus 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/focus-2.svg"
+        }
+      ]
+    },
+    {
+      "category": "Health and skills",
+      "icons": [
+        {
+          "id": "heart",
+          "label": "Heart",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/heart.svg"
+        },
+        {
+          "id": "heartbeat",
+          "label": "Heartbeat",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/heartbeat.svg"
+        },
+        {
+          "id": "heart-plus",
+          "label": "Heart Plus",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/heart-plus.svg"
+        },
+        {
+          "id": "medical-cross",
+          "label": "Medical Cross",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/medical-cross.svg"
+        },
+        {
+          "id": "bandage",
+          "label": "Bandage",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/bandage.svg"
+        },
+        {
+          "id": "first-aid-kit",
+          "label": "First Aid Kit",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/first-aid-kit.svg"
+        },
+        {
+          "id": "plus",
+          "label": "Plus",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/plus.svg"
+        },
+        {
+          "id": "circle-plus",
+          "label": "Circle Plus",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/circle-plus.svg"
+        },
+        {
+          "id": "droplet",
+          "label": "Droplet",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/droplet.svg"
+        },
+        {
+          "id": "flame",
+          "label": "Flame",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/flame.svg"
+        },
+        {
+          "id": "sparkles",
+          "label": "Sparkles",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/sparkles.svg"
+        },
+        {
+          "id": "wand",
+          "label": "Wand",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/wand.svg"
+        },
+        {
+          "id": "snowflake",
+          "label": "Snowflake",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/snowflake.svg"
+        },
+        {
+          "id": "sun",
+          "label": "Sun",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/sun.svg"
+        },
+        {
+          "id": "moon",
+          "label": "Moon",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/moon.svg"
+        },
+        {
+          "id": "star",
+          "label": "Star",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/star.svg"
+        },
+        {
+          "id": "battery",
+          "label": "Battery",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/battery.svg"
+        },
+        {
+          "id": "battery-charging",
+          "label": "Battery Charging",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/battery-charging.svg"
+        }
+      ]
+    },
+    {
+      "category": "Camera and view",
+      "icons": [
+        {
+          "id": "eye",
+          "label": "Eye",
+          "style": "outline",
+          "aliases": ["look back", "rear view"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/eye.svg"
+        },
+        {
+          "id": "eye-off",
+          "label": "Eye Off",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/eye-off.svg"
+        },
+        {
+          "id": "camera",
+          "label": "Camera",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/camera.svg"
+        },
+        {
+          "id": "video",
+          "label": "Video",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/video.svg"
+        },
+        {
+          "id": "zoom-in",
+          "label": "Zoom In",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/zoom-in.svg"
+        },
+        {
+          "id": "zoom-out",
+          "label": "Zoom Out",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/zoom-out.svg"
+        },
+        {
+          "id": "focus-centered",
+          "label": "Focus Centered",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/focus-centered.svg"
+        },
+        {
+          "id": "arrows-maximize",
+          "label": "Arrows Maximize",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrows-maximize.svg"
+        },
+        {
+          "id": "view-360",
+          "label": "View 360",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/view-360.svg"
+        },
+        {
+          "id": "rotate",
+          "label": "Rotate",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/rotate.svg"
+        },
+        {
+          "id": "rotate-2",
+          "label": "Rotate 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/rotate-2.svg"
+        }
+      ]
+    },
+    {
+      "category": "Menus and interaction",
+      "icons": [
+        {
+          "id": "menu",
+          "label": "Menu",
+          "style": "outline",
+          "aliases": ["pause", "menu"],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/menu.svg"
+        },
+        {
+          "id": "menu-2",
+          "label": "Menu 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/menu-2.svg"
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/settings.svg"
+        },
+        {
+          "id": "player-play",
+          "label": "Player Play",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/player-play.svg"
+        },
+        {
+          "id": "player-pause",
+          "label": "Player Pause",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/player-pause.svg"
+        },
+        {
+          "id": "player-stop",
+          "label": "Player Stop",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/player-stop.svg"
+        },
+        {
+          "id": "player-skip-back",
+          "label": "Player Skip Back",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/player-skip-back.svg"
+        },
+        {
+          "id": "arrow-back",
+          "label": "Arrow Back",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/arrow-back.svg"
+        },
+        {
+          "id": "check",
+          "label": "Check",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/check.svg"
+        },
+        {
+          "id": "x",
+          "label": "X",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/x.svg"
+        },
+        {
+          "id": "question-mark",
+          "label": "Question Mark",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/question-mark.svg"
+        },
+        {
+          "id": "info-circle",
+          "label": "Info Circle",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/info-circle.svg"
+        },
+        {
+          "id": "door-enter",
+          "label": "Door Enter",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/door-enter.svg"
+        },
+        {
+          "id": "door-exit",
+          "label": "Door Exit",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/door-exit.svg"
+        },
+        {
+          "id": "message-circle",
+          "label": "Message Circle",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/message-circle.svg"
+        },
+        {
+          "id": "hand-click",
+          "label": "Hand Click",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/hand-click.svg"
+        },
+        {
+          "id": "pointer",
+          "label": "Pointer",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/pointer.svg"
+        },
+        {
+          "id": "switch-horizontal",
+          "label": "Switch Horizontal",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/switch-horizontal.svg"
+        }
+      ]
+    },
+    {
+      "category": "Multiplayer and status",
+      "icons": [
+        {
+          "id": "users",
+          "label": "Users",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/users.svg"
+        },
+        {
+          "id": "user",
+          "label": "User",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/user.svg"
+        },
+        {
+          "id": "user-plus",
+          "label": "User Plus",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/user-plus.svg"
+        },
+        {
+          "id": "user-check",
+          "label": "User Check",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/user-check.svg"
+        },
+        {
+          "id": "crown",
+          "label": "Crown",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/crown.svg"
+        },
+        {
+          "id": "device-gamepad",
+          "label": "Device Gamepad",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/device-gamepad.svg"
+        },
+        {
+          "id": "device-gamepad-2",
+          "label": "Device Gamepad 2",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/device-gamepad-2.svg"
+        },
+        {
+          "id": "wifi",
+          "label": "Wifi",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/wifi.svg"
+        },
+        {
+          "id": "wifi-off",
+          "label": "Wifi Off",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/wifi-off.svg"
+        },
+        {
+          "id": "plug",
+          "label": "Plug",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/plug.svg"
+        },
+        {
+          "id": "lock",
+          "label": "Lock",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/lock.svg"
+        },
+        {
+          "id": "lock-open",
+          "label": "Lock Open",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/lock-open.svg"
+        },
+        {
+          "id": "circle-check",
+          "label": "Circle Check",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/circle-check.svg"
+        },
+        {
+          "id": "circle-x",
+          "label": "Circle X",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/circle-x.svg"
+        },
+        {
+          "id": "alert-triangle",
+          "label": "Alert Triangle",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/alert-triangle.svg"
+        },
+        {
+          "id": "volume",
+          "label": "Volume",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/volume.svg"
+        },
+        {
+          "id": "volume-off",
+          "label": "Volume Off",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/volume-off.svg"
+        },
+        {
+          "id": "microphone",
+          "label": "Microphone",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/microphone.svg"
+        },
+        {
+          "id": "microphone-off",
+          "label": "Microphone Off",
+          "style": "outline",
+          "aliases": [],
+          "source": "https://github.com/tabler/tabler-icons/blob/ed177a085b652fe04ec4f37ced867c94621e7840/icons/outline/microphone-off.svg"
+        }
+      ]
+    }
+  ],
+  "originalPictogramsNeeded": [
+    "accelerator-pedal",
+    "brake-pedal",
+    "drift",
+    "jump",
+    "hop",
+    "throw-item",
+    "light-attack",
+    "heavy-attack",
+    "treasure-chest",
+    "potion"
+  ]
+}

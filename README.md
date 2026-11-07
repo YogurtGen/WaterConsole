@@ -92,6 +92,8 @@ Read [ADDING-GAMES.md](docs/ADDING-GAMES.md) for the file map, adapter lifecycle
 
 A native integration must launch the user's own installation, provide tested input mappings, and release every held input when focus or a connection is lost. A card in the library alone does not make a game playable. Optional AI services have their own installation, account, network, and billing requirements; WaterConsole itself has no AI dependency.
 
+**Proposed next feature:** [Add Game and Controller Studio PRD](docs/planning/PRD-GAME-BUILDER.md), with custom library artwork and visual phone-controller editing. This is a design proposal, not a feature in the current download.
+
 ## Network and device limits
 
 WaterConsole Core serves controllers over **unencrypted HTTP/WebSocket on a trusted local network**. PC approval and session tokens restrict application access; they do not encrypt traffic or make hostile Wi-Fi safe. Do not expose the server to the internet. Read [SECURITY.md](SECURITY.md).
