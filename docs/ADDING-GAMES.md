@@ -200,3 +200,7 @@ For a custom AI-built controller, ask the agent to preserve both development pat
 The GUI can select a visible application window and derive its executable on the PC. The helper `--windows` path enumerates metadata without input injection, virtual devices or screen capture. Desktop IPC validates every selected executable; no window list or filesystem path is exposed on LAN. `game-launch.ts` matches only local Steam app manifests under the selected installation and supplies a numeric app ID to the fixed Steam protocol route. Never accept an arbitrary URI/launcher command from phones.
 
 Default Auto reuses one matching window or starts Steam/the executable and waits for the actual game window. Keep ownership correct: attach preserves an already-open game; a console-initiated launch closes normally and waits for exit. A stale PID may fall back only to one exact-executable window; ambiguity requires owner selection. Custom arguments use Direct. Test process handoff, launch timeout, missing Steam/auth prompts and independent menu/gameplay input; launch alone is not playable/offline proof.
+
+## Import installed Steam and Epic games
+
+Use **Add game → Scan Steam & Epic** for installed-store discovery, local-first artwork and cached official details. Review before saving; importing never runs the game. See [store import](STORE-IMPORT.md). For source/AI controllers, follow the phone-interface baseline in [AGENTS.md](../AGENTS.md) and reuse the existing header, controls and touch renderer. The no-code editor remains available alongside custom source adapters.

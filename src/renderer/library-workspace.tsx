@@ -17,6 +17,7 @@ import {
 } from "./builder-primitives";
 import { ControllerStudio } from "./controller-studio";
 import { CropEditor } from "./crop-editor";
+import { StoreGamePicker } from "./store-game-picker";
 import { RunningGamePicker } from "./running-game-picker";
 import { hostAsset } from "./studio-surface";
 export function PhoneSetup({
@@ -125,6 +126,7 @@ export function LibraryWorkspace({
     [draft, setDraft] = useState<LocalGameRecord | null>(null),
     [showPhones, setShowPhones] = useState(false),
     [showRunning, setShowRunning] = useState(false),
+    [showStores, setShowStores] = useState(false),
     [discard, setDiscard] = useState(false),
     [removeConfirm, setRemoveConfirm] = useState(false),
     [crop, setCrop] = useState<{
@@ -151,7 +153,7 @@ export function LibraryWorkspace({
       target: '[data-guide="game-exe"]',
       title: "Choose your own game",
       description:
-        "Use Browse .exe or Choose running game to select your installation. A running window fills its executable automatically. Review the setup and save before connecting.",
+        "Scan Steam & Epic to import installed game details, or use Browse .exe / Choose running game. A running window fills its executable automatically. Review the setup and save before connecting.",
       enter: () => setStep(0),
     },
     {
@@ -456,6 +458,16 @@ export function LibraryWorkspace({
                       >
                         Choose running game
                       </button>
+                      {game.revision === 0 && (
+                        <button
+                          onClick={() => {
+                            guide.close();
+                            setShowStores(true);
+                          }}
+                        >
+                          Scan Steam &amp; Epic
+                        </button>
+                      )}
                     </div>
                     <label className="builder-field">
                       Game title
@@ -484,13 +496,15 @@ export function LibraryWorkspace({
                           })
                         }
                       >
-                        <option value="auto">Auto · Steam or executable</option>
+                        <option value="auto">
+                          Auto · original launcher or executable
+                        </option>
                         <option value="direct">Direct executable</option>
                       </select>
                       <small>
-                        Auto uses Steam for recognized installations. Custom
-                        arguments use Direct. Already open game windows are
-                        reused.
+                        Auto uses Steam or Epic for recognized installations.
+                        Custom arguments use Direct. Already open game windows
+                        are reused.
                       </small>
                     </label>
                     <label className="builder-check">
@@ -1130,6 +1144,25 @@ export function LibraryWorkspace({
           label="Game setup"
           steps={guideSteps}
           onClose={guide.close}
+        />
+      )}
+      {showStores && (
+        <StoreGamePicker
+          onClose={() => setShowStores(false)}
+          onPick={(imported, notes) => {
+            setGame((g) => ({
+              ...g,
+              title: imported.title,
+              description: imported.description,
+              tags: imported.tags,
+              launch: imported.launch,
+              storeRef: imported.storeRef,
+              artwork: { ...g.artwork, ...imported.artwork },
+            }));
+            setMessage(notes.join(" "));
+            setShowStores(false);
+            setStep(1);
+          }}
         />
       )}
       {showRunning && (

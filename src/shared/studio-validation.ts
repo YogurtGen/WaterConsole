@@ -82,6 +82,12 @@ export function validateTheme(
 export function validateController(
   value: unknown,
 ): asserts value is ControllerDefinition {
+  if (obj(value))
+    assert(
+      value.layoutFit === undefined ||
+        ["responsive", "content", "canvas"].includes(value.layoutFit),
+      "Invalid phone fit.",
+    );
   assert(
     obj(value) &&
       value.version === 1 &&
@@ -219,6 +225,16 @@ export function validateController(
         "Invalid lock option.",
       );
       assert(c.group === undefined || identifier(c.group), "Invalid group.");
+      assert(
+        c.appearance === undefined ||
+          ["console", "primary", "raised", "outline"].includes(c.appearance),
+        "Invalid control appearance.",
+      );
+      assert(
+        c.dpadStyle === undefined ||
+          ["cross", "petals", "disc"].includes(c.dpadStyle),
+        "Invalid D-pad model.",
+      );
       for (const id of [c.imageSource, c.pressedImageSource])
         assert(
           id === undefined || (typeof id === "string" && ASSET_ID.test(id)),
@@ -322,6 +338,23 @@ export function validateGame(value: unknown): asserts value is LocalGameRecord {
         value.launch.attachPid > 0),
     "Invalid process selection.",
   );
+  if (value.storeRef !== undefined) {
+    const s = value.storeRef;
+    assert(
+      obj(s) &&
+        ["steam", "epic"].includes(s.store) &&
+        typeof s.id === "string" &&
+        /^[a-zA-Z0-9_-]{1,128}$/.test(s.id) &&
+        (s.store !== "steam" ||
+          (/^[1-9]\d{0,9}$/.test(s.id) && Number(s.id) <= 0xffffffff)) &&
+        (s.store !== "epic" ||
+          (typeof s.namespace === "string" &&
+            /^[a-zA-Z0-9_-]{1,128}$/.test(s.namespace) &&
+            typeof s.appName === "string" &&
+            /^[a-zA-Z0-9_-]{1,128}$/.test(s.appName))),
+      "Invalid store reference.",
+    );
+  }
   validateController(value.controller);
   assert(obj(value.bindings), "Invalid bindings.");
   for (const backend of ["gamepad", "keyboard"]) {

@@ -40,3 +40,7 @@ Never post a live QR, pairing nonce/code/ticket secret, session token, credentia
 Keep authorization in the server and privileged operations on the desktop. A disabled button is not an authorization check. Validate every incoming frame and callback; check slot ownership, session epoch, runtime state, and profile before delivering input or haptics. Fail closed on unknown actions/adapters. Reset held input before recovery or teardown.
 
 Do not log tokens or full pairing URLs. Keep screenshots and fixtures credential-free. Do not commit personal game paths, extracted commercial assets, credentials, dependency caches, or local settings. Review third-party binary provenance and licenses, and disclose archived or unsupported optional components clearly.
+
+## Optional store metadata downloads
+
+Only the trusted desktop editor can scan local Steam/Epic manifests or request metadata. Paths/store launch identifiers never enter LAN session state. Selected games may fetch public official store APIs and HTTPS image CDNs; each redirect is revalidated, requests have deadlines and response bounds, and images are decoded/normalized before local storage. No credentials, launcher browser caches or cookies are read. Store availability may vary. Existing local data and cached assets remain usable offline. Imported metadata is descriptive, not an input-compatibility or offline guarantee.

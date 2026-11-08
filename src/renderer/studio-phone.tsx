@@ -6,7 +6,8 @@ import { nativeSlotAllowed } from "../shared/types";
 import { controllerAssets } from "../shared/studio-validation";
 import { StudioSurface } from "./studio-surface";
 import { ControllerHaptics } from "./haptics";
-import { Brand, Icon } from "./ui";
+import { Icon } from "./ui";
+import { StudioPhoneFrame } from "./studio-phone-frame";
 export function StudioPhone({
   state,
   player,
@@ -18,8 +19,10 @@ export function StudioPhone({
   onFullscreen,
   error,
   fullscreenHint,
+  rtt = null,
 }: {
   fullscreenHint: string;
+  rtt?: number | null;
   state: SessionState;
   player: Player;
   token: string;
@@ -136,65 +139,52 @@ export function StudioPhone({
     } catch {}
   };
   return (
-    <main
-      className="studio-phone"
-      style={{ background: theme.background, color: theme.text }}
+    <StudioPhoneFrame
+      title={
+        state.catalog?.find((g) => g.id === state.selectedGameId)?.title ??
+        "WaterConsole"
+      }
+      name={player.name}
+      slot={player.slot}
+      navigator={player.canNavigate}
+      connected={connection === "connected"}
+      rtt={rtt}
+      theme={theme}
+      modes={definition.modes}
+      modeId={mode.id}
+      onMode={(modeId) => send({ type: "studio-mode", modeId })}
+      onSettings={() => setSettings(!settings)}
+      onFullscreen={onFullscreen}
+      onHome={() => send({ type: "nav", action: "library" })}
+      preview={session.preview}
+      status={
+        session.preview
+          ? undefined
+          : state.native.quitting
+            ? "Closing game…"
+            : state.native.status === "starting"
+              ? "Launching…"
+              : !slotAllowed
+                ? "Spectating"
+                : state.native.focused
+                  ? "Game in focus"
+                  : "Focus game on PC"
+      }
+      extra={
+        definition.allowPersonal &&
+        mode.controls.some((c) => c.variant !== "all") ? (
+          <select
+            aria-label="Control style"
+            value={variant}
+            onChange={(e) => updateVariant(e.target.value as any)}
+          >
+            <option value="assisted">Assisted · Linked inputs</option>
+            <option value="classic">Classic · Separate controls</option>
+          </select>
+        ) : undefined
+      }
     >
-      <header
-        className="studio-phone-toolbar"
-        style={{ background: theme.panel }}
-      >
-        <Brand compact />
-        <span>
-          <i className={connection === "connected" ? "online-dot" : ""} />P
-          {player.slot} · {player.name}
-          <small>{player.canNavigate ? "Navigator" : "Player"}</small>
-        </span>
-        <div>
-          <button
-            aria-label="Controller settings"
-            onClick={() => setSettings(!settings)}
-          >
-            <Icon name="settings" />
-          </button>
-          <button aria-label="Toggle fullscreen" onClick={onFullscreen}>
-            <Icon name="expand" />
-          </button>
-          {player.canNavigate && (
-            <button onClick={() => send({ type: "nav", action: "library" })}>
-              {session.preview ? "Home" : "Stop & Home"}
-            </button>
-          )}
-        </div>
-      </header>
-      <nav
-        className="studio-phone-modes"
-        style={{ background: theme.panel }}
-        aria-label="Controller modes"
-      >
-        {definition.modes.map((m) => (
-          <button
-            key={m.id}
-            className={m.id === mode.id ? "selected" : ""}
-            disabled={!player.canNavigate}
-            onClick={() => send({ type: "studio-mode", modeId: m.id })}
-          >
-            {m.name}
-          </button>
-        ))}
-        {definition.allowPersonal &&
-          mode.controls.some((c) => c.variant !== "all") && (
-            <select
-              aria-label="Control style"
-              value={variant}
-              onChange={(e) => updateVariant(e.target.value as any)}
-            >
-              <option value="assisted">Assisted · Linked inputs</option>
-              <option value="classic">Classic · Separate controls</option>
-            </select>
-          )}
-      </nav>
-      {(session.preview || !enabled || error) && (
+      {((!enabled && !session.preview) || error) && (
         <div className="studio-phone-notice" role="status">
           {personal.editing
             ? "Controls paused while you adjust the layout."
@@ -305,6 +295,6 @@ export function StudioPhone({
           </p>
         </section>
       )}
-    </main>
+    </StudioPhoneFrame>
   );
 }

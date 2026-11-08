@@ -13,6 +13,7 @@ import {
   radialValues,
   resolveTheme,
 } from "../shared/studio-engine";
+import { StudioDpad } from "./studio-dpad";
 import type {
   ControllerDefinition,
   StudioControl,
@@ -41,6 +42,8 @@ export function ControllerGlyph({
   );
 }
 interface Props {
+  onLayout?: (layout: ReturnType<typeof fitControls>) => void;
+  designCanvas?: boolean;
   hostPreview?: boolean;
   readOnly?: boolean;
   definition: ControllerDefinition;
@@ -57,6 +60,7 @@ interface Props {
   observed?: StudioInput;
 }
 export function StudioSurface({
+  onLayout,
   definition,
   modeId,
   slot = 1,
@@ -66,6 +70,7 @@ export function StudioSurface({
   enabled = true,
   readOnly = false,
   hostPreview = false,
+  designCanvas = false,
   mirror = false,
   onInput,
   onPress,
@@ -105,9 +110,28 @@ export function StudioSurface({
     ...(hostPreview ? definition.hostTheme : {}),
   };
   const fitted = useMemo(
-    () => fitControls(mode.controls, size.width, size.height, variant),
-    [mode, size.width, size.height, variant],
+    () =>
+      fitControls(
+        mode.controls,
+        size.width,
+        size.height,
+        variant,
+        designCanvas ? "design" : (definition.layoutFit ?? "responsive"),
+      ),
+    [
+      mode,
+      size.width,
+      size.height,
+      variant,
+      designCanvas,
+      definition.layoutFit,
+    ],
   );
+  const layoutCallback = useRef(onLayout);
+  layoutCallback.current = onLayout;
+  useLayoutEffect(() => {
+    layoutCallback.current?.(fitted);
+  }, [fitted]);
   const emit = useCallback(() => {
     const pressed = [
       ...new Set(
@@ -294,20 +318,34 @@ export function StudioSurface({
       className={`studio-surface ${enabled || readOnly ? "" : "is-paused"}`}
       style={{
         background: theme.background,
-        ...(theme.backgroundImage
-          ? { backgroundImage: `url(${asset(theme.backgroundImage)})` }
-          : {}),
       }}
       role="group"
       aria-label={mode.name + " controller"}
     >
+      <div
+        className="studio-surface-backdrop"
+        style={{
+          ...(!designCanvas &&
+          (definition.layoutFit ?? "responsive") === "responsive"
+            ? { inset: 0 }
+            : {
+                left: fitted.offsetX,
+                top: fitted.offsetY,
+                width: 960 * fitted.scale,
+                height: 540 * fitted.scale,
+              }),
+          backgroundImage: theme.backgroundImage
+            ? `url(${asset(theme.backgroundImage)})`
+            : undefined,
+        }}
+      />
       {fitted.error ? (
         <div className="studio-fit-message">
           <strong>Let's give your controls more room.</strong>
           <p>{fitted.error}</p>
         </div>
       ) : (
-        fitted.items.map(({ control: c, x, y, w, h }) => {
+        fitted.items.map(({ control: c, x, y, w, h, visual, scale }) => {
           const colors = {
               ...resolveTheme(definition, mode, navigator, slot, c),
               ...(hostPreview ? definition.hostTheme : {}),
@@ -361,8 +399,15 @@ export function StudioSurface({
                 ? "999px"
                 : c.shape === "square"
                   ? "0px"
-                  : c.radius + "px",
-            fontSize: Math.max(10, Math.min(c.fontSize, h * 0.27)),
+                  : c.radius * scale + "px",
+            fontSize: Math.max(10, Math.min(c.fontSize, c.h * 0.27) * scale),
+            "--pad-arrow": colors.text,
+            "--pad-active-arrow": colors.pressedText ?? colors.background,
+            "--pad-hub": colors.background,
+            "--control-rest": colors.button,
+            "--control-active": colors.pressed,
+            "--control-accent": colors.accent,
+            "--control-stroke": Math.max(1, scale) + "px",
           } as CSSProperties;
           return (
             <button
@@ -372,7 +417,7 @@ export function StudioSurface({
                 if (el) widgets.current.set(c.id, el);
                 else widgets.current.delete(c.id);
               }}
-              className={`studio-widget shape-${c.shape} kind-${c.kind} ${held ? "is-held" : ""}`}
+              className={`studio-widget shape-${c.shape} kind-${c.kind} appearance-${c.appearance ?? "console"} ${c.kind === "dpad" ? "pad-" + (c.dpadStyle ?? "petals") : ""} ${held ? "is-held" : ""}`}
               style={style}
               aria-label={c.label || c.actions.join(", ") || c.kind}
               aria-disabled={!enabled}
@@ -403,90 +448,80 @@ export function StudioSurface({
                 if (pointers.current.get(-1)?.controlId === c.id) remove(-1);
               }}
             >
-              <span className="studio-widget-body" />
-              {c.kind === "stick" ? (
-                <>
-                  <span className="studio-stick-ring" />
-                  <span
-                    className="studio-stick-knob"
-                    style={{
-                      transform: `translate(${value.x * w * 0.28}px,${-value.y * h * 0.28}px)`,
-                      background: colors.accent,
-                    }}
-                  />
-                  <span className="studio-control-caption">{label}</span>
-                </>
-              ) : c.kind === "dpad" ? (
-                <>
-                  <span className="studio-cross" />
-                  <span
-                    className={`studio-dir north ${value.y > 0.3 ? "active" : ""}`}
-                  >
-                    ▲
-                  </span>
-                  <span
-                    className={`studio-dir south ${value.y < -0.3 ? "active" : ""}`}
-                  >
-                    ▼
-                  </span>
-                  <span
-                    className={`studio-dir west ${value.x < -0.3 ? "active" : ""}`}
-                  >
-                    ◀
-                  </span>
-                  <span
-                    className={`studio-dir east ${value.x > 0.3 ? "active" : ""}`}
-                  >
-                    ▶
-                  </span>
-                  <span className="studio-pad-center" />
-                </>
-              ) : (
-                <>
-                  {c.kind === "trigger" && (
+              <span
+                className="studio-widget-visual"
+                style={{
+                  left: mirror ? w - (visual.x - x) - visual.w : visual.x - x,
+                  top: visual.y - y,
+                  width: visual.w,
+                  height: visual.h,
+                }}
+              >
+                <span className="studio-widget-body" />
+                {c.kind === "stick" ? (
+                  <>
+                    <span className="studio-stick-ring" />
                     <span
-                      className="studio-trigger-fill"
+                      className="studio-stick-knob"
                       style={{
-                        width: value.x * 100 + "%",
+                        transform: `translate(${value.x * visual.w * 0.28}px,${-value.y * visual.h * 0.28}px)`,
                         background: colors.accent,
                       }}
                     />
-                  )}
-                  <span
-                    className={
-                      "studio-label-content" +
-                      (c.display === "image" && image
-                        ? " studio-image-content"
-                        : "")
-                    }
-                  >
-                    {c.display === "image" && image ? (
-                      <img
-                        draggable={false}
-                        src={image}
-                        alt=""
-                        style={{ objectFit: c.fit }}
+                    <span className="studio-control-caption">{label}</span>
+                  </>
+                ) : c.kind === "dpad" ? (
+                  <StudioDpad
+                    model={c.dpadStyle ?? "petals"}
+                    x={value.x}
+                    y={value.y}
+                  />
+                ) : (
+                  <>
+                    {c.kind === "trigger" && (
+                      <span
+                        className="studio-trigger-fill"
+                        style={{
+                          width: value.x * 100 + "%",
+                          background: colors.accent,
+                        }}
                       />
-                    ) : c.display === "icon" || c.display === "icon-text" ? (
-                      <ControllerGlyph
-                        id={c.icon}
-                        size={Math.min(c.iconSize, w * 0.5, h * 0.45)}
-                      />
-                    ) : null}
-                    {(c.display === "text" ||
-                      c.display === "icon-text" ||
-                      (c.display === "image" && !image)) && (
-                      <span>{label}</span>
                     )}
-                  </span>
-                </>
-              )}
+                    <span
+                      className={
+                        "studio-label-content" +
+                        (c.display === "image" && image
+                          ? " studio-image-content"
+                          : "")
+                      }
+                    >
+                      {c.display === "image" && image ? (
+                        <img
+                          draggable={false}
+                          src={image}
+                          alt=""
+                          style={{ objectFit: c.fit }}
+                        />
+                      ) : c.display === "icon" || c.display === "icon-text" ? (
+                        <ControllerGlyph
+                          id={c.icon}
+                          size={
+                            Math.min(c.iconSize, c.w * 0.5, c.h * 0.45) * scale
+                          }
+                        />
+                      ) : null}
+                      {(c.display === "text" ||
+                        c.display === "icon-text" ||
+                        (c.display === "image" && !image)) && (
+                        <span>{label}</span>
+                      )}
+                    </span>
+                  </>
+                )}
+              </span>
             </button>
           );
         })
-      )}
-      {fitted.compact && !fitted.error && (
-        <span className="studio-compact-note">Compact fit</span>
       )}
     </div>
   );

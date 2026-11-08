@@ -1,4 +1,5 @@
 import type { DisplayMode, GameManifest } from "./types";
+import type { StoreReference, StoreScan } from "./store-model";
 export const STUDIO_SCHEMA = 1 as const;
 export type ControlKind = "button" | "stick" | "dpad" | "trigger" | "label";
 export type ButtonShape = "circle" | "square" | "triangle" | "rounded" | "pill";
@@ -55,6 +56,8 @@ export const DEFAULT_THEME: Theme = {
   pressedText: "#123321",
 };
 export interface StudioControl {
+  appearance?: "console" | "primary" | "raised" | "outline";
+  dpadStyle?: "cross" | "petals" | "disc";
   locked?: boolean;
   group?: string;
   imageSource?: string;
@@ -98,6 +101,7 @@ export interface StudioMode {
   theme: Partial<Theme>;
 }
 export interface ControllerDefinition {
+  layoutFit?: "responsive" | "content" | "canvas";
   version: 1;
   revision: number;
   labels: "xbox" | "playstation" | "custom";
@@ -156,6 +160,7 @@ export interface ArtworkSlot {
   fit: "cover" | "contain";
 }
 export interface LocalGameRecord {
+  storeRef?: StoreReference;
   schemaVersion: 1;
   id: string;
   revision: number;
@@ -200,6 +205,8 @@ export interface RunningGameWindow {
   executable: string;
 }
 export interface LibraryResult {
+  scan?: StoreScan;
+  notes?: string[];
   windows?: RunningGameWindow[];
   ok: boolean;
   error?: string;
@@ -215,6 +222,8 @@ export interface LibraryResult {
   config?: unknown;
 }
 export type LibraryCommand =
+  | { type: "scan-stores" }
+  | { type: "prepare-store-game"; key: string; executable?: string }
   | { type: "list" }
   | { type: "choose-executable" }
   | { type: "running-windows" }
@@ -408,6 +417,7 @@ export function createController(): ControllerDefinition {
     control("button", "Back", 410, 100, 90, 60, ["select"]),
     control("button", "Start", 515, 100, 90, 60, ["start"]),
   ];
+  standard[1].anchor = "right";
   standard[1].axisX = "look-x";
   standard[1].axisY = "look-y";
   standard[8].axisX = "lt";

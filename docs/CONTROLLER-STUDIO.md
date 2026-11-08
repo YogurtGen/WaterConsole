@@ -113,6 +113,16 @@ Button images: **Remove image** and **Remove pressed image** clear their own ima
 
 Use **Choose running game** beside **Browse .exe** to search open application windows. Select the game itself; WaterConsole fills its original executable and working directory without copying it. Review the title/controller, then save. The window list and executable paths are available only in the PC editor.
 
-**Start game** first reuses a matching open game window. **Auto · Steam or executable** launches through the official Steam client when the selected executable matches a local installed-game manifest; otherwise it opens the executable directly. **Direct executable** forces the latter. Custom arguments use the direct route; configure Steam launch options in Steam when needed. WaterConsole waits for the actual game window rather than attaching to a short-lived launcher process.
+**Start game** first reuses a matching open game window. **Auto · original launcher or executable** launches through the official Steam or Epic client when the selected executable matches a local installed-game manifest; otherwise it opens the executable directly. **Direct executable** forces the latter. Custom arguments use the direct route; configure Steam launch options in Steam when needed. WaterConsole waits for the actual game window rather than attaching to a short-lived launcher process.
 
 Leave **Only connect to an already running game** off for normal use. Turn it on only when WaterConsole should never launch that entry. A saved PID is a preference: a single matching current window can be reused after a restart; multiple matching windows require an explicit selection. A game you opened yourself stays open when returning Home. A game WaterConsole started is closed normally. No launcher, login or game ownership checks are bypassed.
+
+## Phone fit and built-in console models
+
+The **Console models** palette adds soft action/primary/face/shoulder buttons, a petal D-pad and an analog disc. Each is editable and adds one control without replacing your design. Select a control to choose its Visual style, D-pad model, colors, icon/image and **Phone anchor**.
+
+**Phone scaling → Fit to hands** uses left, center and right anchors so controls do not collect in the middle of a wide phone. It preserves proportions and spacing within each anchored group. Group related controls to keep them together. **Keep composition together** uses one uniform transform for exact relative spacing, while **Preserve full design canvas** also keeps unused outer margins. None of these modes greedily reorders controls. Visual shapes stay proportional; small controls get enlarged invisible touch targets.
+
+Studio opens on a **Phone canvas**. Select, drag and resize controls directly on the same header/layout used by the phone. Choose the phone size in **View**. **Test controls** temporarily switches from editing to local touch testing; **Back to editing** restores the edit handles. **Preview on my phone** sends the current draft to approved phones without running a game. The advanced **Raw coordinates · 960×540** view remains available. Phone settings → Adjust layout → Reset → Done restores the host layout if a previously saved personal adjustment is getting in the way. Never erase personal adjustments silently.
+
+The custom header follows WaterConsole's existing controller interface: game/player identity, connection/latency, Return Home, settings, fullscreen and segmented modes. See [store import](STORE-IMPORT.md) for filling an editable game setup from Steam or Epic.

@@ -126,6 +126,8 @@ export function resolveTheme(
   };
 }
 export interface FittedControl {
+  visual: { x: number; y: number; w: number; h: number };
+  scale: number;
   control: StudioControl;
   x: number;
   y: number;
@@ -137,91 +139,89 @@ export function fitControls(
   width: number,
   height: number,
   variant: "classic" | "assisted",
-): { items: FittedControl[]; compact: boolean; error?: string } {
+  layout: "design" | "responsive" | "content" | "canvas" = "responsive",
+): {
+  items: FittedControl[];
+  compact: boolean;
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+  error?: string;
+} {
   const visible = controls.filter(
     (c) => c.variant === "all" || c.variant === variant,
   );
+  const empty = {
+    items: [] as FittedControl[],
+    compact: false,
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+  };
   if (width < 240 || height < 160)
     return {
-      items: [],
-      compact: true,
+      ...empty,
       error:
-        "More room needed. Enter fullscreen, rotate your phone, or choose a compact mode.",
+        "More room needed. Enter fullscreen or rotate your phone. Your layout will not be rearranged.",
     };
-  const scale = Math.min(width / 960, height / 540);
-  const offX = (width - 960 * scale) / 2,
-    offY = (height - 540 * scale) / 2;
-  if (
-    visible.every((c) => c.kind === "label" || Math.min(c.w, c.h) * scale >= 44)
-  )
-    return {
-      compact: false,
-      items: visible.map((c) => ({
-        control: c,
-        x: offX + c.x * scale,
-        y: offY + c.y * scale,
-        w: c.w * scale,
-        h: c.h * scale,
-      })),
-    };
-  const items: FittedControl[] = [];
-  const ordered = [...visible].sort(
-    (a, b) =>
-      Number(["stick", "dpad"].includes(b.kind)) -
-        Number(["stick", "dpad"].includes(a.kind)) || b.w * b.h - a.w * a.h,
+  if (!visible.length) return empty;
+  const padding = layout === "design" ? 0 : 8;
+  const bounds =
+    layout === "content" || layout === "responsive"
+      ? {
+          x: Math.min(...visible.map((c) => c.x)),
+          y: Math.min(...visible.map((c) => c.y)),
+          right: Math.max(...visible.map((c) => c.x + c.w)),
+          bottom: Math.max(...visible.map((c) => c.y + c.h)),
+        }
+      : { x: 0, y: 0, right: 960, bottom: 540 };
+  const bw = Math.max(1, bounds.right - bounds.x),
+    bh = Math.max(1, bounds.bottom - bounds.y);
+  const scale = Math.min(
+    (width - padding * 2) / bw,
+    (height - padding * 2) / bh,
+    layout === "design"
+      ? Infinity
+      : Math.max(1, Math.min(width / 960, height / 540)),
   );
-  for (const c of ordered) {
-    const stick = c.kind === "stick" || c.kind === "dpad";
-    let w = Math.max(
-      stick ? 96 : 44,
-      Math.min(c.w * scale, stick ? Math.min(176, height * 0.72) : width * 0.6),
-    );
-    let h = Math.max(
-      stick ? 96 : 44,
-      Math.min(
-        c.h * scale,
-        stick ? Math.min(176, height * 0.72) : height * 0.58,
-      ),
-    );
-    if (
-      ["circle", "square", "triangle"].includes(c.shape) &&
-      c.kind !== "label"
-    )
-      w = h = Math.min(Math.max(w, h), height, width);
-    const targetX = clamp(
-        ((c.x + c.w / 2) / 960) * width - w / 2,
-        0,
-        width - w,
-      ),
-      targetY = clamp(((c.y + c.h / 2) / 540) * height - h / 2, 0, height - h);
-    let best: { x: number; y: number; cost: number } | undefined;
-    for (let y = 0; y + h <= height; y += 8)
-      for (let x = 0; x + w <= width; x += 8) {
-        const cost = (x - targetX) ** 2 + (y - targetY) ** 2;
-        if (best && cost >= best.cost) continue;
-        if (
-          items.some(
-            (r) =>
-              x < r.x + r.w + 4 &&
-              x + w + 4 > r.x &&
-              y < r.y + r.h + 4 &&
-              y + h + 4 > r.y,
-          )
-        )
-          continue;
-        best = { x, y, cost };
-      }
-    if (!best)
-      return {
-        items: [],
-        compact: true,
-        error:
-          "This layout needs more room. Rotate your phone or choose a mode with fewer controls. The host can adjust its compact layout.",
-      };
-    items.push({ control: c, x: best.x, y: best.y, w, h });
-  }
-  return { items, compact: true };
+  const offsetX = (width - bw * scale) / 2 - bounds.x * scale,
+    offsetY = (height - bh * scale) / 2 - bounds.y * scale;
+  const slack = Math.max(0, width - padding * 2 - bw * scale);
+  const groupAnchors = new Map<string, StudioControl["anchor"]>();
+  for (const c of visible)
+    if (c.group && !groupAnchors.has(c.group))
+      groupAnchors.set(c.group, c.anchor);
+  const items = visible.map((c) => {
+    const anchor = c.group ? groupAnchors.get(c.group)! : c.anchor;
+    const spread =
+      layout === "responsive"
+        ? anchor === "left"
+          ? -slack / 2
+          : anchor === "right"
+            ? slack / 2
+            : 0
+        : 0;
+    const visual = {
+      x: offsetX + c.x * scale + spread,
+      y: offsetY + c.y * scale,
+      w: c.w * scale,
+      h: c.h * scale,
+    };
+    const w = c.kind === "label" ? visual.w : Math.max(44, visual.w),
+      h = c.kind === "label" ? visual.h : Math.max(44, visual.h);
+    return {
+      control: c,
+      scale,
+      visual,
+      w,
+      h,
+      x: clamp(visual.x - (w - visual.w) / 2, 0, width - w),
+      y: clamp(visual.y - (h - visual.h) / 2, 0, height - h),
+    };
+  });
+  return { items, compact: false, scale, offsetX, offsetY };
 }
+
 export function snappedRect(
   c: StudioControl,
   patch: Partial<Pick<StudioControl, "x" | "y" | "w" | "h">>,

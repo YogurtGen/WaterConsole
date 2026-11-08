@@ -934,7 +934,7 @@ function ControllerApp() {
         nextSequence={() => seq.current++}
         haptics={haptics}
         error={error}
-        fullscreenHint={fullscreenHint}
+        rtt={rtt} fullscreenHint={fullscreenHint}
         onFullscreen={() => {
           neutral();
           if (document.fullscreenElement)

@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-Setup-0.4.4-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-0.4.4-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-Source-0.4.4.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Optional-Controller-Tools-0.4.4.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-Setup-0.5.0-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-0.5.0-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-Source-0.5.0.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Optional-Controller-Tools-0.5.0.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## Edit or delete an added game
 
@@ -35,6 +35,26 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 The cover has no extra menu button. Delete asks for confirmation and keeps the installed game files. Built-in/source-adapter entries stay source-managed. Phones can navigate/scroll the library; editing remains on the PC.
 
 For a banner that fills the Home panel, open **Edit game → Artwork → Banner → Display → Fill**. **Fit** displays the entire image and may leave space. See [the artwork and controller guide](docs/CONTROLLER-STUDIO.md).
+
+## Import your installed games
+
+Open **Add game → Scan Steam & Epic** to fill an editable setup from local installations. Missing official details and artwork download when online and stay cached. Review the executable, player count and bindings before saving. See [store import](docs/STORE-IMPORT.md).
+
+Controller Studio edits the actual phone layout using the same controller frame and geometry. Left/right anchors keep controls near your thumbs; exact-composition and full-canvas modes remain available. Choose soft console buttons and the petal D-pad, then customize them.
+
+![WaterConsole custom phone controller with hand-anchored layout and petal D-pad](docs/media/studio-phone-layout.png)
+
+*Original documentation fixture; browser preview, not a physical-phone comfort test.*
+
+## Import your installed games
+
+Open **Add game → Scan Steam & Epic** to fill an editable setup from local installations. Missing official details and artwork download when online and stay cached. Review the executable, player count and bindings before saving. See [store import](docs/STORE-IMPORT.md).
+
+Controller Studio and phones share the same controller frame and geometry. Left/right anchors keep controls near your thumbs; exact-composition and full-canvas modes remain available. Choose soft console buttons and the petal D-pad, then customize them.
+
+![WaterConsole custom phone controller with hand-anchored layout and petal D-pad](docs/media/studio-phone-layout.png)
+
+*Original documentation fixture; browser preview, not a physical-phone comfort test.*
 
 ## What is included
 

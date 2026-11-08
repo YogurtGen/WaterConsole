@@ -52,8 +52,12 @@ export async function importImage(store: LibraryStore, filename: string) {
   const info = await stat(filename);
   if (!info.isFile() || info.size > 25 * 1024 * 1024)
     throw new Error("Choose an image smaller than 25 MiB.");
-  const bytes = await readFile(filename),
-    size = imageDimensions(bytes);
+  return importImageBytes(store, await readFile(filename));
+}
+export async function importImageBytes(store: LibraryStore, bytes: Buffer) {
+  if (bytes.length > 25 * 1024 * 1024)
+    throw new Error("Choose an image smaller than 25 MiB.");
+  const size = imageDimensions(bytes);
   if (!size.width || !size.height || size.width * size.height > 32e6)
     throw new Error("Choose an image below 32 megapixels.");
   let image = nativeImage.createFromBuffer(bytes);

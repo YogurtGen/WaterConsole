@@ -294,7 +294,7 @@ try {
   checks.push(
     "Studio spotlight covers ten targets, replays and Escape dismisses only the guide",
   );
-  await page.getByRole("button", { name: "Race", exact: true }).click();
+  await page.locator(".studio-editor-header").getByRole("button", { name: "Race", exact: true }).click();
   await page.getByLabel("View", { exact: true }).selectOption("390x844");
   await page.screenshot({ path: output + "/studio-phone-preview.png" });
   await page.getByLabel("View", { exact: true }).selectOption("design");
@@ -365,11 +365,11 @@ try {
   await expect
     .poll(() =>
       page
-        .locator(".studio-surface")
+        .locator(".studio-surface-backdrop")
         .evaluate((el) => getComputedStyle(el).backgroundImage),
     )
     .toContain("user-assets/");
-  const loaded = await page.locator(".studio-surface").evaluate(async (el) => {
+  const loaded = await page.locator(".studio-surface-backdrop").evaluate(async (el) => {
     const url = getComputedStyle(el).backgroundImage.slice(5, -2);
     const img = new Image();
     img.src = url;
@@ -381,7 +381,7 @@ try {
     .locator(".studio-canvas-colors")
     .getByRole("button", { name: "Remove image", exact: true })
     .click();
-  await expect(page.locator(".studio-surface")).toHaveCSS(
+  await expect(page.locator(".studio-surface-backdrop")).toHaveCSS(
     "background-image",
     "none",
   );
@@ -389,7 +389,7 @@ try {
   await expect
     .poll(() =>
       page
-        .locator(".studio-surface")
+        .locator(".studio-surface-backdrop")
         .evaluate((el) => getComputedStyle(el).backgroundImage),
     )
     .toContain("user-assets/");

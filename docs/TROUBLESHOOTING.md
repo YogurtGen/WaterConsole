@@ -130,3 +130,11 @@ For an AI-assisted fix, include the WaterConsole version, selected mode/variant/
 Use the mouse wheel directly over a game row, its left/right arrows, a trackpad or swipe. Navigator-phone directions change selection and reveal the selected card automatically. Right-click editing/deletion belongs to the PC; only Add Game entries have editable records. Delete removes the WaterConsole entry, never the installed game.
 
 In Controller Studio, select a control → **Color & fill** → Fill/Text/Icon. Switch **Normal / While pressed** for its held state. The base **Canvas background** remains available when nothing is selected. Open **Role & player themes** for mode/Navigator/P1–P4 overrides. **Text color** changes labels and **Icon color** changes built-in glyphs/direction symbols. Their separate **Pressed…** colors apply while held. An inherited icon uses the inherited text color until overridden. Uploaded image buttons are not recolored. Use the local Preview on my phone to check the result safely.
+
+### Store scan or missing artwork
+
+Open Add game → Scan Steam & Epic. Only installed Windows games from recognized local manifests appear. Refresh after installing/moving a game. Multiple executables require review; Browse .exe or Choose running game remains available. An already-added title uses its existing card. If a store cannot be reached, local details still fill the setup; use your own artwork or retry importing before saving. Unknown compatibility/player counts require your own test. Imported details can be edited from the card's PC right-click menu.
+
+### Controller collects in the center or differs from Studio
+
+Use Controller Studio → Phone scaling → Fit to hands and select the intended Left hand / Center / Right hand anchor on controls. Group related controls. Inspect the matching phone View so the header is included. Keep composition together intentionally retains all relative spacing; full-canvas mode also preserves blank margins. On the phone, gear → Adjust layout → Reset → Done removes that browser's personal offsets without changing the host design. Refresh the phone after updating the PC app.

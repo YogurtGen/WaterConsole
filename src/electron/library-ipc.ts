@@ -10,9 +10,11 @@ import type {
 import { LibraryStore } from "./library-store";
 import { importImage, cropImage } from "./library-images";
 import type { NativeRouter } from "./native-router";
+import { StoreImporter } from "./store-importer";
 export class LibraryCoordinator {
   store!: LibraryStore;
   private locked = false;
+  private importer!: StoreImporter;
   constructor(
     private runtime: () => NativeRouter | null,
     private validSender: (event: Electron.IpcMainInvokeEvent) => void,
@@ -59,6 +61,7 @@ export class LibraryCoordinator {
     }
     this.store = new LibraryStore(base, [app.getPath("exe"), process.execPath]);
     await this.store.initialize();
+    this.importer = new StoreImporter(this.store, GAMES);
   }
   config() {
     return {
@@ -99,6 +102,18 @@ export class LibraryCoordinator {
         this.locked = true;
         try {
           switch (command.type) {
+            case "scan-stores":
+              return { ok: true, scan: await this.importer.scan() };
+            case "prepare-store-game":
+              if (typeof command.key !== "string" || command.key.length > 300)
+                throw new Error("Invalid store selection.");
+              return {
+                ok: true,
+                ...(await this.importer.prepare(
+                  command.key,
+                  command.executable,
+                )),
+              };
             case "running-windows":
               return {
                 ok: true,
@@ -239,6 +254,7 @@ export class LibraryCoordinator {
                 { mode: 0o600 },
               );
               this.store = next;
+              this.importer = new StoreImporter(next, GAMES);
               this.runtime()?.setStore(next);
               await this.publish();
               return {

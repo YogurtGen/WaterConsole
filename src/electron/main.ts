@@ -372,7 +372,7 @@ if (singleInstance)
       ()=>{if(!quitting&&process.env.WATERCONSOLE_TEST!=="1")window?.minimize();},
       ()=>{if(!quitting&&window&&process.env.WATERCONSOLE_TEST!=="1"){window.restore();window.show();window.focus();}},
       feedback=>service?.postMessage({type:"native-rumble",feedback}),
-      appId=>shell.openExternal("steam://rungameid/"+appId));
+      appId=>shell.openExternal("steam://rungameid/"+appId),route=>shell.openExternal(route));
     await nativeGame.initialize();
     const rendererRoot = path.join(app.getAppPath(), "build", "renderer");
     const gameArtwork = await loadLocalGameArtwork(

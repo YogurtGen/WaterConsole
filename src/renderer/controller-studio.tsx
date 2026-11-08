@@ -1,3 +1,4 @@
+import { CONSOLE_MODELS, consoleControl } from "../shared/controller-models";
 import { VisualBinding } from "./visual-binding";
 import { EditorBoundary } from "./editor-boundary";
 import { actionChoices, actionLabel } from "../shared/binding-tools";
@@ -25,7 +26,11 @@ import {
   type OutputBinding,
   type ArtworkSlot,
 } from "../shared/studio-model";
-import { snappedRect, resolveTheme } from "../shared/studio-engine";
+import {
+  fitControls,
+  snappedRect,
+  resolveTheme,
+} from "../shared/studio-engine";
 import type { HostState } from "../shared/types";
 import { StudioSurface, hostAsset } from "./studio-surface";
 import {
@@ -38,6 +43,7 @@ import {
 } from "./builder-primitives";
 import { IconPicker } from "./icon-picker";
 import { CropEditor } from "./crop-editor";
+import { StudioDeviceFrame } from "./studio-phone-frame";
 interface Props {
   game: LocalGameRecord;
   onChange: (game: LocalGameRecord) => void;
@@ -65,7 +71,8 @@ export function ControllerStudio({
     [slot, setSlot] = useState(1),
     [role, setRole] = useState("navigator"),
     [variant, setVariant] = useState<"classic" | "assisted">("assisted"),
-    [size, setSize] = useState("design"),
+    [size, setSize] = useState("844x390"),
+    [testTouches, setTestTouches] = useState(false),
     [iconOpen, setIconOpen] = useState(false),
     [visualOpen, setVisualOpen] = useState(false),
     [crop, setCrop] = useState<{
@@ -97,7 +104,11 @@ export function ControllerStudio({
     redo = useRef<LocalGameRecord[]>([]);
   const canvasHost = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(700);
+  const [surfaceLayout, setSurfaceLayout] = useState<ReturnType<
+    typeof fitControls
+  > | null>(null);
   const gesture = useRef<{
+    factor: number;
     x: number;
     y: number;
     resize: boolean;
@@ -313,6 +324,7 @@ export function ControllerStudio({
     redo.current = [];
     setHistoryTick((x) => x + 1);
     gesture.current = {
+      factor: viewScale * (size === "design" ? 1 : (surfaceLayout?.scale ?? 1)),
       x: e.clientX,
       y: e.clientY,
       resize,
@@ -323,8 +335,8 @@ export function ControllerStudio({
   function drag(e: PE<HTMLDivElement>) {
     const g = gesture.current;
     if (!g || !e.currentTarget.hasPointerCapture(e.pointerId)) return;
-    let dx = (e.clientX - g.x) / scale,
-      dy = (e.clientY - g.y) / scale;
+    let dx = (e.clientX - g.x) / g.factor,
+      dy = (e.clientY - g.y) / g.factor;
     const controls = g.original.filter(
       (c) => g.ids.includes(c.id) && !c.locked,
     );
@@ -652,7 +664,7 @@ export function ControllerStudio({
       target: ".studio-canvas-footer",
       title: "Preview safely, then test",
       description:
-        "Preview on my phone sends your draft to approved phones without controlling a game. Save & test in game launches explicitly. Your phone has its own Vibration toggle and Test button.",
+        "The Phone canvas is also your editing canvas: its header, positions, shapes and sizes match the phone. Test controls tries local touches. Preview on my phone sends your draft to approved phones without controlling a game. Save & test in game launches explicitly. Your phone has its own Vibration toggle and Test button.",
     },
     {
       target: '[data-guide="studio-save"]',
@@ -763,6 +775,30 @@ export function ControllerStudio({
               </button>
             ))}
           </Panel>
+          <Panel title="Console models">
+            <small>
+              Use the same controls as the built-in console layouts.
+            </small>
+            <div className="studio-model-palette">
+              {CONSOLE_MODELS.map((model) => (
+                <button
+                  key={model.id}
+                  onClick={() => {
+                    const c = consoleControl(model.id, visibleTheme);
+                    commit((d) => {
+                      d.controller.modes
+                        .find((m) => m.id === mode.id)!
+                        .controls.push(c);
+                    });
+                    setSelected([c.id]);
+                  }}
+                >
+                  <span className={"studio-model-sample " + model.id} />
+                  {model.name}
+                </button>
+              ))}
+            </div>
+          </Panel>
           <Panel title="Mode">
             <label className="builder-field">
               Name
@@ -784,7 +820,9 @@ export function ControllerStudio({
                   Choose template…
                 </option>
                 {["menu", "standard", "fight", "race"].map((x) => (
-                  <option key={x}>{x}</option>
+                  <option key={x} value={x}>
+                    Phone canvas · {x.replace("x", " × ")}
+                  </option>
                 ))}
               </select>
             </label>
@@ -830,8 +868,9 @@ export function ControllerStudio({
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
               >
-                <option value="design">Design · 960 × 540</option>
+                <option value="design">Raw coordinates · 960 × 540</option>
                 {[
+                  "780x360",
                   "568x320",
                   "640x360",
                   "844x390",
@@ -841,7 +880,9 @@ export function ControllerStudio({
                   "412x915",
                   "1024x768",
                 ].map((x) => (
-                  <option key={x}>{x}</option>
+                  <option key={x} value={x}>
+                    Phone preview · {x.replace("x", " × ")}
+                  </option>
                 ))}
               </select>
             </label>
@@ -900,73 +941,100 @@ export function ControllerStudio({
                   background: visibleTheme.background,
                 }}
               >
-                <StudioSurface
-                  definition={game.controller}
+                <StudioDeviceFrame
+                  active={size !== "design"}
+                  title={game.title}
+                  modes={game.controller.modes}
                   modeId={mode.id}
+                  onMode={setModeId}
+                  theme={visibleTheme}
                   slot={slot}
-                  navigator={role === "navigator"}
-                  hostPreview={role === "host"}
-                  variant={variant}
-                  enabled={size !== "design"}
-                  readOnly={size === "design"}
-                  observed={
-                    preview
-                      ? state.players.find((p) => p.slot === slot)?.studio
-                      : undefined
-                  }
-                />
-                {size === "design" && (
-                  <div
-                    className={
-                      "studio-design-overlay " +
-                      (game.controller.grid.visible ? "grid-visible" : "")
+                >
+                  <StudioSurface
+                    designCanvas={size === "design"}
+                    definition={game.controller}
+                    modeId={mode.id}
+                    slot={slot}
+                    navigator={role === "navigator"}
+                    hostPreview={role === "host"}
+                    variant={variant}
+                    onLayout={setSurfaceLayout}
+                    enabled={testTouches && size !== "design"}
+                    readOnly={!testTouches || size === "design"}
+                    observed={
+                      preview
+                        ? state.players.find((p) => p.slot === slot)?.studio
+                        : undefined
                     }
-                    style={{
-                      backgroundSize: `${game.controller.grid.size}px ${game.controller.grid.size}px`,
-                    }}
-                    onPointerDown={(e) => {
-                      if (e.target === e.currentTarget) setSelected([]);
-                    }}
-                  >
-                    {visible.map((c) => (
-                      <div
-                        key={c.id}
-                        className={
-                          "studio-edit-control " +
-                          (selected.includes(c.id) ? "selected" : "") +
-                          (c.locked ? " locked" : "")
-                        }
-                        style={{ left: c.x, top: c.y, width: c.w, height: c.h }}
-                        onPointerDown={(e) => begin(e, c)}
-                        onPointerMove={drag}
-                        onPointerUp={() => {
-                          gesture.current = null;
-                        }}
-                        onPointerCancel={() => {
-                          gesture.current = null;
-                        }}
-                        onLostPointerCapture={() => {
-                          gesture.current = null;
-                        }}
-                      >
-                        <span className="studio-control-name">
-                          {c.label || c.kind}
-                        </span>
-                        {selected.includes(c.id) && !c.locked && (
+                  />
+                  {(!testTouches || size === "design") && (
+                    <div
+                      className={
+                        "studio-design-overlay " +
+                        (game.controller.grid.visible ? "grid-visible" : "")
+                      }
+                      style={{
+                        backgroundSize: `${game.controller.grid.size * (size === "design" ? 1 : (surfaceLayout?.scale ?? 1))}px ${game.controller.grid.size * (size === "design" ? 1 : (surfaceLayout?.scale ?? 1))}px`,
+                      }}
+                      onPointerDown={(e) => {
+                        if (e.target === e.currentTarget) setSelected([]);
+                      }}
+                    >
+                      {visible.map((c) => {
+                        const rect =
+                          size === "design"
+                            ? c
+                            : surfaceLayout?.items.find(
+                                (i) => i.control.id === c.id,
+                              )?.visual;
+                        if (!rect) return null;
+                        return (
                           <div
-                            className="studio-resize"
-                            aria-label="Resize control"
-                            onPointerDown={(e) => begin(e, c, true)}
+                            key={c.id}
+                            className={
+                              "studio-edit-control " +
+                              (selected.includes(c.id) ? "selected" : "") +
+                              (c.locked ? " locked" : "")
+                            }
+                            data-edit-control={c.id}
+                            style={{
+                              left: rect.x,
+                              top: rect.y,
+                              width: rect.w,
+                              height: rect.h,
+                            }}
+                            onPointerDown={(e) => begin(e, c)}
                             onPointerMove={drag}
                             onPointerUp={() => {
                               gesture.current = null;
                             }}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                            onPointerCancel={() => {
+                              gesture.current = null;
+                            }}
+                            onLostPointerCapture={() => {
+                              gesture.current = null;
+                            }}
+                          >
+                            <span className="studio-control-name">
+                              {c.label || c.kind}
+                            </span>
+                            {selected.includes(c.id) && !c.locked && (
+                              <div
+                                className="studio-resize"
+                                aria-label="Resize control"
+                                onPointerDown={(e) => begin(e, c, true)}
+                                onPointerMove={drag}
+                                onPointerUp={() => {
+                                  gesture.current = null;
+                                }}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </StudioDeviceFrame>
               </div>
             </div>
           </div>
@@ -1082,6 +1150,14 @@ export function ControllerStudio({
             </select>
           </div>
           <footer className="studio-canvas-footer">
+            {size !== "design" && (
+              <button
+                aria-pressed={testTouches}
+                onClick={() => setTestTouches((v) => !v)}
+              >
+                {testTouches ? "Back to editing" : "Test controls"}
+              </button>
+            )}
             <button onClick={() => void togglePreview()}>
               {preview ? "End phone preview" : "Preview on my phone"}
             </button>
@@ -1099,8 +1175,8 @@ export function ControllerStudio({
             </button>
             <small>
               {size === "design"
-                ? "Edit selects controls; it never controls your game."
-                : "Device simulation · drag controls to test locally. Safe areas are reserved on your actual phone."}
+                ? "Raw coordinates · advanced design space. Choose a Phone canvas to edit the actual phone layout."
+                : "Edit the same layout your phone uses · drag to move, use the corner to resize. Test controls tries touches without running a game."}
             </small>
           </footer>
         </div>
@@ -1191,6 +1267,30 @@ export function ControllerStudio({
               )}
               <Panel title="Controller">
                 <label className="builder-field">
+                  Phone scaling
+                  <select
+                    aria-label="Phone scaling"
+                    value={game.controller.layoutFit ?? "responsive"}
+                    onChange={(e) =>
+                      commit((d) => {
+                        d.controller.layoutFit = e.target.value as
+                          "responsive" | "content" | "canvas";
+                      })
+                    }
+                  >
+                    <option value="responsive">
+                      Fit to hands · left / center / right
+                    </option>
+                    <option value="content">Keep composition together</option>
+                    <option value="canvas">Preserve full design canvas</option>
+                  </select>
+                  <small>
+                    Fit to hands uses each control’s phone anchor to keep side
+                    controls near your thumbs. Groups stay together. Use Keep
+                    composition together for exact spacing.
+                  </small>
+                </label>
+                <label className="builder-field">
                   Button labels
                   <select
                     value={game.controller.labels}
@@ -1224,6 +1324,40 @@ export function ControllerStudio({
               {active && (
                 <>
                   <Panel title="Selected control">
+                    <label className="builder-field">
+                      Visual style
+                      <select
+                        aria-label="Visual style"
+                        value={active.appearance ?? "console"}
+                        onChange={(e) =>
+                          patchControl({ appearance: e.target.value as any })
+                        }
+                      >
+                        <option value="console">Console · soft</option>
+                        <option value="primary">Primary action</option>
+                        <option value="raised">Raised</option>
+                        <option value="outline">Outline</option>
+                      </select>
+                    </label>
+                    {active.kind === "dpad" && (
+                      <label className="builder-field">
+                        D-pad model
+                        <select
+                          aria-label="D-pad model"
+                          value={active.dpadStyle ?? "petals"}
+                          onChange={(e) =>
+                            patchControl({ dpadStyle: e.target.value as any })
+                          }
+                        >
+                          <option value="petals">Console petals</option>
+                          <option value="cross">Cross</option>
+                          <option value="disc">Disc</option>
+                        </select>
+                      </label>
+                    )}
+                    <small>
+                      Appearance changes keep your position, size and bindings.
+                    </small>
                     <label className="builder-field">
                       Label / accessible name
                       <input
@@ -1346,7 +1480,10 @@ export function ControllerStudio({
                     {(active.image || active.pressedImage) && (
                       <div className="builder-actions">
                         {active.image && (
-                          <button aria-label="Remove button image" onClick={() => removeButtonImage()}>
+                          <button
+                            aria-label="Remove button image"
+                            onClick={() => removeButtonImage()}
+                          >
                             Remove image
                           </button>
                         )}
@@ -1379,6 +1516,27 @@ export function ControllerStudio({
                         </small>
                       </label>
                     )}
+                    <label className="builder-field">
+                      Phone anchor
+                      <select
+                        aria-label="Phone anchor"
+                        value={active.anchor}
+                        onChange={(e) =>
+                          patchControl({
+                            anchor: e.target.value as
+                              "left" | "center" | "right",
+                          })
+                        }
+                      >
+                        <option value="left">Left hand</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right hand</option>
+                      </select>
+                      <small>
+                        On a wider phone, this control follows the chosen side.
+                        Group related controls to keep their spacing together.
+                      </small>
+                    </label>
                     <div className="builder-two">
                       <NumberField
                         label="Icon size"

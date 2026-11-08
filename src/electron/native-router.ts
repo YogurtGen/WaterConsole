@@ -17,6 +17,7 @@ import type { LocalGameRecord } from "../shared/studio-model";
 import { LibraryStore } from "./library-store";
 import {
   detectSteamApp,
+  detectEpicApp,
   selectGameProcess,
   waitForGameWindow,
 } from "./game-launch";
@@ -71,6 +72,7 @@ export class NativeRouter {
     private onReturn: () => void,
     private onRumble: (r: NativeRumble) => void,
     private openSteam?: (appId: string) => Promise<void>,
+    private openEpic?: (route: string) => Promise<void>,
   ) {
     this.legacySnapshot = legacy.getState();
   }
@@ -410,6 +412,12 @@ export class NativeRouter {
           record.launch.method !== "direct" && record.launch.args.length === 0
             ? await detectSteamApp(record.launch.executable)
             : undefined;
+        const epic =
+          !steamId &&
+          record.launch.method !== "direct" &&
+          record.launch.args.length === 0
+            ? await detectEpicApp(record.launch.executable)
+            : undefined;
         if (steamId) {
           if (!this.openSteam)
             throw new Error(
@@ -420,6 +428,16 @@ export class NativeRouter {
               "Opening the game through Steam. Complete any launcher sign-in or update on the PC.",
           });
           await this.openSteam(steamId);
+        } else if (epic) {
+          if (!this.openEpic)
+            throw new Error(
+              "Epic launch is unavailable. Open the game through Epic first.",
+            );
+          this.publish({
+            message:
+              "Opening the game through Epic Games. Complete any launcher sign-in or update on the PC.",
+          });
+          await this.openEpic(epic);
         } else {
           const child = spawn(record.launch.executable, record.launch.args, {
             cwd: record.launch.cwd || undefined,

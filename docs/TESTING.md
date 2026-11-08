@@ -74,3 +74,9 @@ To additionally create virtual controllers and launch only that owned fixture, d
 For a packaged app, set `WATERCONSOLE_EXECUTABLE` to its exact executable; for a custom development Electron runtime also set `WATERCONSOLE_APP_ROOT` to this checkout. All caches/reports remain in the checkout. Do not publish live pairing state or its local data folder.
 
 `npm run test:editor` checks the native file picker through a controlled owned fixture, first-use spotlight/Skip/replay/persistence, target interaction, keyboard dismissal, all crop and Studio guide steps, icon/shape/color editing and library persistence. It does not launch the selected fixture or third-party games. Screenshot connection/path values are sanitized before public documentation use.
+
+### Layout fidelity and store import
+
+Run `node scripts/run-local.mjs scripts/test-layout-fidelity.mjs` for the shared Studio/phone geometry comparison and console-model palette. It uses an isolated library and browser-emulated phones, without launching a commercial game. `tests/controller-fidelity.test.ts` covers shape/size ratios and hand anchors; `tests/store-import.test.ts` covers fixture discovery, manifest containment, launcher identity, metadata identity, destination allowlists, redirects and response bounds. Real metadata availability and physical-phone comfort are separate manual checks.
+
+Run `node scripts/run-local.mjs scripts/test-store-picker.mjs` for the import-dialog layout regression:18 generic installed-game fixtures, long titles/paths, four desktop sizes down to800×600, selection/launch-file panel, store filtering, search and editable import. It uses an isolated test IPC fixture, launches no game and fetches no publisher artwork. Scrollable flex-column rows must not shrink into overlapping text.
