@@ -292,6 +292,41 @@ try {
       )
       .toBe(true);
   }
+  const orientationBeforeModes = await Promise.all(
+    phones.map((phone) =>
+      phone.page.evaluate(() => ({
+        locks: window.__orientationLocks.length,
+        unlocks: window.__orientationUnlocks,
+      })),
+    ),
+  );
+  for (const modeId of ["standard", "menu", "fight", "race", "menu"]) {
+    await phones[0].page
+      .getByRole("button", {
+        name: game.controller.modes.find((m) => m.id === modeId).name,
+        exact: true,
+      })
+      .click();
+    for (const [index, phone] of phones.entries()) {
+      await expect(
+        phone.page.locator(".studio-phone-modes .selected"),
+      ).toHaveText(game.controller.modes.find((m) => m.id === modeId).name);
+      assert.deepEqual(
+        await phone.page.evaluate(() => ({
+          locks: window.__orientationLocks.length,
+          unlocks: window.__orientationUnlocks,
+        })),
+        orientationBeforeModes[index],
+      );
+      assert.equal(
+        await phone.page.evaluate(() => !!document.fullscreenElement),
+        true,
+      );
+    }
+  }
+  pass(
+    "Menu / Standard / Fight / Race switches retain the same landscape lock and fullscreen on all four phones",
+  );
   const menuPhone = phones[0];
   await menuPhone.page.evaluate(() => document.exitFullscreen());
   await expect(menuPhone.page.locator(".studio-phone-rotate")).toContainText(
@@ -378,6 +413,10 @@ try {
       })
     ).ok,
   );
+  await p.page.evaluate(() => document.exitFullscreen());
+  await p.page
+    .getByRole("button", { name: "Toggle fullscreen", exact: true })
+    .click();
   await expect(p.page.locator(".studio-phone-rotate")).toContainText(
     "could not lock",
   );
@@ -394,6 +433,10 @@ try {
       })
     ).ok,
   );
+  await p.page.evaluate(() => document.exitFullscreen());
+  await p.page
+    .getByRole("button", { name: "Toggle fullscreen", exact: true })
+    .click();
   await expect(p.page.locator(".studio-phone-rotate")).toHaveCount(0);
   pass(
     "Gameplay requests landscape and shows an honest fallback when the browser denies it",

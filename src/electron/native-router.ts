@@ -15,6 +15,12 @@ import type {
 import { resolveBindings, type DeviceOutput } from "../shared/studio-engine";
 import type { LocalGameRecord } from "../shared/studio-model";
 import { LibraryStore } from "./library-store";
+import {
+  detectSteamApp,
+  selectGameProcess,
+  waitForGameWindow,
+} from "./game-launch";
+import type { RunningGameWindow } from "../shared/studio-model";
 const run = promisify(execFile);
 interface LegacyRuntime {
   initialize(): Promise<NativeRuntimeState>;
@@ -64,6 +70,7 @@ export class NativeRouter {
     private onActivate: () => void,
     private onReturn: () => void,
     private onRumble: (r: NativeRumble) => void,
+    private openSteam?: (appId: string) => Promise<void>,
   ) {
     this.legacySnapshot = legacy.getState();
   }
@@ -143,6 +150,37 @@ export class NativeRouter {
       title: string;
       window: boolean;
     }>;
+  }
+  async windows(): Promise<RunningGameWindow[]> {
+    const { stdout } = await run(this.helperPath, ["--windows"], {
+      windowsHide: true,
+      timeout: 8000,
+      maxBuffer: 1024 * 1024,
+    });
+    const raw = JSON.parse(stdout).windows;
+    if (!Array.isArray(raw) || raw.length > 512)
+      throw new Error("Unable to list application windows.");
+    const windows: RunningGameWindow[] = [];
+    for (const item of raw) {
+      if (
+        !Number.isSafeInteger(item.pid) ||
+        item.pid <= 0 ||
+        typeof item.executable !== "string" ||
+        item.executable.length > 2048 ||
+        typeof item.title !== "string"
+      )
+        continue;
+      try {
+        const executable = await this.store.validateExecutable(item.executable);
+        if (executable)
+          windows.push({
+            pid: item.pid,
+            title: item.title.slice(0, 180),
+            executable,
+          });
+      } catch {}
+    }
+    return windows.sort((a, b) => a.title.localeCompare(b.title));
   }
   async command(c: NativeCommand): Promise<CommandResult> {
     if (c.type === "start" && c.gameId?.startsWith("local-"))
@@ -357,37 +395,54 @@ export class NativeRouter {
           });
       });
       await ready;
-      if (record.launch.attachOnly) {
-        const found = await this.processes(record.launch.executable);
-        const match = record.launch.attachPid
-          ? found.find((p) => p.pid === record.launch.attachPid)
-          : found.filter((p) => p.window).length === 1
-            ? found.find((p) => p.window)
-            : undefined;
-        if (!match)
-          throw new Error(
-            "Open the game through its normal launcher, then select its running window in Edit game.",
-          );
-        this.pid = match.pid;
+      const existing = selectGameProcess(
+        await this.processes(record.launch.executable),
+        record.launch.attachPid,
+      );
+      if (existing) {
+        this.pid = existing.pid;
       } else {
-        const child = spawn(record.launch.executable, record.launch.args, {
-          cwd: record.launch.cwd || undefined,
-          stdio: "ignore",
-          windowsHide: false,
-        });
-        await new Promise<void>((resolve, reject) => {
-          child.once("spawn", resolve);
-          child.once("error", () =>
-            reject(
-              new Error(
-                "The game could not start. Check its original launcher and installation.",
-              ),
-            ),
+        if (record.launch.attachOnly)
+          throw new Error(
+            "No matching game window is open. Open it through its launcher, or turn off Only connect to an already running game in Edit game.",
           );
-        });
-        this.pid = child.pid!;
+        const steamId =
+          record.launch.method !== "direct" && record.launch.args.length === 0
+            ? await detectSteamApp(record.launch.executable)
+            : undefined;
+        if (steamId) {
+          if (!this.openSteam)
+            throw new Error(
+              "Steam launch is unavailable. Use Direct executable or open the game through Steam first.",
+            );
+          this.publish({
+            message:
+              "Opening the game through Steam. Complete any launcher sign-in or update on the PC.",
+          });
+          await this.openSteam(steamId);
+        } else {
+          const child = spawn(record.launch.executable, record.launch.args, {
+            cwd: record.launch.cwd || undefined,
+            stdio: "ignore",
+            windowsHide: false,
+          });
+          await new Promise<void>((resolve, reject) => {
+            child.once("spawn", resolve);
+            child.once("error", () =>
+              reject(
+                new Error(
+                  "The game could not start. Check its original launcher and installation.",
+                ),
+              ),
+            );
+          });
+          child.unref();
+        }
+        const window = await waitForGameWindow(() =>
+          this.processes(record.launch.executable),
+        );
+        this.pid = window.pid;
         this.owned = true;
-        child.unref();
       }
       const attached = this.waitFor("attached", 8000);
       this.write({ type: "attach", pid: this.pid });

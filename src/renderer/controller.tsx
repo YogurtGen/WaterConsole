@@ -540,8 +540,6 @@ function ControllerApp() {
     entered,
     fullscreen,
     wantLandscape,
-    state?.studio?.modeId,
-    state?.native.controls,
     neutral,
   ]);
   useEffect(() => {

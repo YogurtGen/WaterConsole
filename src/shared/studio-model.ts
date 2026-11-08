@@ -172,6 +172,7 @@ export interface LocalGameRecord {
     cwd: string;
     args: string[];
     attachOnly: boolean;
+    method?: "auto" | "direct";
     attachPid?: number;
   };
   artwork: { cover?: ArtworkSlot; banner?: ArtworkSlot };
@@ -193,7 +194,13 @@ export interface StudioSession {
   modeId: string;
   preview: boolean;
 }
+export interface RunningGameWindow {
+  pid: number;
+  title: string;
+  executable: string;
+}
 export interface LibraryResult {
+  windows?: RunningGameWindow[];
   ok: boolean;
   error?: string;
   games?: LocalGameRecord[];
@@ -210,6 +217,7 @@ export interface LibraryResult {
 export type LibraryCommand =
   | { type: "list" }
   | { type: "choose-executable" }
+  | { type: "running-windows" }
   | { type: "choose-image" }
   | { type: "save"; game: LocalGameRecord }
   | { type: "remove"; id: string }

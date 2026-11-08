@@ -99,6 +99,11 @@ export class LibraryCoordinator {
         this.locked = true;
         try {
           switch (command.type) {
+            case "running-windows":
+              return {
+                ok: true,
+                windows: (await this.runtime()?.windows()) ?? [],
+              };
             case "choose-executable": {
               const choice = await dialog.showOpenDialog({
                 title: "Choose the original game executable",

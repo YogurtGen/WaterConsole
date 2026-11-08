@@ -2,6 +2,7 @@ import {NativeRouter} from "./native-router";
 import {LibraryCoordinator} from "./library-ipc";
 import {
   app,
+  shell,
   BrowserWindow,
   dialog,
   ipcMain,
@@ -234,7 +235,7 @@ async function request(command?: HostCommand): Promise<unknown> {
         requests.delete(id);
         reject(new Error("The local server took too long to respond."));
       },
-      command?.type === "startGame" ? 75_000 : 25000,
+      command?.type === "startGame" && command.gameId.startsWith("local-") ? 100_000 : command?.type === "startGame" ? 75_000 : 25000,
     );
     requests.set(id, { resolve, reject, timer });
     service!.postMessage({
@@ -370,7 +371,8 @@ if (singleInstance)
       state=>service?.postMessage({type:"native-state",state}),
       ()=>{if(!quitting&&process.env.WATERCONSOLE_TEST!=="1")window?.minimize();},
       ()=>{if(!quitting&&window&&process.env.WATERCONSOLE_TEST!=="1"){window.restore();window.show();window.focus();}},
-      feedback=>service?.postMessage({type:"native-rumble",feedback}));
+      feedback=>service?.postMessage({type:"native-rumble",feedback}),
+      appId=>shell.openExternal("steam://rungameid/"+appId));
     await nativeGame.initialize();
     const rendererRoot = path.join(app.getAppPath(), "build", "renderer");
     const gameArtwork = await loadLocalGameArtwork(

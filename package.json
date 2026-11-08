@@ -1,6 +1,6 @@
 {
   "name": "waterconsole-core",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": true,
   "description": "Open-source local multiplayer console. Playing together should be free.",
   "author": "WaterConsole contributors",

@@ -1,6 +1,6 @@
 import { _electron, expect } from "playwright/test";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs/promises";
 const root = process.cwd(),
   output = path.join(root, ".local", "editor-test");
@@ -39,7 +39,7 @@ const appArgs = process.env.WATERCONSOLE_APP_ROOT
   : process.env.WATERCONSOLE_EXECUTABLE
     ? []
     : [root];
-let app;
+let app, windowFixture;
 const checks = [],
   errors = [];
 try {
@@ -131,6 +131,65 @@ try {
   );
   await page.getByLabel("Game title", { exact: true }).fill("My Fixture Game");
   checks.push("Native picker stores a validated executable and editable title");
+  windowFixture = spawn(
+    output + "/WaterConsole.InputFixture.exe",
+    [output + "/window-report.json"],
+    { stdio: "ignore", windowsHide: false },
+  );
+  await expect
+    .poll(async () =>
+      page.evaluate(
+        (pid) =>
+          window.waterconsole
+            .library({ type: "running-windows" })
+            .then((r) => r.windows?.some((w) => w.pid === pid) ?? false),
+        windowFixture.pid,
+      ),
+    )
+    .toBe(true);
+  await page
+    .getByRole("button", { name: "Choose running game", exact: true })
+    .click();
+  const windowPicker = page.getByRole("dialog", {
+    name: "Choose running game",
+    exact: true,
+  });
+  await expect(windowPicker).toBeVisible();
+  await windowPicker
+    .getByLabel("Find a window", { exact: true })
+    .fill("WaterConsole Input Fixture");
+  await windowPicker
+    .locator(".running-game-choice")
+    .filter({ hasText: "Process " + windowFixture.pid })
+    .click();
+  await expect(windowPicker).toHaveCount(0);
+  await expect(page.locator(".builder-file code")).toContainText(
+    "WaterConsole.InputFixture.exe",
+  );
+  await expect(
+    page.getByLabel("Only connect to an already running game", { exact: true }),
+  ).not.toBeChecked();
+  await expect(page.getByLabel("Launch method", { exact: true })).toHaveValue(
+    "auto",
+  );
+  await page
+    .getByLabel("Only connect to an already running game", { exact: true })
+    .check();
+  await expect(
+    page.getByText("WaterConsole will not launch this game.", { exact: false }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Only connect to an already running game", { exact: true })
+    .uncheck();
+  await fs.writeFile(
+    output + "/window-report.json.close",
+    "close owned fixture",
+  );
+  await expect.poll(() => windowFixture.exitCode).not.toBeNull();
+  checks.push(
+    "Searchable running-game picker finds the original executable without enabling connect-only, and explains launch choices",
+  );
+
   await page.locator(".builder-steps button").nth(1).click();
   await page
     .getByLabel("Description", { exact: true })
@@ -185,7 +244,10 @@ try {
   checks.push(
     "Cover crop GUI defaults to its own recommended size and saves artwork",
   );
-  await page.locator(".builder-art-slot.banner").getByRole("button", { name: "Upload image", exact: true }).click();
+  await page
+    .locator(".builder-art-slot.banner")
+    .getByRole("button", { name: "Upload image", exact: true })
+    .click();
   if (await page.locator(".guide-card").count())
     await page.keyboard.press("Escape");
   await expect(
@@ -315,11 +377,23 @@ try {
     return img.naturalWidth;
   });
   if (loaded !== 1920) throw Error("Recommended controller backdrop missing");
-  await page.locator('.studio-canvas-colors').getByRole('button',{name:'Remove image',exact:true}).click();
-  await expect(page.locator('.studio-surface')).toHaveCSS('background-image','none');
-  await page.getByRole('button',{name:'Undo',exact:true}).click();
-  await expect.poll(()=>page.locator('.studio-surface').evaluate(el=>getComputedStyle(el).backgroundImage)).toContain('user-assets/');
-  checks.push('Canvas background image removes cleanly and Undo restores it');
+  await page
+    .locator(".studio-canvas-colors")
+    .getByRole("button", { name: "Remove image", exact: true })
+    .click();
+  await expect(page.locator(".studio-surface")).toHaveCSS(
+    "background-image",
+    "none",
+  );
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect
+    .poll(() =>
+      page
+        .locator(".studio-surface")
+        .evaluate((el) => getComputedStyle(el).backgroundImage),
+    )
+    .toContain("user-assets/");
+  checks.push("Canvas background image removes cleanly and Undo restores it");
 
   checks.push(
     "Persistent canvas background crop loads through the local asset protocol in the design canvas",
@@ -478,7 +552,9 @@ try {
   await expect(
     page.getByRole("button", { name: "Remove pressed image", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Remove button image", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Remove button image", exact: true })
+    .click();
   await expect(inventory.locator("img")).toHaveCount(0);
   await page
     .getByRole("button", { name: "Remove pressed image", exact: true })
@@ -580,5 +656,9 @@ try {
   }
   process.exitCode = 1;
 } finally {
+  if (windowFixture?.exitCode === null)
+    await fs
+      .writeFile(output + "/window-report.json.close", "close owned fixture")
+      .catch(() => {});
   await app?.close();
 }

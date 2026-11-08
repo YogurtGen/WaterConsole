@@ -17,6 +17,7 @@ import {
 } from "./builder-primitives";
 import { ControllerStudio } from "./controller-studio";
 import { CropEditor } from "./crop-editor";
+import { RunningGamePicker } from "./running-game-picker";
 import { hostAsset } from "./studio-surface";
 export function PhoneSetup({
   state,
@@ -123,6 +124,7 @@ export function LibraryWorkspace({
     [message, setMessage] = useState(""),
     [draft, setDraft] = useState<LocalGameRecord | null>(null),
     [showPhones, setShowPhones] = useState(false),
+    [showRunning, setShowRunning] = useState(false),
     [discard, setDiscard] = useState(false),
     [removeConfirm, setRemoveConfirm] = useState(false),
     [crop, setCrop] = useState<{
@@ -149,7 +151,7 @@ export function LibraryWorkspace({
       target: '[data-guide="game-exe"]',
       title: "Choose your own game",
       description:
-        "Browse to the original .exe from your existing installation. Choosing a file does not launch or copy the game. You can reconnect to a launcher-opened game instead.",
+        "Use Browse .exe or Choose running game to select your installation. A running window fills its executable automatically. Review the setup and save before connecting.",
       enter: () => setStep(0),
     },
     {
@@ -334,7 +336,8 @@ export function LibraryWorkspace({
       aria-modal="true"
       aria-label={gameId ? "Edit local game" : "Add game"}
       onKeyDown={(e) => {
-        if (!studio && !crop && !showPhones) trapDialog(e, close);
+        if (!studio && !crop && !showPhones && !showRunning)
+          trapDialog(e, close);
       }}
     >
       {studio ? (
@@ -445,6 +448,14 @@ export function LibraryWorkspace({
                       >
                         Browse .exe
                       </button>
+                      <button
+                        onClick={() => {
+                          guide.close();
+                          setShowRunning(true);
+                        }}
+                      >
+                        Choose running game
+                      </button>
                     </div>
                     <label className="builder-field">
                       Game title
@@ -458,6 +469,30 @@ export function LibraryWorkspace({
                     </label>
                   </Panel>
                   <Panel title="Launch options">
+                    <label className="builder-field">
+                      Launch method
+                      <select
+                        aria-label="Launch method"
+                        value={game.launch.method ?? "auto"}
+                        disabled={game.launch.attachOnly}
+                        onChange={(e) =>
+                          patch({
+                            launch: {
+                              ...game.launch,
+                              method: e.target.value as "auto" | "direct",
+                            },
+                          })
+                        }
+                      >
+                        <option value="auto">Auto · Steam or executable</option>
+                        <option value="direct">Direct executable</option>
+                      </select>
+                      <small>
+                        Auto uses Steam for recognized installations. Custom
+                        arguments use Direct. Already open game windows are
+                        reused.
+                      </small>
+                    </label>
                     <label className="builder-check">
                       <input
                         type="checkbox"
@@ -472,11 +507,12 @@ export function LibraryWorkspace({
                           })
                         }
                       />
-                      Connect to a game I open myself
+                      Only connect to an already running game
                     </label>
                     <small>
-                      Useful when the original launcher needs sign-in.
-                      WaterConsole never bypasses it.
+                      {game.launch.attachOnly
+                        ? "WaterConsole will not launch this game. Turn this off to let Start game open the selected executable."
+                        : "Start game opens the selected executable. If the game requires its original launcher, sign in there first."}
                     </small>
                     {game.launch.attachOnly && (
                       <>
@@ -1094,6 +1130,43 @@ export function LibraryWorkspace({
           label="Game setup"
           steps={guideSteps}
           onClose={guide.close}
+        />
+      )}
+      {showRunning && (
+        <RunningGamePicker
+          onClose={() => setShowRunning(false)}
+          onPick={(w) => {
+            patch({
+              title:
+                game.title === "My game"
+                  ? (
+                      w.title ||
+                      w.executable
+                        .split(/[\\/]/)
+                        .pop()!
+                        .replace(/\.exe$/i, "")
+                    ).slice(0, 120)
+                  : game.title,
+              launch: {
+                ...game.launch,
+                executable: w.executable,
+                cwd: w.executable.slice(
+                  0,
+                  Math.max(
+                    w.executable.lastIndexOf("/"),
+                    w.executable.lastIndexOf("\\"),
+                  ),
+                ),
+                attachOnly: false,
+                attachPid: w.pid,
+                method: "auto",
+              },
+            });
+            setMessage(
+              "Window selected. Review your setup, then save to connect.",
+            );
+            setShowRunning(false);
+          }}
         />
       )}
       {showPhones && (

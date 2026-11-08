@@ -84,7 +84,7 @@ Open the phone's gear → **Adjust layout**. Drag a control to move it; drag its
 
 This works for declarative Studio controllers and supported source-defined controllers. Bindings, colors, ownership and other players are unchanged. Each phone/game/mode/variant and portrait/landscape layout has its own local settings. Clear browser storage to remove them. Input and vibration are paused while editing; losing focus or changing screen orientation cancels an unfinished edit.
 
-When a game controller or Studio phone preview is active, WaterConsole requests landscape after fullscreen has been entered, including the game's Menu mode. You do not need to switch to Standard, Fight or Race first. Returning to the WaterConsole Home releases the orientation lock. Android Chrome normally supports this; fullscreen still requires a tap. If the browser rejects orientation lock, the controller shows a rotate/fullscreen hint and remains usable. No CSS fake rotation is applied to touch coordinates.
+When a game controller or Studio phone preview is active, WaterConsole requests landscape after fullscreen has been entered, including the game's Menu mode. You do not need to switch to Standard, Fight or Race first. Switching between Menu, Standard, Fight and Race keeps the same landscape lock without a portrait transition. Returning to the WaterConsole Home releases the orientation lock. Android Chrome normally supports this; fullscreen still requires a tap. If the browser rejects orientation lock, the controller shows a rotate/fullscreen hint and remains usable. No CSS fake rotation is applied to touch coordinates.
 
 ## PC output and compatibility
 
@@ -108,3 +108,11 @@ Catalog, images and drafts are local in the **Saved on this PC** folder shown by
 
 Do not publish your catalog: it contains personal executable paths and arguments. Shareable sanitized presets/import/export, advanced analog curves and reusable user templates are future extensions. For specialized controller behavior or supported game telemetry, the [source/AI route](ADDING-GAMES.md) remains available alongside this editor.
 Button images: **Remove image** and **Remove pressed image** clear their own image/crop references. Removing the last image returns the button to text; Undo can restore it. Images and their crop preview follow circle, square, triangle, rounded-rectangle and pill shapes. **Button image fit** selects Fill/cover or Fit/proportional display. Original files remain unchanged.
+
+### Launching or connecting
+
+Use **Choose running game** beside **Browse .exe** to search open application windows. Select the game itself; WaterConsole fills its original executable and working directory without copying it. Review the title/controller, then save. The window list and executable paths are available only in the PC editor.
+
+**Start game** first reuses a matching open game window. **Auto · Steam or executable** launches through the official Steam client when the selected executable matches a local installed-game manifest; otherwise it opens the executable directly. **Direct executable** forces the latter. Custom arguments use the direct route; configure Steam launch options in Steam when needed. WaterConsole waits for the actual game window rather than attaching to a short-lived launcher process.
+
+Leave **Only connect to an already running game** off for normal use. Turn it on only when WaterConsole should never launch that entry. A saved PID is a preference: a single matching current window can be reused after a restart; multiple matching windows require an explicit selection. A game you opened yourself stays open when returning Home. A game WaterConsole started is closed normally. No launcher, login or game ownership checks are bypassed.

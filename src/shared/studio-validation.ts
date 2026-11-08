@@ -309,6 +309,8 @@ export function validateGame(value: unknown): asserts value is LocalGameRecord {
       str(value.launch.executable, 2048) &&
       str(value.launch.cwd, 2048) &&
       typeof value.launch.attachOnly === "boolean" &&
+      (value.launch.method === undefined ||
+        ["auto", "direct"].includes(value.launch.method)) &&
       Array.isArray(value.launch.args) &&
       value.launch.args.length <= 32 &&
       value.launch.args.every((x: unknown) => str(x, 1024)),

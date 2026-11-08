@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-Setup-0.4.3-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-0.4.3-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-Source-0.4.3.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Optional-Controller-Tools-0.4.3.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-Setup-0.4.4-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-0.4.4-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.4.4](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Core-Source-0.4.4.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/WaterConsole-Optional-Controller-Tools-0.4.4.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.4/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## Edit or delete an added game
 
@@ -143,3 +143,7 @@ See [Controller Studio](docs/CONTROLLER-STUDIO.md) for the step-by-step workflow
 Browse game rows with a hidden scrollbar using the wheel, arrows or Navigator phone. Right-click a user-added game to edit it or remove its library entry. Studio uses a compact Color & fill panel with separate label/icon colors and Normal/While pressed states; Canvas background stays available without a selection.
 
 ![Contextual controller colors with persistent canvas background](docs/media/contextual-colors.png)
+
+### Pick a game that is already open
+
+In **Add game**, choose **Choose running game**, search the game window and select it. WaterConsole fills the executable for you. Keep **Only connect to an already running game** off if you also want Start game to launch it later. **Auto** uses Steam for recognized local Steam installations and otherwise opens the executable. Review the controller and save before connecting. [Launch and controller guide](docs/CONTROLLER-STUDIO.md#launching-or-connecting).

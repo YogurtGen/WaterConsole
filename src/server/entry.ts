@@ -41,7 +41,7 @@ function nativeCommand(command: NativeCommand): Promise<CommandResult> {
             "The native game action timed out. Check the game window on the host PC.",
         });
       },
-      command.type === "start" ? 70_000 : 20_000,
+      command.type === "start" && command.gameId?.startsWith("local-") ? 95_000 : command.type === "start" ? 70_000 : 20_000,
     );
     timer.unref();
     nativeRequests.set(id, { resolve, timer });
