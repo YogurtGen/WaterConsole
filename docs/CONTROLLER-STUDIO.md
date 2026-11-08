@@ -84,7 +84,7 @@ Open the phone's gear → **Adjust layout**. Drag a control to move it; drag its
 
 This works for declarative Studio controllers and supported source-defined controllers. Bindings, colors, ownership and other players are unchanged. Each phone/game/mode/variant and portrait/landscape layout has its own local settings. Clear browser storage to remove them. Input and vibration are paused while editing; losing focus or changing screen orientation cancels an unfinished edit.
 
-When a gameplay controller is active, WaterConsole requests landscape after fullscreen has been entered. Android Chrome normally supports this; fullscreen still requires a tap. If the browser rejects orientation lock, the controller shows a rotate/fullscreen hint and remains usable. No CSS fake rotation is applied to touch coordinates.
+When a game controller or Studio phone preview is active, WaterConsole requests landscape after fullscreen has been entered, including the game's Menu mode. You do not need to switch to Standard, Fight or Race first. Returning to the WaterConsole Home releases the orientation lock. Android Chrome normally supports this; fullscreen still requires a tap. If the browser rejects orientation lock, the controller shows a rotate/fullscreen hint and remains usable. No CSS fake rotation is applied to touch coordinates.
 
 ## PC output and compatibility
 

@@ -206,6 +206,7 @@ try {
     await context.addInitScript(() => {
       window.__vibrations = [];
       window.__orientationLocks = [];
+      window.__orientationUnlocks = 0;
       window.__rejectRotation = false;
       let full = false;
       Object.defineProperty(document, "fullscreenElement", {
@@ -231,7 +232,9 @@ try {
       });
       Object.defineProperty(screen.orientation, "unlock", {
         configurable: true,
-        value: () => {},
+        value: () => {
+          window.__orientationUnlocks++;
+        },
       });
       Object.defineProperty(navigator, "vibrate", {
         configurable: true,
@@ -261,6 +264,60 @@ try {
     );
     phones.push({ context, page, cdp: await context.newCDPSession(page) });
   }
+  for (const phone of phones) {
+    assert.equal(
+      await phone.page.evaluate(() => window.__orientationLocks.length),
+      0,
+    );
+  }
+  assert(
+    (
+      await library({
+        type: "preview",
+        gameId: game.id,
+        definition: game.controller,
+        modeId: "menu",
+      })
+    ).ok,
+  );
+  for (const phone of phones) {
+    await expect(
+      phone.page.locator(".studio-phone-modes .selected"),
+    ).toHaveText("Menu");
+    await expect
+      .poll(() =>
+        phone.page.evaluate(() =>
+          window.__orientationLocks.includes("landscape"),
+        ),
+      )
+      .toBe(true);
+  }
+  const menuPhone = phones[0];
+  await menuPhone.page.evaluate(() => document.exitFullscreen());
+  await expect(menuPhone.page.locator(".studio-phone-rotate")).toContainText(
+    "Tap fullscreen",
+  );
+  const locksBeforeReentry = await menuPhone.page.evaluate(
+    () => window.__orientationLocks.length,
+  );
+  await menuPhone.page
+    .getByRole("button", { name: "Toggle fullscreen", exact: true })
+    .click();
+  await expect
+    .poll(() => menuPhone.page.evaluate(() => window.__orientationLocks.length))
+    .toBeGreaterThan(locksBeforeReentry);
+  await expect(menuPhone.page.locator(".studio-phone-rotate")).toHaveCount(0);
+  const unlocksBeforeHome = await menuPhone.page.evaluate(
+    () => window.__orientationUnlocks,
+  );
+  assert((await library({ type: "end-preview" })).ok);
+  await expect(menuPhone.page.locator(".studio-phone")).toHaveCount(0);
+  await expect
+    .poll(() => menuPhone.page.evaluate(() => window.__orientationUnlocks))
+    .toBeGreaterThan(unlocksBeforeHome);
+  pass(
+    "Game Menu requests landscape on all phones, re-entering fullscreen retries it and Home releases the lock",
+  );
   assert(
     (
       await library({

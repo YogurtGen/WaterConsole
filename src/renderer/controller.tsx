@@ -495,12 +495,9 @@ function ControllerApp() {
       document.removeEventListener("fullscreenchange", fs);
     };
   }, [neutral]);
-  const modePurpose = state?.studio?.definition.modes.find(
-    (m) => m.id === state.studio?.modeId,
-  )?.purpose;
   const wantLandscape =
     !!state &&
-    (state.studio ? modePurpose !== "menu" : state.profile !== "menu");
+    (state.phase === "native" || !!state.studio || state.profile !== "menu");
   useEffect(() => {
     const orientation = screen.orientation as ScreenOrientation & {
       lock?: (value: string) => Promise<void>;

@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-Setup-0.4.2-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-0.4.2-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-Source-0.4.2.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Optional-Controller-Tools-0.4.2.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-Setup-0.4.3-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-0.4.3-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.4.3](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Core-Source-0.4.3.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/WaterConsole-Optional-Controller-Tools-0.4.3.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.3/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## Edit or delete an added game
 
