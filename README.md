@@ -20,11 +20,21 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-Setup-0.3.0-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-0.3.0-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.3.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Core-Source-0.3.0.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/WaterConsole-Optional-Controller-Tools-0.3.0.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.3.0/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-Setup-0.4.2-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-0.4.2-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.4.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Core-Source-0.4.2.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/WaterConsole-Optional-Controller-Tools-0.4.2.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.4.2/SHA256SUMS.txt) | Verify downloaded release files. |
+
+## Edit or delete an added game
+
+1. **Right-click the game's card** in your PC library.
+2. Choose **Edit game**, **Controller Studio**, or **Delete from library…**.
+3. To use the keyboard, focus the card with Tab and press **Shift+F10** (or the Menu key).
+
+The cover has no extra menu button. Delete asks for confirmation and keeps the installed game files. Built-in/source-adapter entries stay source-managed. Phones can navigate/scroll the library; editing remains on the PC.
+
+For a banner that fills the Home panel, open **Edit game → Artwork → Banner → Display → Fill**. **Fit** displays the entire image and may leave space. See [the artwork and controller guide](docs/CONTROLLER-STUDIO.md).
 
 ## What is included
 

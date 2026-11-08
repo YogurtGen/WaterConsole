@@ -452,7 +452,14 @@ export function StudioSurface({
                       }}
                     />
                   )}
-                  <span className="studio-label-content">
+                  <span
+                    className={
+                      "studio-label-content" +
+                      (c.display === "image" && image
+                        ? " studio-image-content"
+                        : "")
+                    }
+                  >
                     {c.display === "image" && image ? (
                       <img
                         draggable={false}

@@ -185,6 +185,19 @@ try {
   checks.push(
     "Cover crop GUI defaults to its own recommended size and saves artwork",
   );
+  await page.locator(".builder-art-slot.banner").getByRole("button", { name: "Upload image", exact: true }).click();
+  if (await page.locator(".guide-card").count())
+    await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("dialog", { name: "Crop banner", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Artwork fit", { exact: true })).toHaveValue(
+    "cover",
+  );
+  await page
+    .getByRole("button", { name: "Use this crop", exact: true })
+    .click();
+
   await page.locator(".builder-steps button").nth(3).click();
   await page
     .getByRole("button", { name: "Open Controller Studio", exact: true })
@@ -302,6 +315,12 @@ try {
     return img.naturalWidth;
   });
   if (loaded !== 1920) throw Error("Recommended controller backdrop missing");
+  await page.locator('.studio-canvas-colors').getByRole('button',{name:'Remove image',exact:true}).click();
+  await expect(page.locator('.studio-surface')).toHaveCSS('background-image','none');
+  await page.getByRole('button',{name:'Undo',exact:true}).click();
+  await expect.poll(()=>page.locator('.studio-surface').evaluate(el=>getComputedStyle(el).backgroundImage)).toContain('user-assets/');
+  checks.push('Canvas background image removes cleanly and Undo restores it');
+
   checks.push(
     "Persistent canvas background crop loads through the local asset protocol in the design canvas",
   );
@@ -401,6 +420,74 @@ try {
     "Visual Xbox/PlayStation/full keyboard assignment preserves per-player mapping, highlights shared inputs and explains compound usage; hotspots remain inside the shell and callout labels stay readable",
   );
 
+  await page.getByLabel("Shape", { exact: true }).selectOption("circle");
+  await page.getByLabel("Show", { exact: true }).selectOption("image");
+  await page.getByRole("button", { name: "Upload image", exact: true }).click();
+  await expect(page.locator(".crop-result-frame")).toHaveCSS(
+    "border-top-left-radius",
+    "999px",
+  );
+  await page
+    .getByRole("button", { name: "Use this crop", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Pressed image", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Use this crop", exact: true })
+    .click();
+  await page.getByLabel("View", { exact: true }).selectOption("844x390");
+  for (const shape of ["circle", "square", "triangle", "rounded", "pill"]) {
+    await page.getByLabel("Shape", { exact: true }).selectOption(shape);
+    const clip = inventory.locator(".studio-image-content");
+    await expect(clip).toHaveCSS("overflow", "hidden");
+    const bounds = await inventory.boundingBox(),
+      imageBounds = await clip.boundingBox();
+    if (
+      imageBounds.x < bounds.x - 1 ||
+      imageBounds.y < bounds.y - 1 ||
+      imageBounds.x + imageBounds.width > bounds.x + bounds.width + 1 ||
+      imageBounds.y + imageBounds.height > bounds.y + bounds.height + 1
+    )
+      throw Error(shape + " image escapes button");
+    const mask = await clip.evaluate((el) => ({
+      path: getComputedStyle(el).clipPath,
+      radius: getComputedStyle(el).borderTopLeftRadius,
+    }));
+    if (shape === "triangle" && !mask.path.startsWith("polygon"))
+      throw Error("Triangle image is not clipped");
+    if (["circle", "pill"].includes(shape) && mask.radius === "0px")
+      throw Error("Round image is not clipped");
+    await page
+      .getByLabel("Button image fit", { exact: true })
+      .selectOption("cover");
+    await expect(clip.locator("img")).toHaveCSS("object-fit", "cover");
+    await page
+      .getByLabel("Button image fit", { exact: true })
+      .selectOption("contain");
+    await expect(clip.locator("img")).toHaveCSS("object-fit", "contain");
+  }
+  await page
+    .getByRole("button", { name: "Remove pressed image", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Remove pressed image", exact: true }),
+  ).toHaveCount(0);
+  await expect(inventory.locator("img")).toHaveCount(1);
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Remove pressed image", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Remove button image", exact: true }).click();
+  await expect(inventory.locator("img")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Remove pressed image", exact: true })
+    .click();
+  await expect(page.getByLabel("Show", { exact: true })).toHaveValue("text");
+  await page.getByLabel("View", { exact: true }).selectOption("design");
+  checks.push(
+    "Normal/pressed button images can be removed and undone; every shape clips images correctly with Fit/Fill",
+  );
   await page
     .getByRole("button", { name: "Save controller", exact: true })
     .click();
@@ -423,6 +510,48 @@ try {
   ).toBeVisible();
   await page.screenshot({ path: output + "/home-library.png" });
   checks.push("Saved game appears in the dynamic Home catalog");
+  await page
+    .getByRole("button", { name: "Show My Fixture Game details", exact: true })
+    .first()
+    .click();
+  for (const [width, height] of [
+    [1920, 1080],
+    [1280, 720],
+  ]) {
+    await app.evaluate(
+      ({ BrowserWindow }, { width, height }) =>
+        BrowserWindow.getAllWindows()[0].setContentSize(width, height),
+      { width, height },
+    );
+    const art = page.locator(".hero-detail .hero-art"),
+      hero = page.locator(".hero-detail");
+    await expect(art.locator("img")).toHaveCSS("object-fit", "cover");
+    await expect
+      .poll(async () => {
+        const a = await art.boundingBox(),
+          h = await hero.boundingBox();
+        return Math.abs(a.y - h.y) < 1 && Math.abs(a.height - h.height) < 1;
+      })
+      .toBe(true);
+  }
+  const latest = await page.evaluate(() =>
+    window.waterconsole.library({ type: "list" }),
+  );
+  const fitGame = latest.games[0];
+  fitGame.artwork.banner.fit = "contain";
+  const fitSaved = await page.evaluate(
+    (game) => window.waterconsole.library({ type: "save", game }),
+    fitGame,
+  );
+  if (!fitSaved.ok) throw Error(fitSaved.error);
+  await expect(page.locator(".hero-detail .hero-art img")).toHaveCSS(
+    "object-fit",
+    "contain",
+  );
+  checks.push(
+    "New banner defaults to Fill, fills the full Home panel at 1080p/720p and preserves an explicit Fit choice",
+  );
+
   await page.getByRole("button", { name: "Add game", exact: false }).click();
   await expect(
     page.getByRole("heading", { name: "Add a game", exact: true }),

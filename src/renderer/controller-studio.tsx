@@ -145,6 +145,22 @@ export function ControllerStudio({
       c.y = clamp(c.y, 0, 540 - c.h);
     });
   }
+  function removeButtonImage(pressed = false) {
+    if (!active) return;
+    const other = pressed ? active.image : active.pressedImage;
+    patchControl({
+      ...(pressed
+        ? {
+            pressedImage: undefined,
+            pressedImageSource: undefined,
+            pressedImageCrop: undefined,
+          }
+        : { image: undefined, imageSource: undefined, imageCrop: undefined }),
+      ...(!other && active.display === "image"
+        ? { display: "text" as const }
+        : {}),
+    });
+  }
   function history(back = true) {
     const source = back ? undo : redo,
       destination = back ? redo : undo;
@@ -1327,6 +1343,42 @@ export function ControllerStudio({
                         </button>
                       </div>
                     )}
+                    {(active.image || active.pressedImage) && (
+                      <div className="builder-actions">
+                        {active.image && (
+                          <button aria-label="Remove button image" onClick={() => removeButtonImage()}>
+                            Remove image
+                          </button>
+                        )}
+                        {active.pressedImage && (
+                          <button onClick={() => removeButtonImage(true)}>
+                            Remove pressed image
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {active.display === "image" && (
+                      <label className="builder-field">
+                        Image fit
+                        <select
+                          aria-label="Button image fit"
+                          value={active.fit}
+                          onChange={(e) =>
+                            patchControl({
+                              fit: e.target.value as "cover" | "contain",
+                            })
+                          }
+                        >
+                          <option value="cover">Fill · cover button</option>
+                          <option value="contain">
+                            Fit · keep proportions
+                          </option>
+                        </select>
+                        <small>
+                          The image is clipped to the selected button shape.
+                        </small>
+                      </label>
+                    )}
                     <div className="builder-two">
                       <NumberField
                         label="Icon size"
@@ -1903,6 +1955,28 @@ export function ControllerStudio({
           source={crop.source}
           purpose={(crop as any).background ? "banner" : "button"}
           initial={crop.initial}
+          previewShape={(crop as any).background ? undefined : active?.shape}
+          previewAspect={
+            (crop as any).background
+              ? undefined
+              : active
+                ? active.w / active.h
+                : undefined
+          }
+          previewRadius={
+            active
+              ? {
+                  x:
+                    (Math.min(active.radius, active.w / 2, active.h / 2) /
+                      active.w) *
+                    100,
+                  y:
+                    (Math.min(active.radius, active.w / 2, active.h / 2) /
+                      active.h) *
+                    100,
+                }
+              : undefined
+          }
           onClose={() => setCrop(null)}
           onApply={(art) => {
             if ((crop as any).background)

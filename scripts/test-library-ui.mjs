@@ -79,6 +79,7 @@ try {
     assert(saved.ok, saved.error);
     games.push(saved.game);
   }
+  await expect(page.locator(".card-edit")).toHaveCount(0);
   const shelf = page.locator(".game-shelf").first(),
     row = shelf.locator(".game-row");
   await expect

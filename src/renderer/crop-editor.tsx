@@ -12,6 +12,7 @@ import {
   clamp,
   type ArtworkSlot,
   type CropSpec,
+  type ButtonShape,
 } from "../shared/studio-model";
 import { hostAsset } from "./studio-surface";
 export function CropEditor({
@@ -20,7 +21,13 @@ export function CropEditor({
   initial,
   onApply,
   onClose,
+  previewShape,
+  previewAspect,
+  previewRadius = { x: 0, y: 0 },
 }: {
+  previewShape?: ButtonShape;
+  previewAspect?: number;
+  previewRadius?: { x: number; y: number };
   source: string;
   purpose: "cover" | "banner" | "button";
   initial?: ArtworkSlot;
@@ -39,7 +46,7 @@ export function CropEditor({
     },
   );
   const [fit, setFit] = useState<"contain" | "cover">(
-    initial?.fit ?? "contain",
+    initial?.fit ?? (purpose === "banner" ? "cover" : "contain"),
   );
   const [size, setSize] = useState({ w: 1, h: 1 });
   const [rendered, setRendered] = useState("");
@@ -395,7 +402,27 @@ export function CropEditor({
             <p>Preview in the destination frame</p>
             <div
               className={"crop-result-frame purpose-" + purpose}
-              style={{ aspectRatio: target.width / target.height }}
+              style={{
+                aspectRatio:
+                  purpose === "button"
+                    ? (previewAspect ?? 1)
+                    : target.width / target.height,
+                ...(purpose === "button"
+                  ? {
+                      borderRadius:
+                        previewShape === "circle" || previewShape === "pill"
+                          ? "999px"
+                          : previewShape === "rounded"
+                            ? `${previewRadius.x}% / ${previewRadius.y}%`
+                            : "0px",
+                      clipPath:
+                        previewShape === "triangle"
+                          ? "polygon(50% 0,100% 100%,0 100%)"
+                          : undefined,
+                      overflow: "hidden",
+                    }
+                  : {}),
+              }}
             >
               {sample && (
                 <img
@@ -416,6 +443,13 @@ export function CropEditor({
                 <option value="cover">Fill · cover the frame</option>
               </select>
             </label>
+            {purpose === "banner" && (
+              <p>
+                Fill covers the whole Home panel and may crop the edges. Fit
+                keeps the complete image and can leave space. The Home panel
+                adapts to your window size.
+              </p>
+            )}
             <small>
               {crop.ratio === "recommended"
                 ? `Export: ${target.width} × ${target.height} pixels`

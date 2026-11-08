@@ -384,6 +384,11 @@ function GameCard({
     >
       <button
         className="game-card-select"
+        title={
+          game.local
+            ? "Right-click or press Shift+F10 to edit this game"
+            : undefined
+        }
         onClick={() => send({ type: "selectGame", gameId: game.id })}
         aria-label={`Show ${game.title} details`}
         aria-pressed={selected}
@@ -460,23 +465,6 @@ function GameCard({
       >
         <Icon name="heart" size={19} />
       </button>
-      {game.local && (
-        <button
-          className="card-edit"
-          aria-label={"Options for " + game.title}
-          aria-haspopup="menu"
-          onClick={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            onMenu?.(game, {
-              x: r.left,
-              y: r.bottom + 6,
-              trigger: e.currentTarget,
-            });
-          }}
-        >
-          •••
-        </button>
-      )}
     </div>
   );
 }
@@ -843,7 +831,8 @@ function Home({
             </h2>
             {saved.length ? (
               <GameShelf
-                revealOnNavigation={false} label="Favorites and recent games"
+                revealOnNavigation={false}
+                label="Favorites and recent games"
                 selectedId={featured ? undefined : state.selectedGameId}
                 itemIds={saved.map((g) => g.id).join("|")}
               >

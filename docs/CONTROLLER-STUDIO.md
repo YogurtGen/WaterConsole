@@ -25,7 +25,7 @@ An entry can be saved as **Needs setup** or **Ready to test**. **Tested by you**
 
 Scroll the game row horizontally with the mouse wheel, trackpad or a swipe. The visible left/right arrows browse one page. On an approved Navigator phone, use the Home D-pad's left/right buttons: the selected card automatically scrolls into view on the PC. Phone navigation cannot open PC editing controls.
 
-Right-click an Add Game card, press Shift+F10 while it is focused, or click its **•••** button. **Edit game** opens its details/artwork setup; **Controller Studio** opens its controller directly. **Delete from library…** opens a confirmation: **Keep game** cancels, while **Delete from library** removes only that entry and its WaterConsole controller setup. The installed executable and original artwork are not deleted. Built-in/source-adapter entries show an explanation rather than offering unsupported edits/deletion.
+Right-click an Add Game card, or focus it with Tab and press **Shift+F10** (or the keyboard Menu key). The cover has no extra menu button. **Edit game** opens its details/artwork setup; **Controller Studio** opens its controller directly. **Delete from library…** opens a confirmation: **Keep game** cancels, while **Delete from library** removes only that entry and its WaterConsole controller setup. The installed executable and original artwork are not deleted. Built-in/source-adapter entries show an explanation rather than offering unsupported edits/deletion.
 
 ## Cover and banner have different frames
 
@@ -35,7 +35,7 @@ Right-click an Add Game card, press Shift+F10 while it is focused, or click its 
 | Banner / detail preview | 1920 × 1080 | 16:9 landscape |
 | Custom button image | 512 × 512 | 1:1 |
 
-**Recommended size** is specific to the destination. You can also choose Original, 1:1, 1:3, 3:4, 2:3, 16:9, 3:1 or Free crop. Drag the crop, resize its corners, rotate, or enter coordinates. The destination preview shows **Fit** (complete crop) or **Fill** (cover the frame). Manual crops preserve their chosen proportions; only Recommended exports to the destination pixel size. A small source may look soft when enlarged.
+**Recommended size** is specific to the destination. You can also choose Original, 1:1, 1:3, 3:4, 2:3, 16:9, 3:1 or Free crop. Drag the crop, resize its corners, rotate, or enter coordinates. The destination preview shows **Fit** (complete crop) or **Fill** (cover the frame). Manual crops preserve their chosen proportions; only Recommended exports to the destination pixel size. New banners default to **Fill** so the Home panel is filled edge to edge. Choose **Fit** to show the full image with possible empty space. Existing explicit Fit choices are preserved. The Home panel adapts to the window size and can have a different shape from the exported 16:9 image. A small source may look soft when enlarged.
 
 The normalized original and crop coordinates are kept, so **Re-crop** is reversible. Upload PNG/JPEG/WebP up to 25 MiB and 32 megapixels. Imported images are normalized locally; scriptable SVG/HTML uploads are not accepted. Only use artwork you are entitled to use; a local upload does not grant redistribution rights.
 
@@ -107,3 +107,4 @@ Input is released on cancellation, lost capture, focus/tab/connection loss, mode
 Catalog, images and drafts are local in the **Saved on this PC** folder shown by the wizard. Use **Change data folder** to copy the library to another drive. It preserves the previous folder. Back up the entire `library` directory while the app is closed, including its images. The app also keeps an atomic previous catalog and preserves a damaged file for recovery.
 
 Do not publish your catalog: it contains personal executable paths and arguments. Shareable sanitized presets/import/export, advanced analog curves and reusable user templates are future extensions. For specialized controller behavior or supported game telemetry, the [source/AI route](ADDING-GAMES.md) remains available alongside this editor.
+Button images: **Remove image** and **Remove pressed image** clear their own image/crop references. Removing the last image returns the button to text; Undo can restore it. Images and their crop preview follow circle, square, triangle, rounded-rectangle and pill shapes. **Button image fit** selects Fill/cover or Fit/proportional display. Original files remain unchanged.
