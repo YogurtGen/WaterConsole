@@ -1,3 +1,6 @@
+import { VisualBinding } from "./visual-binding";
+import { EditorBoundary } from "./editor-boundary";
+import { actionChoices, actionLabel } from "../shared/binding-tools";
 import { SpotlightGuide, useGuidedHelp, type GuideStep } from "./guided-tour";
 import {
   useCallback,
@@ -57,12 +60,13 @@ export function ControllerStudio({
     ),
     [selected, setSelected] = useState<string[]>([]),
     [tab, setTab] = useState<"appearance" | "actions">("appearance"),
-    [themeScope, setThemeScope] = useState("control"),
+    [themeScope, setThemeScope] = useState("base"),
     [slot, setSlot] = useState(1),
     [role, setRole] = useState("navigator"),
     [variant, setVariant] = useState<"classic" | "assisted">("assisted"),
     [size, setSize] = useState("design"),
     [iconOpen, setIconOpen] = useState(false),
+    [visualOpen, setVisualOpen] = useState(false),
     [crop, setCrop] = useState<{
       source: string;
       pressed: boolean;
@@ -75,8 +79,8 @@ export function ControllerStudio({
     [newAction, setNewAction] = useState("");
   const guide = useGuidedHelp("controller-studio");
   useEffect(() => {
-    if (iconOpen || crop) guide.close();
-  }, [iconOpen, crop, guide.close]);
+    if (iconOpen || crop || visualOpen) guide.close();
+  }, [iconOpen, crop, visualOpen, guide.close]);
   const current = useRef(game);
   current.current = game;
   const undo = useRef<LocalGameRecord[]>([]),
@@ -94,6 +98,9 @@ export function ControllerStudio({
     game.controller.modes.find((m) => m.id === modeId) ??
     game.controller.modes[0];
   const active = mode.controls.find((c) => selected.includes(c.id));
+  useEffect(() => {
+    setThemeScope(active ? "control" : "base");
+  }, [active?.id]);
   const scale = Math.min(canvasWidth / 960, 1);
   const visible = mode.controls.filter(
     (c) => c.variant === "all" || c.variant === variant,
@@ -518,7 +525,9 @@ export function ControllerStudio({
     setSelected([]);
   }
   const actionMap = game.bindings[game.inputMethod][slot]?.[mode.id] ?? {};
-  const actions = Object.keys(actionMap);
+  const actions = active
+    ? actionChoices(game, mode.id, slot, active)
+    : Object.keys(actionMap);
   const selectedActions =
     active?.kind === "button"
       ? active.actions
@@ -597,7 +606,7 @@ export function ControllerStudio({
       target: '[data-guide="studio-output"]',
       title: "Map the actual game input",
       description:
-        "Choose the PC output for this player and mode. Gamepad buttons/axes and keyboard keys are configured here, not on the phone. Check menus and gameplay bindings separately.",
+        "Choose the PC output for this player and mode. Use Visual binding to click a full Xbox, PlayStation or keyboard diagram. Colors show used/shared inputs; hover shows their owners. Gamepad buttons/axes and keyboard keys are configured here, not on the phone. Check menus and gameplay bindings separately.",
       enter: () => inspectButton(true),
     },
     {
@@ -1027,7 +1036,9 @@ export function ControllerStudio({
                 "horizontal",
                 "vertical",
               ].map((a) => (
-                <option key={a}>{a}</option>
+                <option key={a} value={a}>
+                  {actionLabel(a, actionMap, "xbox")}
+                </option>
               ))}
             </select>
           </div>
@@ -1262,7 +1273,14 @@ export function ControllerStudio({
                   <select
                     data-guide="theme-scope"
                     value={themeScope}
-                    onChange={(e) => setThemeScope(e.target.value)}
+                    onChange={(e) => {
+                      const scope = e.target.value;
+                      setThemeScope(scope);
+                      if (["navigator", "player", "host"].includes(scope))
+                        setRole(scope);
+                      if (scope.startsWith("slot-"))
+                        setSlot(Number(scope.slice(5)));
+                    }}
                   >
                     <option value="control" disabled={!active}>
                       Selected control
@@ -1279,25 +1297,60 @@ export function ControllerStudio({
                     <option value="host">Host preview</option>
                   </select>
                 </label>
+                {themeScope === "control" && active?.theme.backgroundImage && (
+                  <button
+                    onClick={() => {
+                      commit((d) => {
+                        const m = d.controller.modes.find(
+                            (m) => m.id === mode.id,
+                          )!,
+                          c = m.controls.find((c) => c.id === active.id)!;
+                        m.theme.backgroundImage = c.theme.backgroundImage;
+                        delete c.theme.backgroundImage;
+                      });
+                      setThemeScope("mode");
+                    }}
+                  >
+                    Use existing image as mode background
+                  </button>
+                )}
                 <ThemeFields
                   value={themeValue()}
+                  effective={resolveTheme(
+                    game.controller,
+                    mode,
+                    role === "navigator",
+                    slot,
+                    themeScope === "control" ? active : undefined,
+                  )}
+                  controlOnly={themeScope === "control"}
                   partial={themeScope !== "base"}
                   onChange={setTheme}
                 />
-                <div className="builder-actions">
-                  <button onClick={() => void upload(false, true)}>
-                    Background image
-                  </button>
-                  <button
-                    onClick={() => {
-                      const next = { ...themeValue() };
-                      delete next.backgroundImage;
-                      setTheme(next);
-                    }}
-                  >
-                    Clear background
-                  </button>
-                </div>
+                {themeScope === "control" ? (
+                  <p className="builder-hint">
+                    Button fill colors this control. To add an image to a
+                    button, use Button content.{" "}
+                    <button onClick={() => setThemeScope("mode")}>
+                      Edit mode background
+                    </button>
+                  </p>
+                ) : (
+                  <div className="builder-actions">
+                    <button onClick={() => void upload(false, true)}>
+                      Background image
+                    </button>
+                    <button
+                      onClick={() => {
+                        const next = { ...themeValue() };
+                        delete next.backgroundImage;
+                        setTheme(next);
+                      }}
+                    >
+                      Clear background
+                    </button>
+                  </div>
+                )}
                 <small>
                   Role colors follow the current Navigator. Player identity and
                   permissions remain separate.
@@ -1328,14 +1381,22 @@ export function ControllerStudio({
                               })
                             }
                           />
-                          {a.replaceAll("-", " ")}
+                          {actionLabel(
+                            a,
+                            actionMap,
+                            game.controller.labels === "playstation"
+                              ? "playstation"
+                              : game.inputMethod === "keyboard"
+                                ? "keyboard"
+                                : "xbox",
+                          )}
                         </label>
                       ))}
                     </div>
                     <small>
-                      Select Accelerate and Drift for a single combined button.
-                      Both release together, without releasing another held
-                      source.
+                      Select physical inputs to hold together, such as RT + B.
+                      Their function depends on the game’s bindings. Both
+                      release together, without releasing another held source.
                     </small>
                   </>
                 ) : (
@@ -1353,7 +1414,9 @@ export function ControllerStudio({
                         >
                           <option value="">Not assigned</option>
                           {actions.map((a) => (
-                            <option key={a}>{a}</option>
+                            <option key={a} value={a}>
+                              {actionLabel(a, actionMap, "xbox")}
+                            </option>
                           ))}
                         </select>
                       </label>
@@ -1468,6 +1531,16 @@ export function ControllerStudio({
                 </small>
               </Panel>
               <Panel title={"Output bindings · Player " + slot}>
+                <button
+                  data-guide="visual-binding"
+                  onClick={() => setVisualOpen(true)}
+                >
+                  Visual binding · choose on a diagram
+                </button>
+                <small>
+                  Optional visual editor: Xbox, PlayStation or full keyboard.
+                  The fields below are the advanced editor.
+                </small>
                 <label className="builder-field">
                   Input method
                   <select
@@ -1490,7 +1563,7 @@ export function ControllerStudio({
                 </small>
                 {[...new Set(selectedActions)].map((action) => (
                   <div className="studio-binding" key={action}>
-                    <h4>{action.replaceAll("-", " ")}</h4>
+                    <h4>{actionLabel(action, actionMap, "xbox")}</h4>
                     {(actionMap[action] ?? []).map((output, index) => (
                       <div className="studio-output" key={index}>
                         <select
@@ -1516,7 +1589,13 @@ export function ControllerStudio({
                                           negative: "ArrowLeft",
                                           positive: "ArrowRight",
                                         }
-                                      : { kind: "key", code: "Space" },
+                                      : e.target.value === "key-direction"
+                                        ? {
+                                            kind: "key-direction",
+                                            code: "W",
+                                            value: 1,
+                                          }
+                                        : { kind: "key", code: "Space" },
                             )
                           }
                         >
@@ -1531,6 +1610,9 @@ export function ControllerStudio({
                           ) : (
                             <>
                               <option value="key">Key</option>
+                              <option value="key-direction">
+                                Directional key
+                              </option>
                               <option value="key-axis">
                                 Negative / positive keys
                               </option>
@@ -1582,21 +1664,39 @@ export function ControllerStudio({
                               }
                             />
                           </>
-                        ) : output.kind === "key" ? (
-                          <select
-                            aria-label={action + " key"}
-                            value={output.code}
-                            onChange={(e) =>
-                              updateOutput(action, index, {
-                                ...output,
-                                code: e.target.value,
-                              })
-                            }
-                          >
-                            {KEYS.map((k) => (
-                              <option key={k}>{k}</option>
-                            ))}
-                          </select>
+                        ) : output.kind === "key" ||
+                          output.kind === "key-direction" ? (
+                          <>
+                            {output.kind === "key-direction" && (
+                              <select
+                                aria-label="Axis direction"
+                                value={output.value}
+                                onChange={(e) =>
+                                  updateOutput(action, index, {
+                                    ...output,
+                                    value: Number(e.target.value) as -1 | 1,
+                                  })
+                                }
+                              >
+                                <option value={-1}>Negative direction</option>
+                                <option value={1}>Positive direction</option>
+                              </select>
+                            )}
+                            <select
+                              aria-label={action + " key"}
+                              value={output.code}
+                              onChange={(e) =>
+                                updateOutput(action, index, {
+                                  ...output,
+                                  code: e.target.value,
+                                })
+                              }
+                            >
+                              {KEYS.map((k) => (
+                                <option key={k}>{k}</option>
+                              ))}
+                            </select>
+                          </>
                         ) : (
                           <>
                             {(["negative", "positive"] as const).map((key) => (
@@ -1669,22 +1769,36 @@ export function ControllerStudio({
           )}
         </aside>
       </div>
-      {guide.open && !iconOpen && !crop && (
+      {guide.open && !iconOpen && !crop && !visualOpen && (
         <SpotlightGuide
           label="Controller Studio"
           steps={guideSteps}
           onClose={guide.close}
         />
       )}
+      {visualOpen && active && (
+        <EditorBoundary onClose={() => setVisualOpen(false)}>
+          <VisualBinding
+            game={game}
+            modeId={mode.id}
+            controlId={active.id}
+            initialSlot={slot}
+            onCommit={commit}
+            onClose={() => setVisualOpen(false)}
+          />
+        </EditorBoundary>
+      )}
       {iconOpen && active && (
-        <IconPicker
-          value={active.icon}
-          onClose={() => setIconOpen(false)}
-          onChoose={(id) => {
-            patchControl({ icon: id });
-            setIconOpen(false);
-          }}
-        />
+        <EditorBoundary onClose={() => setIconOpen(false)}>
+          <IconPicker
+            value={active.icon}
+            onClose={() => setIconOpen(false)}
+            onChoose={(id) => {
+              patchControl({ icon: id });
+              setIconOpen(false);
+            }}
+          />
+        </EditorBoundary>
       )}
       {crop && (
         <CropEditor

@@ -37,10 +37,10 @@ describe("Linked held actions", () => {
       b = createBindings(d),
       race = d.modes.find((m) => m.id === "race")!;
     const gas = control("button", "Independent gas", 100, 400, 100, 60, [
-      "accelerate",
+      "rt",
     ]);
     race.controls.push(gas);
-    const combined = race.controls.find((c) => c.label === "Drift + gas")!;
+    const combined = race.controls.find((c) => c.label === "RT + B")!;
     let out = resolveBindings(
       d,
       b,
@@ -95,7 +95,7 @@ describe("Linked held actions", () => {
     b.keyboard[4].menu.a = [{ kind: "key", code: "Numpad0" }];
     expect(
       resolveBindings(d, b, "keyboard", 1, input("menu", [c.id])).keys,
-    ).toEqual(["Alt"]);
+    ).toEqual(["AltLeft"]);
     expect(
       resolveBindings(d, b, "keyboard", 4, input("menu", [c.id])).keys,
     ).toEqual(["Numpad0"]);

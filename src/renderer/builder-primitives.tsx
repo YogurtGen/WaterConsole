@@ -1,6 +1,7 @@
 import { useEffect, useState, type KeyboardEvent, type ReactNode } from "react";
 import {
   COLOR,
+  DEFAULT_THEME,
   type LibraryCommand,
   type LibraryResult,
   type Theme,
@@ -114,7 +115,9 @@ function ColorField({
   value,
   onChange,
   onReset,
+  inherited,
 }: {
+  inherited: string;
   label: string;
   value?: string;
   onChange: (v: string) => void;
@@ -122,8 +125,12 @@ function ColorField({
 }) {
   const [hex, setHex] = useState(value ?? "");
   useEffect(() => setHex(value ?? ""), [value]);
+  const apply = () => {
+    if (COLOR.test(hex)) onChange(hex);
+    else setHex(value ?? "");
+  };
   return (
-    <label className="builder-color">
+    <div className="builder-color">
       <span>
         {label}
         {!value && <small>Inherited</small>}
@@ -132,18 +139,26 @@ function ColorField({
         <input
           aria-label={label + " color"}
           type="color"
-          value={(value ?? "#83e8b3").slice(0, 7)}
+          value={(value ?? inherited).slice(0, 7)}
+          onInput={(e) => onChange(e.currentTarget.value)}
           onChange={(e) => onChange(e.target.value)}
         />
         <input
           aria-label={label + " HEX"}
           value={hex}
-          placeholder="Inherited"
+          placeholder={inherited}
           maxLength={9}
-          onChange={(e) => setHex(e.target.value)}
-          onBlur={() => {
-            if (COLOR.test(hex)) onChange(hex);
-            else setHex(value ?? "");
+          onChange={(e) => {
+            const v = e.target.value;
+            setHex(v);
+            if (COLOR.test(v)) onChange(v);
+          }}
+          onBlur={apply}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              apply();
+            }
           }}
         />
         {onReset && (
@@ -152,37 +167,64 @@ function ColorField({
           </button>
         )}
       </div>
-    </label>
+      <div className="color-presets">
+        {[
+          "#83e8b3",
+          "#ffcf73",
+          "#94c9ff",
+          "#d5a8ff",
+          "#f48791",
+          "#f0f5ed",
+          "#14221c",
+          "#304737",
+        ].map((c) => (
+          <button
+            type="button"
+            key={c}
+            aria-label={label + " preset " + c}
+            style={{ background: c }}
+            onClick={() => onChange(c)}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 export function ThemeFields({
   value,
   onChange,
   partial = true,
+  effective = DEFAULT_THEME,
+  controlOnly = false,
 }: {
   value: Partial<Theme>;
   onChange: (theme: Partial<Theme>) => void;
   partial?: boolean;
+  effective?: Theme;
+  controlOnly?: boolean;
 }) {
   return (
     <div className="builder-theme-fields">
-      {Object.entries(THEME_LABELS).map(([key, label]) => (
-        <ColorField
-          key={key}
-          label={label}
-          value={value[key as keyof Theme]}
-          onChange={(color) => onChange({ ...value, [key]: color })}
-          onReset={
-            partial
-              ? () => {
-                  const next = { ...value };
-                  delete next[key as keyof Theme];
-                  onChange(next);
-                }
-              : undefined
-          }
-        />
-      ))}
+      {Object.entries(THEME_LABELS)
+        .filter(([k]) => !controlOnly || !["background", "panel"].includes(k))
+        .map(([key, label]) => (
+          <ColorField
+            key={key}
+            label={label}
+            inherited={effective[key as keyof Theme] ?? DEFAULT_THEME.button}
+            value={value[key as keyof Theme]}
+            onChange={(color) => onChange({ ...value, [key]: color })}
+            onReset={
+              partial
+                ? () => {
+                    const next = { ...value };
+                    delete next[key as keyof Theme];
+                    onChange(next);
+                  }
+                : undefined
+            }
+          />
+        ))}
     </div>
   );
 }

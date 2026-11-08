@@ -1,4 +1,5 @@
-import {StudioPhone} from "./studio-phone";
+import { PersonalLayoutEditor, usePersonalLayout } from "./personal-layout";
+import { StudioPhone } from "./studio-phone";
 import {
   useCallback,
   useEffect,
@@ -104,7 +105,7 @@ function ControllerApp() {
   }, []);
   const sendInput = useCallback(() => {
     const s = current.current;
-    if(s?.studio)return;
+    if (s?.studio) return;
     if (
       !s ||
       !enteredRef.current ||
@@ -137,6 +138,14 @@ function ControllerApp() {
     setHeld([]);
     sendInput();
   }, [sendInput, haptics]);
+  const layoutRoot = useRef<HTMLElement>(null);
+  const personal = usePersonalLayout(
+    layoutRoot,
+    `${entered ? "entered" : "waiting"}.${state?.selectedGameId ?? "home"}.${state?.profile ?? "none"}.${state?.native.controls ?? "menu"}`,
+    neutral,
+  );
+  feedbackSettingsRef.current = feedbackSettings || personal.editing;
+
   const updateActions = useCallback(() => {
     const pressed = new Set([
       ...pointers.current.values(),
@@ -486,30 +495,58 @@ function ControllerApp() {
       document.removeEventListener("fullscreenchange", fs);
     };
   }, [neutral]);
+  const modePurpose = state?.studio?.definition.modes.find(
+    (m) => m.id === state.studio?.modeId,
+  )?.purpose;
+  const wantLandscape =
+    !!state &&
+    (state.studio ? modePurpose !== "menu" : state.profile !== "menu");
   useEffect(() => {
     const orientation = screen.orientation as ScreenOrientation & {
-      lock?: (orientation: string) => Promise<void>;
+      lock?: (value: string) => Promise<void>;
     };
     let active = true;
-    if (
-      !entered ||
-      !fullscreen ||
-      (state?.profile !== "lab" && state?.profile !== "gamepad")
-    ) {
+    if (!entered || !wantLandscape) {
       orientation?.unlock?.();
+      setFullscreenHint("");
       return;
     }
-    orientation?.lock?.("landscape").catch(() => {
-      if (active)
-        setFullscreenHint(
-          "Orientation lock is unavailable. Your controller works in either orientation.",
-        );
-    });
+    if (!fullscreen) {
+      setFullscreenHint(
+        "Tap fullscreen to rotate automatically, or turn your phone sideways.",
+      );
+      return;
+    }
+    neutral();
+    if (!orientation?.lock) {
+      setFullscreenHint(
+        "Turn your phone sideways. This browser cannot lock orientation.",
+      );
+      return;
+    }
+    void orientation
+      .lock("landscape")
+      .then(() => {
+        if (active) setFullscreenHint("");
+      })
+      .catch(() => {
+        if (active)
+          setFullscreenHint(
+            "Turn your phone sideways. Your browser could not lock orientation.",
+          );
+      });
     return () => {
       active = false;
       orientation?.unlock?.();
     };
-  }, [entered, fullscreen, state?.profile]);
+  }, [
+    entered,
+    fullscreen,
+    wantLandscape,
+    state?.studio?.modeId,
+    state?.native.controls,
+    neutral,
+  ]);
   useEffect(() => {
     if (editing) setTimeout(() => nameRef.current?.focus(), 0);
   }, [editing]);
@@ -595,6 +632,7 @@ function ControllerApp() {
   ) => (
     <button
       type="button"
+      data-layout-id={action + "-" + label}
       className={`touch-button ${className} ${held.includes(action) ? "held" : ""}`}
       disabled={
         connection !== "connected" ||
@@ -607,7 +645,9 @@ function ControllerApp() {
             state.native.quitting))
       }
       aria-label={label}
-      onPointerDown={(e) => press(e, action)}
+      onPointerDown={(e) => {
+        if (!personal.editingRef.current) press(e, action);
+      }}
       onPointerUp={release}
       onPointerCancel={release}
       onLostPointerCapture={release}
@@ -666,6 +706,7 @@ function ControllerApp() {
             aria-label={direction[0].toUpperCase() + direction.slice(1)}
             aria-pressed={held.includes(direction)}
             disabled={stickDisabled}
+            data-layout-id={direction}
             className={`touch-button drag-pad-direction stick-${direction} ${held.includes(direction) ? "held" : ""}`}
             onKeyDown={(e) => {
               if (!["Enter", " "].includes(e.key)) return;
@@ -887,9 +928,29 @@ function ControllerApp() {
         </footer>
       </main>
     );
-  if(state.studio)return <StudioPhone state={state} player={player} token={token} connection={connection} send={send} nextSequence={()=>seq.current++} haptics={haptics} error={error} onFullscreen={()=>{neutral();if(document.fullscreenElement)void document.exitFullscreen().catch(()=>{});else void enter();}}/>;
+  if (state.studio)
+    return (
+      <StudioPhone
+        state={state}
+        player={player}
+        token={token}
+        connection={connection}
+        send={send}
+        nextSequence={() => seq.current++}
+        haptics={haptics}
+        error={error}
+        fullscreenHint={fullscreenHint}
+        onFullscreen={() => {
+          neutral();
+          if (document.fullscreenElement)
+            void document.exitFullscreen().catch(() => {});
+          else void enter();
+        }}
+      />
+    );
   return (
     <main
+      ref={layoutRoot}
       className={`phone-controller ${nativeProfile ? "profile-lab profile-gamepad" : `profile-${state.profile}`}`}
       style={{ "--player": player.color } as CSSProperties}
     >
@@ -1133,6 +1194,7 @@ function ControllerApp() {
           </button>
         </div>
       )}
+      <PersonalLayoutEditor model={personal} />
       {feedbackSettings && (
         <div className="phone-modal-overlay">
           <section
@@ -1153,6 +1215,21 @@ function ControllerApp() {
                 }}
               />
             </div>
+            <button
+              className="button full-width"
+              onClick={() => {
+                neutral();
+                feedbackSettingsRef.current = false;
+                setFeedbackSettings(false);
+                personal.begin();
+              }}
+            >
+              Adjust layout
+            </button>
+            <p className="layout-settings-hint">
+              Move and resize controls on this phone. Bindings and other players
+              stay the same.
+            </p>
             <button
               className="button full-width"
               aria-label="Phone vibration"

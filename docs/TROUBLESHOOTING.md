@@ -115,3 +115,12 @@ For suspected vulnerabilities, use the reporting route in [SECURITY.md](../SECUR
 - **Restore a backup:** close WaterConsole, copy the whole library folder somewhere safe, then inspect catalog.previous.json and preserved recovery files. Do not overwrite the only copy of images or a working catalog. The app can load a validated previous catalog after corruption.
 
 For an AI-assisted fix, include the WaterConsole version, selected mode/variant/backend, affected player slots, exact held combination, reproduction steps and sanitized errors. Omit personal paths, live invitations/tokens and commercial media. Ask it to read AGENTS.md and reproduce the issue before editing either controller route.
+
+## Studio colors, icons, backgrounds and phone layout
+
+- Colors: select the intended scope. **Button fill** changes a button; **Background** changes the controller canvas. HEX applies on Enter or when leaving the field; swatches/presets update live. Reset removes a local override. A role/player/control override can take precedence over the base theme.
+- Controller image missing: select **This mode** or **Controller base** before adding a Background image. Use Button content for a button image. If an older draft put a background on a control, use **Use existing image as mode background** to recover it.
+- Icon blank-screen fix: update to 0.4.0. The scrolling event is captured before deferred updates. If a tool fails, close it and save your draft before restarting.
+- Rotation: tap fullscreen, then select the gameplay mode. If your browser declines orientation lock, rotate the phone physically and disable its system portrait lock. Safari/fullscreen behavior varies.
+- Uncomfortable controls: phone gear → Adjust layout → drag/corner resize → Done. Reset + Done restores the host design for that profile/orientation. Changes only affect this browser and cannot edit PC bindings.
+- Wrong game action: use Actions → Visual binding and compare the original game's Controls menu. Xbox/PlayStation labels are not fixed gameplay functions. Menu input working does not prove the game selected the same device for gameplay.

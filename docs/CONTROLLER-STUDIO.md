@@ -44,7 +44,7 @@ Start with **Menu**, **Standard**, **Fight** or **Race**. Modes have their own c
 - Shift-select controls to move/group, align or distribute them. Lock a layer to prevent accidental movement. Undo/Redo keeps the last 50 changes.
 - **Show grid** and **Snap to grid** are independent. Set spacing from 1 to 128 design units or switch snap off.
 - In Appearance, choose text, icon, icon + text, or your own image. Search the 6,257 bundled Tabler icons offline by name/category/aliases; keep favorites and recent choices. Select an optional pressed image and re-crop the normal image later.
-- Edit base/mode/control colors and background, text/icon tint, border, pressed, disabled and focus colors. Reset an override to inherit its parent. Change sizes and opacity independently.
+- Edit base/mode/role/player colors and controller background images. For a selected control, use **Button fill**, text/icon tint, border, accent, pressed, disabled and focus colors. Inherited swatches show their effective color. The color picker applies live; use a preset or type HEX and press Enter. Reset an override to inherit its parent. Background/Panels belong to the controller; custom button artwork is under Button content. Change sizes and opacity independently.
 - Preview landscape/portrait phone sizes, player slot, Navigator/Other player and the separate PC preview theme. The **host** is the PC; the phone with navigation permission is the **Navigator**. Styling a role does not give it permissions.
 
 Role colors follow the Navigator when the PC transfers that permission. Slot themes follow P1–P4. Per-control overrides take precedence over inherited phone colors. Avoid color combinations with unreadable text.
@@ -53,13 +53,32 @@ Role colors follow the Navigator when the PC transfers that permission. Slot the
 
 ## Link actions, such as Drift + Throttle
 
-Select a button → **Actions** → **While held, also hold…**. Check both **accelerate** and **drift**. Map each semantic action to the actual PC output for the selected player and mode. Up to eight actions/outputs can be held together.
+Select a button → **Actions** → **While held, also hold…**. Choose the actual physical inputs used in your game, for example **RT** and **B**, then label the phone button **Drift + Throttle** if that describes your bindings. WaterConsole does not assume that a trigger is acceleration or a face button is drift. Map each semantic action to the actual PC output for the selected player and mode. Up to eight actions/outputs can be held together.
 
 When you press the combined button, both actions start immediately. Releasing it stops its contribution. If a separate Throttle button remains held, throttle stays on until that other touch releases. The same union rule protects shared keyboard outputs across players. Triggers take the greatest active contribution; stick contributions combine and clamp to the valid range.
 
-Use **Show in variant** to make controls Classic-only, Assisted-only or visible in both. Race supplies separate Throttle/Drift in Classic and a combined button in Assisted. Each phone can select its variant when the owner allows it. This is a simultaneous held combination, not a timed macro, script, toggle or repeated-input bot.
+Use **Show in variant** to make controls Classic-only, Assisted-only or visible in both. New Race presets supply separate RT/B in Classic and a combined RT + B button in Assisted. Existing saved game-specific profiles retain their own names and mappings. Each phone can select its variant when the owner allows it. This is a simultaneous held combination, not a timed macro, script, toggle or repeated-input bot.
 
 For a sliding button cluster, give its buttons the same **Slide-between-buttons group**. Dragging between them releases the previous action without lifting. For continuous steering/movement, prefer an analog stick or 4/8-way D-pad with an adjustable dead zone. Other fingers can keep action buttons held.
+
+
+## Visual binding, or advanced fields
+
+Select a phone control → **Actions** → **Visual binding**. Choose P1–P4 and a phone control. Pick the Xbox, PlayStation or full ANSI 104 keyboard model, then click inputs to add/remove them. Multiple selections are simultaneous holds. The advanced fields remain available underneath the visual editor.
+
+Gray means unused, green means used, amber means shared by several controls, and blue means assigned to the selected control. Blue with an amber dashed outline is both selected and shared. Hover or keyboard-focus an input to see every phone control using it, its player/variant, and its complete combination (for example A versus A + B). Reusing an input is allowed. Editing a visual assignment preserves other players and controls that previously shared an action.
+
+Gamepad player slots are independent devices; keyboard usage is shown across all players because Windows shares the keyboard. On a phone analog/D-pad, choose the horizontal/vertical axis or click a whole stick/D-pad target to assign both axes. For keyboard directions choose negative (left/down) or positive (right/up). Triggers are unipolar. Up to eight outputs can be assigned per control axis/button.
+
+PlayStation is a label/diagram option: PC gamepad output is still Xbox/XInput. Touchpad, microphone, Home/Share and reserved system/lock keys are displayed disabled because that backend does not provide those features. The original schematic diagrams are bundled locally and use no manufacturer photos.
+
+## Adjust a layout on your own phone
+
+Open the phone's gear → **Adjust layout**. Drag a control to move it; drag its corner to scale it proportionally. D-pads and analog sticks move as one unit. Controls stay inside the available phone canvas, with a minimum touch size. **Done** saves on this browser, **Cancel** discards changes, and **Reset** restores the host layout (press Done to keep that reset).
+
+This works for declarative Studio controllers and supported source-defined controllers. Bindings, colors, ownership and other players are unchanged. Each phone/game/mode/variant and portrait/landscape layout has its own local settings. Clear browser storage to remove them. Input and vibration are paused while editing; losing focus or changing screen orientation cancels an unfinished edit.
+
+When a gameplay controller is active, WaterConsole requests landscape after fullscreen has been entered. Android Chrome normally supports this; fullscreen still requires a tap. If the browser rejects orientation lock, the controller shows a rotate/fullscreen hint and remains usable. No CSS fake rotation is applied to touch coordinates.
 
 ## PC output and compatibility
 

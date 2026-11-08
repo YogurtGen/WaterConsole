@@ -1,3 +1,5 @@
+import { PersonalLayoutEditor, usePersonalLayout } from "./personal-layout";
+import { resolveTheme } from "../shared/studio-engine";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientMessage, Player, SessionState } from "../shared/types";
 import { nativeSlotAllowed } from "../shared/types";
@@ -15,7 +17,9 @@ export function StudioPhone({
   haptics,
   onFullscreen,
   error,
+  fullscreenHint,
 }: {
+  fullscreenHint: string;
   state: SessionState;
   player: Player;
   token: string;
@@ -54,6 +58,14 @@ export function StudioPhone({
     }
   });
   const [images, setImages] = useState<Record<string, string>>({});
+  const layoutRoot = useRef<HTMLDivElement>(null);
+  const personal = usePersonalLayout(
+    layoutRoot,
+    `${state.selectedGameId}.${mode.id}.${variant}.${mirror ? "left" : "right"}`,
+    () => haptics.stop(),
+    definition.revision,
+  );
+  const theme = resolveTheme(definition, mode, player.canNavigate, player.slot);
   const current = useRef(state);
   current.current = state;
   const slotAllowed =
@@ -87,14 +99,27 @@ export function StudioPhone({
   }, [definition, token]);
   useEffect(() => {
     haptics.stop();
-    haptics.suspended = settings || connection !== "connected" || !slotAllowed;
+    haptics.suspended =
+      settings ||
+      personal.editing ||
+      connection !== "connected" ||
+      !slotAllowed;
     return () => {
       haptics.suspended = false;
     };
-  }, [state.epoch, session.modeId, variant, connection, settings, slotAllowed]);
+  }, [
+    state.epoch,
+    session.modeId,
+    variant,
+    connection,
+    settings,
+    personal.editing,
+    slotAllowed,
+  ]);
   const enabled =
     connection === "connected" &&
     !settings &&
+    !personal.editing &&
     slotAllowed &&
     (session.preview ||
       (state.phase === "native" &&
@@ -113,9 +138,12 @@ export function StudioPhone({
   return (
     <main
       className="studio-phone"
-      style={{ background: definition.theme.background }}
+      style={{ background: theme.background, color: theme.text }}
     >
-      <header className="studio-phone-toolbar">
+      <header
+        className="studio-phone-toolbar"
+        style={{ background: theme.panel }}
+      >
         <Brand compact />
         <span>
           <i className={connection === "connected" ? "online-dot" : ""} />P
@@ -139,7 +167,11 @@ export function StudioPhone({
           )}
         </div>
       </header>
-      <nav className="studio-phone-modes" aria-label="Controller modes">
+      <nav
+        className="studio-phone-modes"
+        style={{ background: theme.panel }}
+        aria-label="Controller modes"
+      >
         {definition.modes.map((m) => (
           <button
             key={m.id}
@@ -157,25 +189,32 @@ export function StudioPhone({
               value={variant}
               onChange={(e) => updateVariant(e.target.value as any)}
             >
-              <option value="assisted">Assisted · Drift + gas</option>
+              <option value="assisted">Assisted · Linked inputs</option>
               <option value="classic">Classic · Separate controls</option>
             </select>
           )}
       </nav>
       {(session.preview || !enabled || error) && (
         <div className="studio-phone-notice" role="status">
-          {settings
-            ? "Controls paused while settings are open."
-            : session.preview
-              ? "Safe preview · your inputs do not control a game."
-              : !slotAllowed
-                ? `Spectating · this game uses the first ${state.native.maxPlayers ?? 0} player slots.`
-                : error ||
-                  state.native.message ||
-                  "Focus the game window on your PC to enable controls."}
+          {personal.editing
+            ? "Controls paused while you adjust the layout."
+            : settings
+              ? "Controls paused while settings are open."
+              : session.preview
+                ? "Safe preview · your inputs do not control a game."
+                : !slotAllowed
+                  ? `Spectating · this game uses the first ${state.native.maxPlayers ?? 0} player slots.`
+                  : error ||
+                    state.native.message ||
+                    "Focus the game window on your PC to enable controls."}
         </div>
       )}
-      <div className="studio-phone-canvas">
+      {fullscreenHint && (
+        <button className="studio-phone-rotate" onClick={onFullscreen}>
+          {fullscreenHint}
+        </button>
+      )}
+      <div className="studio-phone-canvas" ref={layoutRoot}>
         <StudioSurface
           definition={definition}
           modeId={mode.id}
@@ -210,6 +249,7 @@ export function StudioPhone({
           }}
         />
       </div>
+      <PersonalLayoutEditor model={personal} />
       {settings && (
         <section
           className="studio-phone-settings"
@@ -219,6 +259,18 @@ export function StudioPhone({
             <h2>Your controller</h2>
             <button onClick={() => setSettings(false)}>Done</button>
           </div>
+          <button
+            onClick={() => {
+              setSettings(false);
+              personal.begin();
+            }}
+          >
+            Adjust layout
+          </button>
+          <p>
+            Move and resize controls on this phone only. Your host’s bindings
+            stay the same.
+          </p>
           <label>
             <input
               type="checkbox"

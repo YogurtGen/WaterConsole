@@ -364,6 +364,7 @@ export function StudioSurface({
           return (
             <button
               key={c.id}
+              data-layout-id={c.id}
               ref={(el) => {
                 if (el) widgets.current.set(c.id, el);
                 else widgets.current.delete(c.id);

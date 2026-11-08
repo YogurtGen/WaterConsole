@@ -119,3 +119,11 @@ If the project helps your game night, you can [support its development via yapp.
 ## License
 
 WaterConsole source and original project artwork are licensed under [MIT](LICENSE). Third-party components retain their own licenses; see [asset provenance](assets/ASSET-LICENSES.md) and the notices bundled with releases. No ownership or redistribution rights to third-party games are granted.
+
+## Controller usability 0.4
+
+Choose bindings directly on Xbox, PlayStation or full-keyboard diagrams. Shared-input colors and hover details explain linked combinations without requiring input-code knowledge. Every phone can adjust control position and size locally from the gear menu. Live colors, mode backgrounds and gameplay landscape hints are included.
+
+![Visual binding editor with shared Xbox inputs](docs/media/visual-xbox.png)
+
+See [Controller Studio](docs/CONTROLLER-STUDIO.md) for the step-by-step workflow and [0.4 release notes](docs/releases/0.4.0.md) for update details.

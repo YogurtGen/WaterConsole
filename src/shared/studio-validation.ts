@@ -235,6 +235,11 @@ export function validateBinding(v: unknown): asserts v is OutputBinding {
     assert(PAD_BUTTONS.includes(v.code as any), "Unknown gamepad button.");
   else if (v.kind === "key")
     assert(KEYS.includes(v.code), "Choose a supported game key.");
+  else if (v.kind === "key-direction")
+    assert(
+      KEYS.includes(v.code) && [-1, 1].includes(v.value),
+      "Invalid directional key.",
+    );
   else if (v.kind === "axis")
     assert(
       ["lx", "ly", "rx", "ry", "lt", "rt"].includes(v.code) &&
@@ -343,7 +348,7 @@ export function validateGame(value: unknown): asserts value is LocalGameRecord {
             assert(
               backend === "gamepad"
                 ? ["button", "axis", "button-axis"].includes(output.kind)
-                : ["key", "key-axis"].includes(output.kind),
+                : ["key", "key-axis", "key-direction"].includes(output.kind),
               "Binding type does not match its input method.",
             );
           });

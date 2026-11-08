@@ -205,6 +205,34 @@ try {
     });
     await context.addInitScript(() => {
       window.__vibrations = [];
+      window.__orientationLocks = [];
+      window.__rejectRotation = false;
+      let full = false;
+      Object.defineProperty(document, "fullscreenElement", {
+        configurable: true,
+        get: () => (full ? document.documentElement : null),
+      });
+      Element.prototype.requestFullscreen = function () {
+        full = true;
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      document.exitFullscreen = () => {
+        full = false;
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      };
+      Object.defineProperty(screen.orientation, "lock", {
+        configurable: true,
+        value: async (value) => {
+          window.__orientationLocks.push(value);
+          if (window.__rejectRotation) throw Error("Fixture denial");
+        },
+      });
+      Object.defineProperty(screen.orientation, "unlock", {
+        configurable: true,
+        value: () => {},
+      });
       Object.defineProperty(navigator, "vibrate", {
         configurable: true,
         value: (v) => {
@@ -245,12 +273,12 @@ try {
   );
   for (const phone of phones)
     await expect(
-      phone.page.getByRole("button", { name: "Drift + gas", exact: true }),
+      phone.page.getByRole("button", { name: "RT + B", exact: true }),
     ).toBeVisible();
   for (let i = 0; i < 4; i++) {
     const p = phones[i],
       a = await center(p, "Steer", i % 2 ? 0.4 : -0.4),
-      b = await center(p, "Drift + gas");
+      b = await center(p, "RT + B");
     await touch(p, [
       { id: 1, ...a },
       { id: 2, ...b },
@@ -264,7 +292,7 @@ try {
     ),
   );
   pass(
-    "Four approved browser controllers hold steering and linked Drift + gas independently",
+    "Four approved browser controllers hold steering and linked RT + B independently",
   );
   for (const p of phones) await touch(p, [], "touchEnd");
   await wait(async () =>
@@ -275,6 +303,46 @@ try {
     ),
   );
   const p = phones[0];
+  await expect
+    .poll(() =>
+      p.page.evaluate(() => window.__orientationLocks.includes("landscape")),
+    )
+    .toBe(true);
+  await p.page.evaluate(() => {
+    window.__rejectRotation = true;
+  });
+  assert(
+    (
+      await library({
+        type: "preview",
+        gameId: game.id,
+        definition: game.controller,
+        modeId: "fight",
+      })
+    ).ok,
+  );
+  await expect(p.page.locator(".studio-phone-rotate")).toContainText(
+    "could not lock",
+  );
+  await p.page.evaluate(() => {
+    window.__rejectRotation = false;
+  });
+  assert(
+    (
+      await library({
+        type: "preview",
+        gameId: game.id,
+        definition: game.controller,
+        modeId: "race",
+      })
+    ).ok,
+  );
+  await expect(p.page.locator(".studio-phone-rotate")).toHaveCount(0);
+  pass(
+    "Gameplay requests landscape and shows an honest fallback when the browser denies it",
+  );
+
+  await p.page.waitForTimeout(200);
   const start = await center(p, "Steer", 0.4, 0);
   await touch(p, [{ id: 1, ...start }]);
   const end = await center(p, "Steer", -0.4, 0);
@@ -325,6 +393,112 @@ try {
     .toBe(true);
   await p.page.getByRole("button", { name: "Done", exact: true }).click();
   pass("Explicit Test vibration works while settings pause gameplay feedback");
+  await p.page
+    .getByRole("button", { name: "Controller settings", exact: true })
+    .click();
+  await p.page
+    .getByRole("button", { name: "Adjust layout", exact: true })
+    .click();
+  await expect(
+    p.page.getByRole("dialog", {
+      name: "Adjust your controller layout",
+      exact: true,
+    }),
+  ).toBeVisible();
+  const handle = p.page.getByLabel("Move RT + B", { exact: true }),
+    original = await p.page
+      .getByRole("button", { name: "RT + B", exact: true })
+      .boundingBox();
+  const hb = await handle.boundingBox();
+  await p.page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
+  await p.page.mouse.down();
+  await p.page.mouse.move(hb.x + hb.width / 2 - 65, hb.y + hb.height / 2 - 8, {
+    steps: 6,
+  });
+  await p.page.mouse.up();
+  await wait(async () => !(await state()).players[0].studio?.pressed.length);
+  const moved = await p.page
+    .getByRole("button", { name: "RT + B", exact: true })
+    .boundingBox();
+  assert(moved.x < original.x - 30);
+  const resize = p.page.getByRole("button", {
+      name: "Resize RT + B",
+      exact: true,
+    }),
+    rb = await resize.boundingBox();
+  await p.page.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2);
+  await p.page.mouse.down();
+  await p.page.mouse.move(rb.x + rb.width / 2 - 35, rb.y + rb.height / 2 - 25, {
+    steps: 6,
+  });
+  await p.page.mouse.up();
+  const resized = await p.page
+    .getByRole("button", { name: "RT + B", exact: true })
+    .boundingBox();
+  assert(resized.width < moved.width - 5);
+  await expect
+    .poll(async () => !(await state()).players[0].studio?.pressed.length)
+    .toBe(true);
+
+  await p.page.getByRole("button", { name: "Done", exact: true }).click();
+  const savedLayout = await p.page.evaluate(() =>
+    Object.entries(localStorage).filter(([k]) =>
+      k.startsWith("waterconsole.layout.v1."),
+    ),
+  );
+  assert(savedLayout.some(([, v]) => v !== "{}"));
+  assert.equal(
+    (
+      await phones[1].page.evaluate(() =>
+        Object.keys(localStorage).filter((k) =>
+          k.startsWith("waterconsole.layout.v1."),
+        ),
+      )
+    ).length,
+    0,
+  );
+  await p.page.reload();
+  await p.page
+    .getByRole("button", { name: "Enter controller", exact: true })
+    .click();
+  await expect(
+    p.page.getByRole("button", { name: "RT + B", exact: true }),
+  ).toBeVisible();
+  await p.page.waitForTimeout(200);
+  const reloaded = await p.page
+    .getByRole("button", { name: "RT + B", exact: true })
+    .boundingBox();
+  assert(Math.abs(reloaded.x - resized.x) < 3);
+  await p.page
+    .getByRole("button", { name: "Controller settings", exact: true })
+    .click();
+  await p.page
+    .getByRole("button", { name: "Adjust layout", exact: true })
+    .click();
+  await p.page.getByRole("button", { name: "Reset", exact: true }).click();
+  await p.page.getByRole("button", { name: "Cancel", exact: true }).click();
+  assert(
+    Math.abs(
+      (
+        await p.page
+          .getByRole("button", { name: "RT + B", exact: true })
+          .boundingBox()
+      ).x - reloaded.x,
+    ) < 3,
+  );
+  await p.page
+    .getByRole("button", { name: "Controller settings", exact: true })
+    .click();
+  await p.page
+    .getByRole("button", { name: "Adjust layout", exact: true })
+    .click();
+  await p.page.getByRole("button", { name: "Reset", exact: true }).click();
+  await p.page.getByRole("button", { name: "Done", exact: true }).click();
+  await p.page.screenshot({ path: out + "/phone-personal-layout.png" });
+  pass(
+    "Phone drag layout is neutral, device-local, survives reload, cancels safely and resets",
+  );
+
   assert((await library({ type: "end-preview" })).ok);
   if (process.env.WATERCONSOLE_STUDIO_NATIVE === "1") {
     const capabilities = await library({ type: "capabilities" });
@@ -334,13 +508,17 @@ try {
     );
     const started = await command({ type: "startGame", gameId: game.id });
     assert(started.ok, started.error);
+    await fs.writeFile(
+      out + "/native-report.json.focus",
+      "activate owned fixture",
+    );
     await wait(async () => (await state()).native.focused);
     assert((await command({ type: "studioMode", modeId: "race" })).ok);
     await wait(async () => (await state()).native.controls === "game");
     for (let i = 0; i < 4; i++) {
       const phone = phones[i];
       const a = await center(phone, "Steer", i % 2 ? 0.4 : -0.4),
-        b = await center(phone, "Drift + gas");
+        b = await center(phone, "RT + B");
       await touch(phone, [
         { id: 1, ...a },
         { id: 2, ...b },
@@ -408,19 +586,25 @@ try {
     assert((await command({ type: "stopGame" })).ok);
     await wait(async () => (await state()).phase === "home");
     pass("Normal return Home waits for the owned test application to exit");
+    game.bindings.keyboard[1].race.rt = [{ kind: "key", code: "W" }];
+    game.bindings.keyboard[1].race.b = [{ kind: "key", code: "Space" }];
     game.inputMethod = "keyboard";
     game.maxPlayers = 1;
     const keyboard = await library({ type: "save", game });
     assert(keyboard.ok, keyboard.error);
     game = keyboard.game;
     assert((await command({ type: "startGame", gameId: game.id })).ok);
+    await fs.writeFile(
+      out + "/native-report.json.focus",
+      "activate owned fixture",
+    );
     await wait(async () => (await state()).native.focused);
     assert((await command({ type: "studioMode", modeId: "race" })).ok);
     await expect(
-      phones[3].page.getByRole("button", { name: "Drift + gas", exact: true }),
+      phones[3].page.getByRole("button", { name: "RT + B", exact: true }),
     ).toHaveAttribute("aria-disabled", "true");
     const steer = await center(p, "Steer", 0.4, 0),
-      combo = await center(p, "Drift + gas");
+      combo = await center(p, "RT + B");
     await touch(p, [
       { id: 1, ...steer },
       { id: 2, ...combo },

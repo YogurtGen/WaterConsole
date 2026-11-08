@@ -28,3 +28,5 @@ The optional driver archive has its own provenance and checksums. A checksum est
 ## Offline controller icons
 
 `assets/public/assets/controller-icons/` bundles 6,257 Tabler icons (outline and filled), MIT, copyright Paweł Kuna. Source is pinned to upstream commit `ed177a085b652fe04ec4f37ced867c94621e7840`; exact provenance and the complete license are in `SOURCE.json` and `LICENSE.txt` beside the icons. Catalog aliases/categories are local editor metadata. SVG paths were checked for executable/external content; arbitrary uploaded SVG is not accepted. Icons work offline.
+
+Original WaterConsole hardware schematics (`device-models.ts`, `visual-binding.tsx`) and documentation captures of those diagrams: MIT. Physical layout/names are referenced in docs/validation/controller-usability-0.4.md. No manufacturer reference photographs/logos are redistributed.

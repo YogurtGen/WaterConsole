@@ -23,6 +23,7 @@ export const PAD_BUTTONS = [
 export type OutputBinding =
   | { kind: "button"; code: string }
   | { kind: "key"; code: string }
+  | { kind: "key-direction"; code: string; value: -1 | 1 }
   | { kind: "axis"; code: AxisCode; value: number }
   | { kind: "button-axis"; negative: string; positive: string }
   | { kind: "key-axis"; negative: string; positive: string };
@@ -249,6 +250,35 @@ export const KEYS = [
   "Backspace",
   ...Array.from({ length: 12 }, (_, i) => "F" + (i + 1)),
   ...Array.from({ length: 10 }, (_, i) => "Numpad" + i),
+  "Backquote",
+  "Minus",
+  "Equal",
+  "BracketLeft",
+  "BracketRight",
+  "Backslash",
+  "Semicolon",
+  "Quote",
+  "Comma",
+  "Period",
+  "Slash",
+  "Insert",
+  "Delete",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+  "NumpadAdd",
+  "NumpadSubtract",
+  "NumpadMultiply",
+  "NumpadDivide",
+  "NumpadDecimal",
+  "NumpadEnter",
+  "ShiftLeft",
+  "ShiftRight",
+  "ControlLeft",
+  "ControlRight",
+  "AltLeft",
+  "AltRight",
 ];
 export const clamp = (n: number, lo = -1, hi = 1) =>
   Math.max(lo, Math.min(hi, n));
@@ -286,7 +316,7 @@ export function control(
         : kind === "stick"
           ? "move-x"
           : kind === "trigger"
-            ? "accelerate"
+            ? "rt"
             : undefined,
     axisY: kind === "dpad" ? "pad-y" : kind === "stick" ? "move-y" : undefined,
     deadZone: 0.18,
@@ -310,14 +340,12 @@ function defaultActions(mode: string): ActionBindings {
     y: [{ kind: "button", code: "y" }],
     l: [{ kind: "button", code: "l" }],
     r: [{ kind: "button", code: "r" }],
+    ls: [{ kind: "button", code: "ls" }],
+    rs: [{ kind: "button", code: "rs" }],
     lt: [{ kind: "axis", code: "lt", value: 1 }],
     rt: [{ kind: "axis", code: "rt", value: 1 }],
     start: [{ kind: "button", code: "start" }],
     select: [{ kind: "button", code: "select" }],
-    accelerate: [{ kind: "axis", code: "rt", value: 1 }],
-    brake: [{ kind: "axis", code: "lt", value: 1 }],
-    drift: [{ kind: "button", code: "b" }],
-    boost: [{ kind: "button", code: "a" }],
   };
 }
 export function createController(): ControllerDefinition {
@@ -329,22 +357,19 @@ export function createController(): ControllerDefinition {
   ];
   const fight = [
     control("dpad", "Move", 60, 100, 240, 240),
-    control("button", "Light", 550, 100, 125, 105, ["x"]),
-    control("button", "Heavy", 700, 100, 125, 105, ["b"]),
-    control("button", "Jump", 550, 235, 275, 85, ["a"]),
-    control("button", "Dodge", 550, 350, 125, 65, ["lt"]),
-    control("button", "Throw", 700, 350, 125, 65, ["r"]),
+    control("button", "X", 550, 100, 125, 105, ["x"]),
+    control("button", "B", 700, 100, 125, 105, ["b"]),
+    control("button", "A", 550, 235, 275, 85, ["a"]),
+    control("button", "LT", 550, 350, 125, 65, ["lt"]),
+    control("button", "RB", 700, 350, 125, 65, ["r"]),
   ];
   const race = [
     control("stick", "Steer", 60, 100, 240, 240),
-    control("button", "Throttle", 690, 190, 160, 185, ["accelerate"]),
-    control("button", "Drift", 510, 190, 150, 185, ["drift"]),
-    control("button", "Drift + gas", 630, 190, 220, 185, [
-      "accelerate",
-      "drift",
-    ]),
-    control("button", "Boost", 510, 90, 340, 70, ["boost"]),
-    control("button", "Brake", 510, 400, 150, 58, ["brake"]),
+    control("button", "RT", 690, 190, 160, 185, ["rt"]),
+    control("button", "B", 510, 190, 150, 185, ["b"]),
+    control("button", "RT + B", 630, 190, 220, 185, ["rt", "b"]),
+    control("button", "A", 510, 90, 340, 70, ["a"]),
+    control("button", "LT", 510, 400, 150, 58, ["lt"]),
     control("button", "Pause", 350, 350, 120, 58, ["start"]),
   ];
   race[1].variant = "classic";
@@ -451,10 +476,6 @@ export function createBindings(def: ControllerDefinition): GameBindings {
                           b: "Escape",
                           x: "J",
                           y: "K",
-                          accelerate: "W",
-                          brake: "S",
-                          drift: "Space",
-                          boost: "Shift",
                           start: "Escape",
                           select: "Tab",
                           l: "Q",

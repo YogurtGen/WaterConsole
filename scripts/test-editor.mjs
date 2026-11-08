@@ -233,6 +233,15 @@ try {
   await page.getByLabel("Shape", { exact: true }).selectOption("triangle");
   await page.getByLabel("Show", { exact: true }).selectOption("icon-text");
   await page.getByRole("button", { name: "Choose icon", exact: false }).click();
+  await page.locator(".icon-picker-scroll").evaluate((el) => {
+    el.scrollTop = 1500;
+    el.dispatchEvent(new Event("scroll"));
+  });
+  await page.waitForTimeout(100);
+  if (errors.length) throw Error(errors.join("\n"));
+  checks.push("Scrolling the icon catalog keeps the editor mounted");
+  await page.getByLabel("Search icons").fill("zzzznomatchingicon");
+  await page.getByLabel("Search icons").press("ArrowDown");
   await page.getByLabel("Search icons").fill("backpack");
   await expect(
     page.getByRole("button", { name: "backpack · outline", exact: true }),
@@ -246,6 +255,107 @@ try {
   await page.getByLabel("Button fill HEX").blur();
   await page.screenshot({ path: output + "/studio-editor.png" });
   checks.push("Shapes, labels, offline icon search and Navigator colors edit");
+  await page.getByLabel("Edit theme for").selectOption("control");
+  await expect(page.getByLabel("Background HEX", { exact: true })).toHaveCount(
+    0,
+  );
+  await page.getByLabel("Button fill HEX").fill("#d14672");
+  await page.getByLabel("Button fill HEX").press("Enter");
+  const inventory = page.locator('.studio-widget[aria-label="Inventory"]');
+  await expect(inventory).toHaveCSS("--control-bg", "#d14672");
+  await page.getByLabel("Button fill color", { exact: true }).evaluate((el) => {
+    el.value = "#293b7a";
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await expect(inventory).toHaveCSS("--control-bg", "#293b7a");
+  checks.push(
+    "Control color uses effective inheritance and applies HEX Enter/native input live",
+  );
+  await page
+    .getByRole("button", { name: "Edit mode background", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Background image", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Use this crop", exact: true })
+    .click();
+  await expect
+    .poll(() =>
+      page
+        .locator(".studio-surface")
+        .evaluate((el) => getComputedStyle(el).backgroundImage),
+    )
+    .toContain("user-assets/");
+  const loaded = await page.locator(".studio-surface").evaluate(async (el) => {
+    const url = getComputedStyle(el).backgroundImage.slice(5, -2);
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    return img.naturalWidth;
+  });
+  if (loaded !== 1920) throw Error("Recommended controller backdrop missing");
+  checks.push(
+    "Mode background crop loads through the local asset protocol in the design canvas",
+  );
+  await page.getByRole("button", { name: "Actions", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Visual binding", exact: false })
+    .click();
+  const binding = page.getByRole("dialog", {
+    name: "Visual input binding",
+    exact: true,
+  });
+  await expect(binding).toBeVisible();
+  await binding
+    .getByLabel("Visual model", { exact: true })
+    .selectOption("xbox");
+  await binding
+    .getByRole("button", { name: "Clear this control", exact: true })
+    .click();
+  await binding.getByRole("button", { name: "Bind A", exact: true }).click();
+  await binding.getByRole("button", { name: "Bind B", exact: true }).click();
+  await expect(binding.locator(".binding-chips")).toContainText("A");
+  await expect(
+    binding.getByRole("button", { name: "Bind A", exact: true }),
+  ).toHaveClass(/is-shared/);
+  await binding.getByRole("button", { name: "Bind A", exact: true }).hover();
+  await expect(binding.locator(".hardware-info")).toContainText("Inventory");
+  await expect(binding.locator(".hardware-info")).toContainText("A + B");
+  await binding.getByLabel("Binding player").selectOption("2");
+  await expect(binding.locator(".binding-chips button")).toHaveCount(1);
+  await expect(binding.locator(".binding-chips")).not.toContainText("B");
+  await binding.getByLabel("Binding player").selectOption("1");
+  await binding
+    .getByLabel("Visual model", { exact: true })
+    .selectOption("playstation");
+  await expect(
+    binding.getByRole("button", { name: "Bind Cross", exact: true }),
+  ).toBeVisible();
+
+  const checkPadGeometry=async()=>{const problems=await binding.locator('svg').evaluate(svg=>{const shell=svg.querySelector('.hardware-shell'),bad=[];for(const g of svg.querySelectorAll('.hardware-key')){const name=g.getAttribute('aria-label');if(/Bind (LT|RT|L2|R2|LB|RB|L1|R1) —|^Bind (LB|RB|L1|R1)$/.test(name))continue;const shape=g.querySelector('circle,rect'),r=shape.getBBox();for(let i=0;i<24;i++){const t=i*Math.PI*2/24;const point=new DOMPoint(r.x+r.width/2+Math.cos(t)*r.width/2,r.y+r.height/2+Math.sin(t)*r.height/2);if(!shell.isPointInFill(point)){bad.push(name+' escapes shell');break;}}for(const text of g.querySelectorAll(':scope > text')){const a=text.getBBox();if(a.x<r.x-1||a.y<r.y-1||a.x+a.width>r.x+r.width+1||a.y+a.height>r.y+r.height+1)bad.push(name+' text escapes button');}}return bad;});if(problems.length)throw Error(problems.join('\n'));await expect(binding.locator('.hardware-callouts [data-callout-for]')).toHaveCount(7);};
+  await checkPadGeometry();
+  await page.screenshot({ path: output + "/visual-playstation.png" });
+  await binding
+    .getByLabel("Visual model", { exact: true })
+    .selectOption("keyboard");
+  await expect(binding.locator(".hardware-key")).toHaveCount(104);
+  await binding
+    .getByRole("button", { name: "Bind Space", exact: true })
+    .click();
+  await expect(binding.locator(".binding-chips")).toContainText("Space");
+  await page.screenshot({ path: output + "/visual-keyboard.png" });
+  await binding
+    .getByLabel("Visual model", { exact: true })
+    .selectOption("xbox");
+  await checkPadGeometry();
+  await page.screenshot({ path: output + "/visual-xbox.png" });
+  await binding.getByRole("button", { name: "Done", exact: true }).click();
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  checks.push(
+    "Visual Xbox/PlayStation/full keyboard assignment preserves per-player mapping, highlights shared inputs and explains compound usage; hotspots remain inside the shell and callout labels stay readable",
+  );
+
   await page
     .getByRole("button", { name: "Save controller", exact: true })
     .click();

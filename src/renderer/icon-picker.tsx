@@ -17,7 +17,28 @@ const load = () =>
         throw new Error(
           "The offline icon pack is missing. Reinstall this build.",
         );
-      return r.json();
+      return r.json().then((data: unknown) => {
+        if (
+          !Array.isArray(data) ||
+          data.length > 10000 ||
+          !data.every(
+            (i) =>
+              i &&
+              typeof i.id === "string" &&
+              /^[a-z0-9-]+$/.test(i.id) &&
+              typeof i.name === "string" &&
+              typeof i.category === "string" &&
+              typeof i.gaming === "boolean" &&
+              ["outline", "filled"].includes(i.style) &&
+              Array.isArray(i.aliases) &&
+              i.aliases.every((a: unknown) => typeof a === "string"),
+          )
+        )
+          throw new Error(
+            "The offline icon catalog is invalid. Reinstall the matching icon pack.",
+          );
+        return data as Entry[];
+      });
     })
     .catch((error) => {
       catalogPromise = undefined;
@@ -191,9 +212,10 @@ export function IconPicker({
           className="icon-picker-scroll"
           role="grid"
           aria-label="Icon results"
-          onScroll={(e) =>
-            setView((v) => ({ ...v, top: e.currentTarget.scrollTop }))
-          }
+          onScroll={(e) => {
+            const top = e.currentTarget.scrollTop;
+            setView((v) => ({ ...v, top }));
+          }}
           onKeyDown={(e) => {
             const current = results.findIndex((i) => i.id === selected),
               delta = (
@@ -206,6 +228,7 @@ export function IconPicker({
               )[e.key];
             if (delta) {
               e.preventDefault();
+              if (!results.length) return;
               const next = Math.max(
                 0,
                 Math.min(results.length - 1, current + delta),

@@ -56,6 +56,8 @@ export function resolveBindings(
     for (const output of outputs ?? []) {
       if (output.kind === "button" && amount > 0.3) buttons.add(output.code);
       else if (output.kind === "key" && amount > 0.3) keys.add(output.code);
+      else if (output.kind === "key-direction" && amount * output.value > 0.3)
+        keys.add(output.code);
       else if (output.kind === "button-axis") {
         if (amount > 0.3) buttons.add(output.positive);
         if (amount < -0.3) buttons.add(output.negative);
@@ -81,14 +83,31 @@ export function resolveBindings(
       buttons.delete(a);
       buttons.delete(b);
     }
-  if (keys.has("Alt")) {
+  const alt = ["Alt", "AltLeft", "AltRight"].some((k) => keys.has(k)),
+    ctrl = ["Control", "ControlLeft", "ControlRight"].some((k) => keys.has(k));
+  if (alt) {
+    keys.delete("Space");
     keys.delete("F4");
     keys.delete("Tab");
     keys.delete("Escape");
   }
-  if (keys.has("Control")) keys.delete("Escape");
+  if (ctrl) keys.delete("Escape");
+  if (ctrl && alt) keys.delete("Delete");
   out.buttons = [...buttons];
-  out.keys = [...keys];
+  out.keys = [
+    ...new Set(
+      [...keys].map(
+        (k) =>
+          (
+            ({
+              Shift: "ShiftLeft",
+              Control: "ControlLeft",
+              Alt: "AltLeft",
+            }) as Record<string, string>
+          )[k] ?? k,
+      ),
+    ),
+  ];
   return out;
 }
 export function resolveTheme(

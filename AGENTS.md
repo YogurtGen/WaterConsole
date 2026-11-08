@@ -32,6 +32,6 @@ Read [docs/ADDING-GAMES.md](docs/ADDING-GAMES.md) and [docs/CONTROLLER-STUDIO.md
 
 Use declarative ControllerDefinition profiles when their controls/actions are sufficient. For specialized UI/telemetry/launchers, isolate the adapter/profile, add allowed semantic actions and a safe phone layout, and keep private bindings on PC. Phones never get native keycodes or executable paths. UserBridge v2 is separate from the original semantic toolkit. Do not load JS/DLL plugins from library records.
 
-Linked actions are simultaneous holds: a source can hold Accelerate + Drift, while releasing it must preserve Accelerate if another source still holds it. Use the existing union engine; no last-event-wins, timed macros, automatic repeats, or global keyboard shortcuts. Preserve per-slot true analog values.
+Linked actions are simultaneous holds: a source can hold game-bound inputs such as RT + B, while releasing it must preserve Accelerate if another source still holds it. Use the existing union engine; no last-event-wins, timed macros, automatic repeats, or global keyboard shortcuts. Preserve per-slot true analog values.
 
 Record menu and gameplay bindings separately, actual player limits, the multiplayer menu route, offline evidence, launcher requirements, focus/watchdog recovery, and clean stop. Reuse per-phone Vibration/Test and slot/epoch rumble gates. Test native input with an owned lightweight fixture before opening a third-party game. Do not claim physical-phone vibration or real-game compatibility from browser mocks.
