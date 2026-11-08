@@ -24,6 +24,55 @@ async function fixture() {
   return root;
 }
 describe("Installed store discovery", () => {
+  it("skips incomplete, missing and empty installations and notices removal on rescan", async () => {
+    const root = await fixture(),
+      steam = path.join(root, "Steam"),
+      apps = path.join(steam, "steamapps"),
+      epic = path.join(root, "EpicManifests");
+    await mkdir(apps, { recursive: true });
+    await mkdir(epic, { recursive: true });
+    for (const [id, flags, bytes] of [
+      [201, "2", "leftover"],
+      [202, "4", null],
+      [203, "4", ""],
+      [204, "6", "installed"],
+    ] as const) {
+      const dir = path.join(apps, "common", "Fixture" + id);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        path.join(apps, `appmanifest_${id}.acf`),
+        `"appid" "${id}" "name" "Fixture ${id}" "installdir" "Fixture${id}" "StateFlags" "${flags}"`,
+      );
+      if (bytes !== null) await writeFile(path.join(dir, "Game.exe"), bytes);
+    }
+    for (const [id, incomplete, bytes] of [
+      [301, true, "leftover"],
+      [302, false, null],
+      [303, false, ""],
+    ] as const) {
+      const dir = path.join(root, "Epic" + id);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        path.join(epic, id + ".item"),
+        JSON.stringify({
+          DisplayName: "Epic fixture",
+          InstallLocation: dir,
+          LaunchExecutable: "Game.exe",
+          CatalogItemId: "item" + id,
+          CatalogNamespace: "namespace",
+          AppName: "app" + id,
+          bIsIncompleteInstall: incomplete,
+        }),
+      );
+      if (bytes !== null) await writeFile(path.join(dir, "Game.exe"), bytes);
+    }
+    const options = { steamRoots: [steam], epicDirectory: epic };
+    expect((await discoverStores(options)).games.map((g) => g.key)).toEqual([
+      "steam:204",
+    ]);
+    await rm(path.join(apps, "common", "Fixture204", "Game.exe"));
+    expect((await discoverStores(options)).games).toEqual([]);
+  });
   it("reads Steam libraries and Epic base games without running executables", async () => {
     const root = await fixture(),
       steam = path.join(root, "Steam"),
@@ -43,12 +92,13 @@ describe("Installed store discovery", () => {
     );
     await writeFile(
       path.join(library, "steamapps/appmanifest_123.acf"),
-      '"AppState" { "appid" "123" "name" "Green Game" "installdir" "Green Game" }',
+      '"AppState" { "appid" "123" "name" "Green Game" "StateFlags" "4" "installdir" "Green Game" }',
     );
     await writeFile(path.join(game, "GreenGame.exe"), "test fixture only");
     await writeFile(path.join(game, "uninstall.exe"), "excluded");
     const manifest = {
       DisplayName: "Epic Fixture",
+      bIsIncompleteInstall: false,
       InstallLocation: epicGame,
       LaunchExecutable: "EpicGame.exe",
       CatalogItemId: "item-id",
@@ -110,14 +160,12 @@ describe("Official metadata boundaries", () => {
       expect(() => officialURL(u, true)).toThrow();
   });
   it("rejects redirect escape and bounded response overflow", async () => {
-    const redirect = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(null, {
-          status: 302,
-          headers: { location: "http://127.0.0.1/private" },
-        }),
-      );
+    const redirect = vi.fn().mockResolvedValue(
+      new Response(null, {
+        status: 302,
+        headers: { location: "http://127.0.0.1/private" },
+      }),
+    );
     await expect(
       officialBytes("https://store.steampowered.com/api", false, redirect),
     ).rejects.toThrow("Unsupported");

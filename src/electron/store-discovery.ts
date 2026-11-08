@@ -16,8 +16,13 @@ export function steamManifest(text: string) {
     new RegExp('"' + key + '"\\s+"([^"\\r\\n]*)"', "i").exec(text)?.[1];
   const id = get("appid"),
     name = get("name"),
-    folder = get("installdir");
+    folder = get("installdir"),
+    flags = get("StateFlags");
   return id &&
+    flags &&
+    /^\d{1,10}$/.test(flags) &&
+    Number(flags) <= 0xffffffff &&
+    (Number(flags) & 4) !== 0 &&
     /^[1-9]\d{0,9}$/.test(id) &&
     Number(id) <= 0xffffffff &&
     name &&
@@ -50,6 +55,8 @@ export async function findGameExecutables(directory: string) {
       if (badExe.test(relative)) continue;
       if (entry.isDirectory()) await visit(file, depth + 1);
       else if (entry.isFile() && /\.exe$/i.test(entry.name)) {
+        const info = await stat(file).catch(() => undefined);
+        if (!info?.isFile() || info.size === 0) continue;
         const base = normalizeTitle(entry.name.replace(/\.exe$/i, ""));
         found.push({
           file,
@@ -175,7 +182,7 @@ export async function discoverStores(
         if ((await stat(full)).size > 1024 * 1024) continue;
         const m = JSON.parse(await readFile(full, "utf8"));
         if (
-          m.bIsIncompleteInstall ||
+          m.bIsIncompleteInstall !== false ||
           !m.DisplayName ||
           !m.InstallLocation ||
           !m.CatalogItemId ||
@@ -194,6 +201,8 @@ export async function discoverStores(
           !executable.toLowerCase().endsWith(".exe")
         )
           continue;
+        const info = await stat(executable).catch(() => undefined);
+        if (!info?.isFile() || info.size === 0) continue;
         games.push({
           key: "epic:" + m.CatalogNamespace + ":" + m.CatalogItemId,
           store: "epic",

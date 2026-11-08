@@ -58,6 +58,16 @@ export class StoreImporter {
     const candidate = executable || selected.executable;
     if (!candidate || !selected.executables.includes(candidate))
       throw new Error("Choose an executable from the scanned installation.");
+    const current = (await discoverStores()).games.find(
+      (g) =>
+        g.key === selected.key &&
+        g.directory.toLowerCase() === selected.directory.toLowerCase() &&
+        g.executables.some((e) => e.toLowerCase() === candidate.toLowerCase()),
+    );
+    if (!current)
+      throw new Error(
+        "This installation is no longer available. Scan again after the game has finished installing.",
+      );
     const validated = await this.store.validateExecutable(candidate);
     const game = newLocalGame(),
       notes: string[] = [];
