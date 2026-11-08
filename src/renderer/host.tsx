@@ -1,6 +1,8 @@
-import {LibraryWorkspace} from "./library-workspace";
-import {libraryCall} from "./builder-primitives";
-import type {ArtworkSlot} from "../shared/studio-model";
+import { GameShelf } from "./game-shelf";
+import { LibraryCardMenu, type CardMenuAnchor } from "./library-card-menu";
+import { LibraryWorkspace } from "./library-workspace";
+import { libraryCall } from "./builder-primitives";
+import type { ArtworkSlot } from "../shared/studio-model";
 import {
   useCallback,
   useEffect,
@@ -32,14 +34,29 @@ function GameArtwork({
   alt = "",
 }: {
   gameId: string;
-  art?:ArtworkSlot;
+  art?: ArtworkSlot;
   variant: "cover" | "hero";
   alt?: string;
 }) {
   const [fallback, setFallback] = useState(false);
   useEffect(() => setFallback(false), [gameId, variant, art?.asset]);
-  if(art&&!fallback)return <img src={`waterconsole://app/user-assets/${art.asset}`} style={{objectFit:art.fit,objectPosition:"center"}} alt={alt} data-library-art="true" onError={()=>setFallback(true)}/>;
-  if(gameId.startsWith("local-"))return <div className="custom-art-placeholder" aria-hidden="true"><span>YOUR LOCAL GAME</span><strong>Play it your way.</strong></div>;
+  if (art && !fallback)
+    return (
+      <img
+        src={`waterconsole://app/user-assets/${art.asset}`}
+        style={{ objectFit: art.fit, objectPosition: "center" }}
+        alt={alt}
+        data-library-art="true"
+        onError={() => setFallback(true)}
+      />
+    );
+  if (gameId.startsWith("local-"))
+    return (
+      <div className="custom-art-placeholder" aria-hidden="true">
+        <span>YOUR LOCAL GAME</span>
+        <strong>Play it your way.</strong>
+      </div>
+    );
   const local = gameId !== "controller-lab" && !fallback;
   return (
     <img
@@ -324,11 +341,13 @@ function GameCard({
   state,
   send,
   onEdit,
+  onMenu,
 }: {
   game: GameManifest;
   state: HostState;
   send: (c: HostCommand) => void;
-  onEdit?:(id:string,studio?:boolean)=>void;
+  onEdit?: (id: string, studio?: boolean) => void;
+  onMenu?: (game: GameManifest, anchor: CardMenuAnchor) => void;
 }) {
   const selected =
     state.heroMode === "detail" && state.selectedGameId === game.id;
@@ -336,14 +355,40 @@ function GameCard({
     game.availability === "available" &&
     (game.runtime === "native" ? nativeAvailable(state.native, game.id) : true);
   return (
-    <div className={`game-card ${selected ? "selected" : ""}`}>
+    <div
+      data-game-id={game.id}
+      className={`game-card ${selected ? "selected" : ""}`}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const r = e.currentTarget.getBoundingClientRect();
+        onMenu?.(game, {
+          x: e.clientX || r.left + 20,
+          y: e.clientY || r.top + 20,
+          trigger:
+            e.currentTarget.querySelector<HTMLElement>(".game-card-select")!,
+        });
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
+          e.preventDefault();
+          e.stopPropagation();
+          const r = e.currentTarget.getBoundingClientRect();
+          onMenu?.(game, {
+            x: r.left + 20,
+            y: r.top + 20,
+            trigger: e.target as HTMLElement,
+          });
+        }
+      }}
+    >
       <button
         className="game-card-select"
         onClick={() => send({ type: "selectGame", gameId: game.id })}
         aria-label={`Show ${game.title} details`}
         aria-pressed={selected}
       >
-        <div className={`game-cover ${game.local?"local-game":game.id}`}>
+        <div className={`game-cover ${game.local ? "local-game" : game.id}`}>
           <GameArtwork gameId={game.id} variant="cover" art={game.cover} />
           <span className="card-selected" aria-hidden="true">
             <Icon name="check" size={12} />
@@ -365,19 +410,23 @@ function GameCard({
             )}
           </div>
           <span className={`cover-status ${available ? "available" : ""}`}>
-            {game.local ? (available?game.setup:"Needs setup") : game.connection === "offline-online" && available
-              ? "OFFLINE · ONLINE"
-              : game.connection === "online" && available
-                ? "ONLINE"
-                : game.launchRequirement
-                  ? "OFFLINE CHECK REQUIRED"
-                  : game.runtime === "native"
-                    ? available
-                      ? "INSTALLED ON THIS PC"
-                      : "GAME NOT FOUND"
-                    : available
-                      ? "READY TO PLAY"
-                      : "INTEGRATION PLANNED"}
+            {game.local
+              ? available
+                ? game.setup
+                : "Needs setup"
+              : game.connection === "offline-online" && available
+                ? "OFFLINE · ONLINE"
+                : game.connection === "online" && available
+                  ? "ONLINE"
+                  : game.launchRequirement
+                    ? "OFFLINE CHECK REQUIRED"
+                    : game.runtime === "native"
+                      ? available
+                        ? "INSTALLED ON THIS PC"
+                        : "GAME NOT FOUND"
+                      : available
+                        ? "READY TO PLAY"
+                        : "INTEGRATION PLANNED"}
           </span>
         </div>
         <span className="card-label">{game.title}</span>
@@ -411,7 +460,23 @@ function GameCard({
       >
         <Icon name="heart" size={19} />
       </button>
-      {game.local&&<button className="card-edit" aria-label={"Edit "+game.title} onClick={()=>onEdit?.(game.id)}>•••</button>}
+      {game.local && (
+        <button
+          className="card-edit"
+          aria-label={"Options for " + game.title}
+          aria-haspopup="menu"
+          onClick={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            onMenu?.(game, {
+              x: r.left,
+              y: r.bottom + 6,
+              trigger: e.currentTarget,
+            });
+          }}
+        >
+          •••
+        </button>
+      )}
     </div>
   );
 }
@@ -419,15 +484,26 @@ function Home({
   state,
   send,
   openPair,
-  onAdd,onEdit,
+  onAdd,
+  onEdit,
 }: {
   state: HostState;
   send: (c: HostCommand) => void;
   openPair: () => void;
-  onAdd:()=>void; onEdit:(id:string,studio?:boolean)=>void;
+  onAdd: () => void;
+  onEdit: (id: string, studio?: boolean) => void;
 }) {
-  const [tag,setTag]=useState(""),[players,setPlayers]=useState(""),[connection,setConnection]=useState(""),[setup,setSetup]=useState("");
-  const games=state.catalog??GAMES;
+  const [tag, setTag] = useState(""),
+    [players, setPlayers] = useState(""),
+    [connection, setConnection] = useState(""),
+    [setup, setSetup] = useState("");
+  const [cardMenu, setCardMenu] = useState<{
+    gameId: string;
+    anchor: CardMenuAnchor;
+  } | null>(null);
+  const openCardMenu = (game: GameManifest, anchor: CardMenuAnchor) =>
+    setCardMenu({ gameId: game.id, anchor });
+  const games = state.catalog ?? GAMES;
   const game = games.find((g) => g.id === state.selectedGameId) || GAMES[0];
   const available =
     game.availability === "available" &&
@@ -435,8 +511,14 @@ function Home({
   const featured = state.heroMode === "featured";
   const list = games.filter(
     (g) =>
-      [g.title,g.description,...(g.tags??[])].join(" ").toLowerCase().includes(state.search.toLowerCase()) &&
-      (!tag||g.tags?.includes(tag))&&(!players||g.maxPlayers>=Number(players))&&(!connection||g.connection===connection)&&(!setup||g.setup===setup)&&
+      [g.title, g.description, ...(g.tags ?? [])]
+        .join(" ")
+        .toLowerCase()
+        .includes(state.search.toLowerCase()) &&
+      (!tag || g.tags?.includes(tag)) &&
+      (!players || g.maxPlayers >= Number(players)) &&
+      (!connection || g.connection === connection) &&
+      (!setup || g.setup === setup) &&
       (state.libraryView === "favorites"
         ? state.favorites.includes(g.id)
         : state.libraryView === "recent"
@@ -498,19 +580,27 @@ function Home({
               className={`offline-badge ${game.connection === "online" ? "online-badge" : game.connection === "offline-online" ? "dual-badge" : ""}`}
             >
               <span />{" "}
-              {game.local ? (!game.connection?"Connection not specified":game.connection==="offline-online"?"Offline · Online":game.connection==="offline"?"Offline":"Online") : game.connection === "offline-online"
-                ? "Offline · Online"
-                : game.connection === "online"
-                  ? "Online"
-                  : game.launchRequirement
-                    ? "Launch verification needed"
-                    : game.runtime === "native"
-                      ? available
-                        ? "Installed locally"
-                        : "Game not found"
-                      : available
-                        ? "100% offline"
-                        : "Integration planned"}
+              {game.local
+                ? !game.connection
+                  ? "Connection not specified"
+                  : game.connection === "offline-online"
+                    ? "Offline · Online"
+                    : game.connection === "offline"
+                      ? "Offline"
+                      : "Online"
+                : game.connection === "offline-online"
+                  ? "Offline · Online"
+                  : game.connection === "online"
+                    ? "Online"
+                    : game.launchRequirement
+                      ? "Launch verification needed"
+                      : game.runtime === "native"
+                        ? available
+                          ? "Installed locally"
+                          : "Game not found"
+                        : available
+                          ? "100% offline"
+                          : "Integration planned"}
             </span>
           </div>
           {!featured && <p>{game.description}</p>}
@@ -538,7 +628,22 @@ function Home({
                 Connect phones
               </button>
             )}
-            {game.local&&<><button className="button ghost" onClick={()=>onEdit(game.id)}>Edit game</button><button className="button ghost" onClick={()=>onEdit(game.id,true)}>Controller Studio</button></>}
+            {game.local && (
+              <>
+                <button
+                  className="button ghost"
+                  onClick={() => onEdit(game.id)}
+                >
+                  Edit game
+                </button>
+                <button
+                  className="button ghost"
+                  onClick={() => onEdit(game.id, true)}
+                >
+                  Controller Studio
+                </button>
+              </>
+            )}
           </div>
           {!featured && game.launchRequirement && (
             <p className="native-install-help">
@@ -593,7 +698,9 @@ function Home({
                 : "Your local library"}
           </h2>
           <div className="library-tools">
-            <button className="library-add-game" onClick={onAdd}>＋ Add game</button>
+            <button className="library-add-game" onClick={onAdd}>
+              ＋ Add game
+            </button>
             <div className="view-tabs" aria-label="Library view">
               {(["all", "favorites", "recent"] as const).map((view) => (
                 <button
@@ -631,13 +738,81 @@ function Home({
             </label>
           </div>
         </div>
-        <div className="library-filters" aria-label="Library filters"><select aria-label="Filter by tag" value={tag} onChange={e=>setTag(e.target.value)}><option value="">All tags</option>{[...new Set(games.flatMap(g=>g.tags??[]))].filter(Boolean).map(t=><option key={t}>{t}</option>)}</select><select aria-label="Filter by players" value={players} onChange={e=>setPlayers(e.target.value)}><option value="">Any players</option>{[1,2,3,4].map(p=><option key={p} value={p}>{p}+ players</option>)}</select><select aria-label="Filter by connection" value={connection} onChange={e=>setConnection(e.target.value)}><option value="">Any connection</option><option value="offline">Offline</option><option value="online">Online</option><option value="offline-online">Offline & Online</option></select><select aria-label="Filter by setup" value={setup} onChange={e=>setSetup(e.target.value)}><option value="">Any setup status</option><option>Needs setup</option><option>Ready to test</option><option>Tested by you</option></select>{(tag||players||connection||setup)&&<button onClick={()=>{setTag("");setPlayers("");setConnection("");setSetup("");}}>Clear filters</button>}</div>
-        {list.length ? (
-          <div className="game-row">
-            {list.map((game) => (
-              <GameCard key={game.id} game={game} state={state} send={send} onEdit={onEdit} />
+        <div className="library-filters" aria-label="Library filters">
+          <select
+            aria-label="Filter by tag"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+          >
+            <option value="">All tags</option>
+            {[...new Set(games.flatMap((g) => g.tags ?? []))]
+              .filter(Boolean)
+              .map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+          </select>
+          <select
+            aria-label="Filter by players"
+            value={players}
+            onChange={(e) => setPlayers(e.target.value)}
+          >
+            <option value="">Any players</option>
+            {[1, 2, 3, 4].map((p) => (
+              <option key={p} value={p}>
+                {p}+ players
+              </option>
             ))}
-          </div>
+          </select>
+          <select
+            aria-label="Filter by connection"
+            value={connection}
+            onChange={(e) => setConnection(e.target.value)}
+          >
+            <option value="">Any connection</option>
+            <option value="offline">Offline</option>
+            <option value="online">Online</option>
+            <option value="offline-online">Offline & Online</option>
+          </select>
+          <select
+            aria-label="Filter by setup"
+            value={setup}
+            onChange={(e) => setSetup(e.target.value)}
+          >
+            <option value="">Any setup status</option>
+            <option>Needs setup</option>
+            <option>Ready to test</option>
+            <option>Tested by you</option>
+          </select>
+          {(tag || players || connection || setup) && (
+            <button
+              onClick={() => {
+                setTag("");
+                setPlayers("");
+                setConnection("");
+                setSetup("");
+              }}
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+        {list.length ? (
+          <GameShelf
+            label="Game library"
+            selectedId={featured ? undefined : state.selectedGameId}
+            itemIds={list.map((g) => g.id).join("|")}
+          >
+            {list.map((game) => (
+              <GameCard
+                key={game.id}
+                game={game}
+                state={state}
+                send={send}
+                onEdit={onEdit}
+                onMenu={openCardMenu}
+              />
+            ))}
+          </GameShelf>
         ) : (
           <div className="library-empty">
             <Icon
@@ -667,16 +842,22 @@ function Home({
               Favorites & recently played
             </h2>
             {saved.length ? (
-              <div className="game-row">
+              <GameShelf
+                revealOnNavigation={false} label="Favorites and recent games"
+                selectedId={featured ? undefined : state.selectedGameId}
+                itemIds={saved.map((g) => g.id).join("|")}
+              >
                 {saved.map((game) => (
                   <GameCard
                     key={game.id}
                     game={game}
                     state={state}
-                    send={send} onEdit={onEdit}
+                    send={send}
+                    onEdit={onEdit}
+                    onMenu={openCardMenu}
                   />
                 ))}
-              </div>
+              </GameShelf>
             ) : (
               <p className="saved-empty">
                 A place for your go-to games. Play something or tap a heart to
@@ -684,6 +865,14 @@ function Home({
               </p>
             )}
           </section>
+        )}
+        {cardMenu && games.some((g) => g.id === cardMenu.gameId) && (
+          <LibraryCardMenu
+            game={games.find((g) => g.id === cardMenu.gameId)!}
+            anchor={cardMenu.anchor}
+            onEdit={onEdit}
+            onClose={() => setCardMenu(null)}
+          />
         )}
         <footer className="home-footer">
           <span>
@@ -894,7 +1083,9 @@ function NativeGame({
   openPair: () => void;
 }) {
   const native = state.native;
-  const game = (state.catalog??GAMES).find((game) => game.id === native.gameId);
+  const game = (state.catalog ?? GAMES).find(
+    (game) => game.id === native.gameId,
+  );
   const active =
     native.status === "running" && native.focused && !native.quitting;
   return (
@@ -932,7 +1123,9 @@ function NativeGame({
         </h2>
         <p>
           {native.message ??
-            (game?.local?"Input is released when the game loses focus. Select the matching input device in your game, then test menus and gameplay separately.":"Input is released when the game loses focus. Native support requires an explicitly registered PC adapter.")}
+            (game?.local
+              ? "Input is released when the game loses focus. Select the matching input device in your game, then test menus and gameplay separately."
+              : "Input is released when the game loses focus. Native support requires an explicitly registered PC adapter.")}
         </p>
         <button
           className="button primary"
@@ -946,16 +1139,27 @@ function NativeGame({
           role="group"
           aria-label="Native controller mode"
         >
-          {state.studio?state.studio.definition.modes.map(mode=><button key={mode.id} aria-pressed={mode.id===state.studio?.modeId} disabled={native.quitting} onClick={()=>send({type:"studioMode",modeId:mode.id})}>{mode.name}</button>):(["menu", "game"] as const).map((mode) => (
-            <button
-              key={mode}
-              aria-pressed={native.controls === mode}
-              disabled={native.quitting}
-              onClick={() => send({ type: "nativeControls", mode })}
-            >
-              {mode === "menu" ? "Menu controls" : "Game controls"}
-            </button>
-          ))}
+          {state.studio
+            ? state.studio.definition.modes.map((mode) => (
+                <button
+                  key={mode.id}
+                  aria-pressed={mode.id === state.studio?.modeId}
+                  disabled={native.quitting}
+                  onClick={() => send({ type: "studioMode", modeId: mode.id })}
+                >
+                  {mode.name}
+                </button>
+              ))
+            : (["menu", "game"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  aria-pressed={native.controls === mode}
+                  disabled={native.quitting}
+                  onClick={() => send({ type: "nativeControls", mode })}
+                >
+                  {mode === "menu" ? "Menu controls" : "Game controls"}
+                </button>
+              ))}
         </div>
       </section>
       <section
@@ -992,7 +1196,10 @@ function NativeGame({
   );
 }
 function HostApp() {
-  const [workspace,setWorkspace]=useState<{gameId?:string;studio?:boolean}|null>(null);
+  const [workspace, setWorkspace] = useState<{
+    gameId?: string;
+    studio?: boolean;
+  } | null>(null);
   const [state, setState] = useState<HostState | null>(null),
     [error, setError] = useState(""),
     [panel, setPanel] = useState<Panel>(null),
@@ -1089,7 +1296,7 @@ function HostApp() {
         (e.target as HTMLElement).matches("input,textarea,select")
       )
         return;
-      if(workspace)return;
+      if (workspace) return;
       const map: Record<string, Action> = {
         ArrowUp: "up",
         ArrowDown: "down",
@@ -1331,7 +1538,13 @@ function HostApp() {
           openPair={() => setPanel("pair")}
         />
       ) : (
-        <Home state={state} send={send} openPair={() => setPanel("pair")} onAdd={()=>setWorkspace({})} onEdit={(gameId,studio)=>setWorkspace({gameId,studio})}/>
+        <Home
+          state={state}
+          send={send}
+          openPair={() => setPanel("pair")}
+          onAdd={() => setWorkspace({})}
+          onEdit={(gameId, studio) => setWorkspace({ gameId, studio })}
+        />
       )}
       {panel === "pair" && (
         <Modal title="Bring everyone in" onClose={closePanel} wide>
@@ -1468,7 +1681,14 @@ function HostApp() {
         </Modal>
       )}
       <Pending state={state} send={send} />
-      {workspace&&<LibraryWorkspace gameId={workspace.gameId} openStudio={workspace.studio} state={state} onClose={()=>setWorkspace(null)}/>}
+      {workspace && (
+        <LibraryWorkspace
+          gameId={workspace.gameId}
+          openStudio={workspace.studio}
+          state={state}
+          onClose={() => setWorkspace(null)}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           <Icon name="wifi" size={18} />

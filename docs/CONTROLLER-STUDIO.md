@@ -21,6 +21,12 @@ If a launcher must open the game, select **Connect to a game I open myself**, op
 
 An entry can be saved as **Needs setup** or **Ready to test**. **Tested by you** is your recorded observation, not an automatic compatibility certification. Use the card's edit menu to edit, relink, duplicate or remove a local entry. Removing it does not uninstall the game.
 
+## Browse and manage the game library
+
+Scroll the game row horizontally with the mouse wheel, trackpad or a swipe. The visible left/right arrows browse one page. On an approved Navigator phone, use the Home D-pad's left/right buttons: the selected card automatically scrolls into view on the PC. Phone navigation cannot open PC editing controls.
+
+Right-click an Add Game card, press Shift+F10 while it is focused, or click its **•••** button. **Edit game** opens its details/artwork setup; **Controller Studio** opens its controller directly. **Delete from library…** opens a confirmation: **Keep game** cancels, while **Delete from library** removes only that entry and its WaterConsole controller setup. The installed executable and original artwork are not deleted. Built-in/source-adapter entries show an explanation rather than offering unsupported edits/deletion.
+
 ## Cover and banner have different frames
 
 | Destination | Recommended export | Shape |
@@ -44,7 +50,7 @@ Start with **Menu**, **Standard**, **Fight** or **Race**. Modes have their own c
 - Shift-select controls to move/group, align or distribute them. Lock a layer to prevent accidental movement. Undo/Redo keeps the last 50 changes.
 - **Show grid** and **Snap to grid** are independent. Set spacing from 1 to 128 design units or switch snap off.
 - In Appearance, choose text, icon, icon + text, or your own image. Search the 6,257 bundled Tabler icons offline by name/category/aliases; keep favorites and recent choices. Select an optional pressed image and re-crop the normal image later.
-- Edit base/mode/role/player colors and controller background images. For a selected control, use **Button fill**, text/icon tint, border, accent, pressed, disabled and focus colors. Inherited swatches show their effective color. The color picker applies live; use a preset or type HEX and press Enter. Reset an override to inherit its parent. Background/Panels belong to the controller; custom button artwork is under Button content. Change sizes and opacity independently.
+- Edit base/mode/role/player colors and controller background images. For a selected control, use **Button fill**, text/icon tint, border, accent, pressed, disabled and focus colors. Select a canvas control for its contextual **Color & fill** panel. Click **Fill**, **Text** or **Icon** to open one picker. Use **Normal / While pressed** for independent resting/held colors. **More colors** holds border, accent, disabled and focus colors. **Canvas background** stays available without selecting anything; **Role & player themes** holds advanced overrides. **Text color** and **Icon color** are independent; **Pressed text color** and **Pressed icon color** apply while held. Icon tint applies to built-in glyphs and direction symbols; uploaded images keep their own colors. Older profiles without an icon override continue using the text color. Inherited swatches show their effective color. The color picker applies live; use a preset or type HEX and press Enter. Reset an override to inherit its parent. Background/Panels belong to the controller; custom button artwork is under Button content. Change sizes and opacity independently.
 - Preview landscape/portrait phone sizes, player slot, Navigator/Other player and the separate PC preview theme. The **host** is the PC; the phone with navigation permission is the **Navigator**. Styling a role does not give it permissions.
 
 Role colors follow the Navigator when the PC transfers that permission. Slot themes follow P1–P4. Per-control overrides take precedence over inherited phone colors. Avoid color combinations with unreadable text.

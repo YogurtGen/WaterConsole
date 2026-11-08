@@ -50,6 +50,8 @@ export function validateTheme(
         "disabled",
         "focus",
         "pressedText",
+        "icon",
+        "pressedIcon",
         "backgroundImage",
       ].includes(k),
       "Unknown theme property.",

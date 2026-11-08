@@ -35,3 +35,5 @@ Use declarative ControllerDefinition profiles when their controls/actions are su
 Linked actions are simultaneous holds: a source can hold game-bound inputs such as RT + B, while releasing it must preserve Accelerate if another source still holds it. Use the existing union engine; no last-event-wins, timed macros, automatic repeats, or global keyboard shortcuts. Preserve per-slot true analog values.
 
 Record menu and gameplay bindings separately, actual player limits, the multiplayer menu route, offline evidence, launcher requirements, focus/watchdog recovery, and clean stop. Reuse per-phone Vibration/Test and slot/epoch rumble gates. Test native input with an owned lightweight fixture before opening a third-party game. Do not claim physical-phone vibration or real-game compatibility from browser mocks.
+
+Controller appearance: keep the compact contextual Color & fill panel and persistent Canvas background. Optional theme icon/pressedIcon overrides inherit text/pressedText when absent; preserve old profiles. Only one color picker should open at once. Library shelf scrollbars stay hidden; phone navigation can reveal cards but cannot open PC edit/delete actions.

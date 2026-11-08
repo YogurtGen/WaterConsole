@@ -124,3 +124,9 @@ For an AI-assisted fix, include the WaterConsole version, selected mode/variant/
 - Rotation: tap fullscreen, then select the gameplay mode. If your browser declines orientation lock, rotate the phone physically and disable its system portrait lock. Safari/fullscreen behavior varies.
 - Uncomfortable controls: phone gear → Adjust layout → drag/corner resize → Done. Reset + Done restores the host design for that profile/orientation. Changes only affect this browser and cannot edit PC bindings.
 - Wrong game action: use Actions → Visual binding and compare the original game's Controls menu. Xbox/PlayStation labels are not fixed gameplay functions. Menu input working does not prove the game selected the same device for gameplay.
+
+## Long libraries and controller foreground colors (0.4.1)
+
+Use the mouse wheel directly over a game row, its left/right arrows, a trackpad or swipe. Navigator-phone directions change selection and reveal the selected card automatically. Right-click editing/deletion belongs to the PC; only Add Game entries have editable records. Delete removes the WaterConsole entry, never the installed game.
+
+In Controller Studio, select a control → **Color & fill** → Fill/Text/Icon. Switch **Normal / While pressed** for its held state. The base **Canvas background** remains available when nothing is selected. Open **Role & player themes** for mode/Navigator/P1–P4 overrides. **Text color** changes labels and **Icon color** changes built-in glyphs/direction symbols. Their separate **Pressed…** colors apply while held. An inherited icon uses the inherited text color until overridden. Uploaded image buttons are not recolored. Use the local Preview on my phone to check the result safely.

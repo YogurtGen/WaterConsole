@@ -37,7 +37,9 @@ export interface Theme {
   pressed: string;
   disabled: string;
   focus: string;
+  icon?: string;
   pressedText?: string;
+  pressedIcon?: string;
   backgroundImage?: string;
 }
 export const DEFAULT_THEME: Theme = {

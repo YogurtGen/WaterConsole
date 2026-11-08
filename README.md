@@ -127,3 +127,9 @@ Choose bindings directly on Xbox, PlayStation or full-keyboard diagrams. Shared-
 ![Visual binding editor with shared Xbox inputs](docs/media/visual-xbox.png)
 
 See [Controller Studio](docs/CONTROLLER-STUDIO.md) for the step-by-step workflow and [0.4 release notes](docs/releases/0.4.0.md) for update details.
+
+### Library and controller colors (0.4.1)
+
+Browse game rows with a hidden scrollbar using the wheel, arrows or Navigator phone. Right-click a user-added game to edit it or remove its library entry. Studio uses a compact Color & fill panel with separate label/icon colors and Normal/While pressed states; Canvas background stays available without a selection.
+
+![Contextual controller colors with persistent canvas background](docs/media/contextual-colors.png)

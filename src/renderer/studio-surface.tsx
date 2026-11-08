@@ -351,6 +351,9 @@ export function StudioSurface({
             "--control-fg": held
               ? (colors.pressedText ?? colors.background)
               : colors.text,
+            "--control-icon": held
+              ? (colors.pressedIcon ?? colors.pressedText ?? colors.background)
+              : (colors.icon ?? colors.text),
             "--control-border": colors.border,
             "--control-focus": colors.focus,
             "--control-radius":

@@ -250,12 +250,21 @@ try {
     .getByRole("button", { name: "backpack · outline", exact: true })
     .click();
   await page.getByRole("button", { name: "Use icon", exact: true }).click();
+  await page.locator(".studio-theme-advanced > summary").click();
   await page.getByLabel("Edit theme for").selectOption("navigator");
+  await page
+    .locator(".studio-theme-advanced")
+    .getByRole("button", { name: "Edit Button fill", exact: true })
+    .click();
   await page.getByLabel("Button fill HEX").fill("#235c44");
   await page.getByLabel("Button fill HEX").blur();
   await page.screenshot({ path: output + "/studio-editor.png" });
   checks.push("Shapes, labels, offline icon search and Navigator colors edit");
-  await page.getByLabel("Edit theme for").selectOption("control");
+  await page.locator(".studio-theme-advanced > summary").click();
+  await page
+    .locator(".studio-control-colors")
+    .getByRole("button", { name: "Edit Button fill", exact: true })
+    .click();
   await expect(page.getByLabel("Background HEX", { exact: true })).toHaveCount(
     0,
   );
@@ -271,9 +280,7 @@ try {
   checks.push(
     "Control color uses effective inheritance and applies HEX Enter/native input live",
   );
-  await page
-    .getByRole("button", { name: "Edit mode background", exact: true })
-    .click();
+
   await page
     .getByRole("button", { name: "Background image", exact: true })
     .click();
@@ -296,7 +303,7 @@ try {
   });
   if (loaded !== 1920) throw Error("Recommended controller backdrop missing");
   checks.push(
-    "Mode background crop loads through the local asset protocol in the design canvas",
+    "Persistent canvas background crop loads through the local asset protocol in the design canvas",
   );
   await page.getByRole("button", { name: "Actions", exact: true }).click();
   await page
@@ -333,7 +340,45 @@ try {
     binding.getByRole("button", { name: "Bind Cross", exact: true }),
   ).toBeVisible();
 
-  const checkPadGeometry=async()=>{const problems=await binding.locator('svg').evaluate(svg=>{const shell=svg.querySelector('.hardware-shell'),bad=[];for(const g of svg.querySelectorAll('.hardware-key')){const name=g.getAttribute('aria-label');if(/Bind (LT|RT|L2|R2|LB|RB|L1|R1) —|^Bind (LB|RB|L1|R1)$/.test(name))continue;const shape=g.querySelector('circle,rect'),r=shape.getBBox();for(let i=0;i<24;i++){const t=i*Math.PI*2/24;const point=new DOMPoint(r.x+r.width/2+Math.cos(t)*r.width/2,r.y+r.height/2+Math.sin(t)*r.height/2);if(!shell.isPointInFill(point)){bad.push(name+' escapes shell');break;}}for(const text of g.querySelectorAll(':scope > text')){const a=text.getBBox();if(a.x<r.x-1||a.y<r.y-1||a.x+a.width>r.x+r.width+1||a.y+a.height>r.y+r.height+1)bad.push(name+' text escapes button');}}return bad;});if(problems.length)throw Error(problems.join('\n'));await expect(binding.locator('.hardware-callouts [data-callout-for]')).toHaveCount(7);};
+  const checkPadGeometry = async () => {
+    const problems = await binding.locator("svg").evaluate((svg) => {
+      const shell = svg.querySelector(".hardware-shell"),
+        bad = [];
+      for (const g of svg.querySelectorAll(".hardware-key")) {
+        const name = g.getAttribute("aria-label");
+        if (/Bind (LT|RT|L2|R2|LB|RB|L1|R1) —|^Bind (LB|RB|L1|R1)$/.test(name))
+          continue;
+        const shape = g.querySelector("circle,rect"),
+          r = shape.getBBox();
+        for (let i = 0; i < 24; i++) {
+          const t = (i * Math.PI * 2) / 24;
+          const point = new DOMPoint(
+            r.x + r.width / 2 + (Math.cos(t) * r.width) / 2,
+            r.y + r.height / 2 + (Math.sin(t) * r.height) / 2,
+          );
+          if (!shell.isPointInFill(point)) {
+            bad.push(name + " escapes shell");
+            break;
+          }
+        }
+        for (const text of g.querySelectorAll(":scope > text")) {
+          const a = text.getBBox();
+          if (
+            a.x < r.x - 1 ||
+            a.y < r.y - 1 ||
+            a.x + a.width > r.x + r.width + 1 ||
+            a.y + a.height > r.y + r.height + 1
+          )
+            bad.push(name + " text escapes button");
+        }
+      }
+      return bad;
+    });
+    if (problems.length) throw Error(problems.join("\n"));
+    await expect(
+      binding.locator(".hardware-callouts [data-callout-for]"),
+    ).toHaveCount(7);
+  };
   await checkPadGeometry();
   await page.screenshot({ path: output + "/visual-playstation.png" });
   await binding

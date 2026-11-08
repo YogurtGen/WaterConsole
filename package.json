@@ -1,6 +1,6 @@
 {
   "name": "waterconsole-core",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "description": "Open-source local multiplayer console. Playing together should be free.",
   "author": "WaterConsole contributors",
@@ -23,7 +23,8 @@
     "test:native": "node scripts/run-local.mjs scripts/test-native-toolkit.mjs",
     "tools:download": "node scripts/run-local.mjs scripts/fetch-optional-tools.mjs",
     "test:studio": "node scripts/run-local.mjs scripts/test-studio.mjs",
-    "test:editor": "node scripts/run-local.mjs scripts/test-editor.mjs"
+    "test:editor": "node scripts/run-local.mjs scripts/test-editor.mjs",
+    "test:library": "node scripts/run-local.mjs scripts/test-library-ui.mjs"
   },
   "dependencies": {
     "@fastify/static": "^10.1.10",

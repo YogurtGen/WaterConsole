@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { newLocalGame, KEYS, control } from "../src/shared/studio-model";
-import { validateGame } from "../src/shared/studio-validation";
+import { validateGame, validateTheme } from "../src/shared/studio-validation";
 import { resolveBindings } from "../src/shared/studio-engine";
 import {
   setButtonOutputs,
@@ -129,7 +129,20 @@ describe("Visual input assignment", () => {
     expect(outputKey({ kind: "key", code: "Shift" })).toBe("key:ShiftLeft");
   });
 });
-it('detaches a dedicated action also referenced by an axis',()=>{const g=newLocalGame(),m=g.controller.modes[0],c=m.controls.find(c=>c.label==='Confirm')!,pad=m.controls[0];setButtonOutputs(g,m.id,1,c.id,[{kind:'button',code:'a'}]);const old=c.actions[0];pad.axisX=old;setButtonOutputs(g,m.id,1,c.id,[{kind:'button',code:'b'}]);expect(c.actions[0]).not.toBe(old);expect(g.bindings.gamepad[1].menu[old]).toEqual([{kind:'button',code:'a'}]);});
+it("detaches a dedicated action also referenced by an axis", () => {
+  const g = newLocalGame(),
+    m = g.controller.modes[0],
+    c = m.controls.find((c) => c.label === "Confirm")!,
+    pad = m.controls[0];
+  setButtonOutputs(g, m.id, 1, c.id, [{ kind: "button", code: "a" }]);
+  const old = c.actions[0];
+  pad.axisX = old;
+  setButtonOutputs(g, m.id, 1, c.id, [{ kind: "button", code: "b" }]);
+  expect(c.actions[0]).not.toBe(old);
+  expect(g.bindings.gamepad[1].menu[old]).toEqual([
+    { kind: "button", code: "a" },
+  ]);
+});
 describe("Phone layout boundaries", () => {
   it("fits negative/oversized controls inside different phone canvases", () => {
     for (const [w, h] of [
@@ -152,4 +165,19 @@ describe("Phone layout boundaries", () => {
       ),
     ).toEqual({ ok: { x: 0.1, y: 0.2, w: 0.3, h: 0.4 } });
   });
+});
+
+it("accepts optional independent icon colors while preserving older themes", () => {
+  const g = newLocalGame();
+  expect(g.controller.theme.icon).toBeUndefined();
+  expect(() => validateTheme(g.controller.theme, false)).not.toThrow();
+  g.controller.theme.icon = "#65b9ff";
+  g.controller.theme.pressedIcon = "#973abb";
+  expect(() => validateTheme(g.controller.theme, false)).not.toThrow();
+  expect(() =>
+    validateTheme({
+      ...g.controller.theme,
+      icon: "url(https://invalid.test/image)",
+    }),
+  ).toThrow();
 });

@@ -32,6 +32,7 @@ import {
   libraryCall,
   NumberField,
   ThemeFields,
+  type ThemeColorKey,
   Panel,
   trapDialog,
 } from "./builder-primitives";
@@ -77,6 +78,15 @@ export function ControllerStudio({
     [busy, setBusy] = useState(false),
     [historyTick, setHistoryTick] = useState(0),
     [newAction, setNewAction] = useState("");
+  const [colorEditor, setColorEditor] = useState<{
+    scope: string;
+    key: ThemeColorKey;
+  } | null>(null);
+  const picker = (scope: string) => ({
+    editing: colorEditor?.scope === scope ? colorEditor.key : null,
+    onEditingChange: (key: ThemeColorKey | null) =>
+      setColorEditor(key ? { scope, key } : null),
+  });
   const guide = useGuidedHelp("controller-studio");
   useEffect(() => {
     if (iconOpen || crop || visualOpen) guide.close();
@@ -100,6 +110,10 @@ export function ControllerStudio({
   const active = mode.controls.find((c) => selected.includes(c.id));
   useEffect(() => {
     setThemeScope(active ? "control" : "base");
+  }, [active?.id]);
+  useEffect(() => setColorEditor(null), [active?.id, modeId, themeScope]);
+  useEffect(() => {
+    document.querySelector(".studio-inspector")?.scrollTo({ top: 0 });
   }, [active?.id]);
   const scale = Math.min(canvasWidth / 960, 1);
   const visible = mode.controls.filter(
@@ -400,38 +414,41 @@ export function ControllerStudio({
         }
     });
   }
-  function themeValue(): Partial<Theme> {
-    if (themeScope === "base") return game.controller.theme;
-    if (themeScope === "mode") return mode.theme;
-    if (themeScope === "navigator") return game.controller.roleThemes.navigator;
-    if (themeScope === "player") return game.controller.roleThemes.player;
-    if (themeScope === "host") return game.controller.hostTheme;
-    if (themeScope.startsWith("slot-"))
-      return game.controller.playerThemes[themeScope.slice(5)] ?? {};
+  function themeValue(scope = themeScope): Partial<Theme> {
+    if (scope === "base") return game.controller.theme;
+    if (scope === "mode") return mode.theme;
+    if (scope === "navigator") return game.controller.roleThemes.navigator;
+    if (scope === "player") return game.controller.roleThemes.player;
+    if (scope === "host") return game.controller.hostTheme;
+    if (scope.startsWith("slot-"))
+      return game.controller.playerThemes[scope.slice(5)] ?? {};
     return active?.theme ?? {};
   }
-  function setTheme(value: Partial<Theme>) {
+  function setTheme(value: Partial<Theme>, scope = themeScope) {
     commit((d) => {
-      if (themeScope === "base")
-        d.controller.theme = { ...DEFAULT_THEME, ...value };
-      else if (themeScope === "mode")
+      if (scope === "base") d.controller.theme = { ...DEFAULT_THEME, ...value };
+      else if (scope === "mode")
         d.controller.modes.find((m) => m.id === mode.id)!.theme = value;
-      else if (themeScope === "navigator" || themeScope === "player")
-        d.controller.roleThemes[themeScope] = value;
-      else if (themeScope === "host") d.controller.hostTheme = value;
-      else if (themeScope.startsWith("slot-"))
-        d.controller.playerThemes[themeScope.slice(5)] = value;
+      else if (scope === "navigator" || scope === "player")
+        d.controller.roleThemes[scope] = value;
+      else if (scope === "host") d.controller.hostTheme = value;
+      else if (scope.startsWith("slot-"))
+        d.controller.playerThemes[scope.slice(5)] = value;
       else if (active)
         d.controller.modes
           .find((m) => m.id === mode.id)!
           .controls.find((c) => c.id === active.id)!.theme = value;
     });
   }
-  async function upload(pressed = false, background = false) {
+  async function upload(
+    pressed = false,
+    background = false,
+    backgroundScope = themeScope,
+  ) {
     try {
       const result = await libraryCall({ type: "choose-image" });
       if (!result?.file?.id) return;
-      const c = active;
+      const c = background ? undefined : active;
       const initial =
         c &&
         (pressed
@@ -451,7 +468,13 @@ export function ControllerStudio({
                 fit: c.fit,
               }
             : undefined);
-      setCrop({ source: result.file.id, pressed, background, initial } as any);
+      setCrop({
+        source: result.file.id,
+        pressed,
+        background,
+        backgroundScope,
+        initial,
+      } as any);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -586,10 +609,10 @@ export function ControllerStudio({
       enter: () => inspectButton(false),
     },
     {
-      target: '[data-guide="theme-scope"]',
-      title: "Colors follow the right player",
+      target: '[data-guide="canvas-background"]',
+      title: "Colors without the clutter",
       description:
-        "Edit the base, this mode, Navigator, other players, one player slot, or the PC preview. Reset an override to inherit. The PC host and Navigator phone are different roles.",
+        "Canvas background is always available. Select a control for Color & fill: Fill, Text and Icon, with a separate While pressed state. Open one color picker at a time. Role & player themes keeps advanced overrides available.",
       enter: () => {
         setTab("appearance");
         setThemeScope("base");
@@ -1084,8 +1107,72 @@ export function ControllerStudio({
               </button>
             </div>
           </div>
+          <section
+            className="studio-canvas-colors"
+            data-guide="canvas-background"
+          >
+            <h3>Canvas background</h3>
+            <p>Base for every mode. Select a control below to edit its fill.</p>
+            <ThemeFields
+              fields={["background"]}
+              value={game.controller.theme}
+              effective={game.controller.theme}
+              partial={false}
+              onChange={(value) => setTheme(value, "base")}
+              {...picker("canvas")}
+            />
+            <div className="builder-actions">
+              <button onClick={() => void upload(false, true, "base")}>
+                {game.controller.theme.backgroundImage
+                  ? "Replace image"
+                  : "Background image"}
+              </button>
+              {game.controller.theme.backgroundImage && (
+                <button
+                  onClick={() => {
+                    const value = { ...game.controller.theme };
+                    delete value.backgroundImage;
+                    setTheme(value, "base");
+                  }}
+                >
+                  Remove image
+                </button>
+              )}
+            </div>
+          </section>
           {tab === "appearance" ? (
             <>
+              {active && (
+                <section className="studio-control-colors">
+                  <div className="context-color-title">
+                    <span>SELECTED CONTROL</span>
+                    <h3>Color &amp; fill</h3>
+                    <small>{active.label || active.kind}</small>
+                  </div>
+                  <ThemeFields
+                    controlOnly
+                    value={active.theme}
+                    effective={resolveTheme(
+                      game.controller,
+                      mode,
+                      role === "navigator",
+                      slot,
+                      active,
+                    )}
+                    onChange={(theme) => patchControl({ theme })}
+                    {...picker("control:" + active.id)}
+                  />
+                  <div className="builder-actions">
+                    <button onClick={() => void upload()}>
+                      Use button image…
+                    </button>
+                  </div>
+                  <p>
+                    Text and icon colors are separate. Uploaded images keep
+                    their own colors.
+                  </p>
+                </section>
+              )}
               <Panel title="Controller">
                 <label className="builder-field">
                   Button labels
@@ -1267,95 +1354,106 @@ export function ControllerStudio({
                   </Panel>
                 </>
               )}
-              <Panel title="Colors and background">
-                <label className="builder-field">
-                  Edit theme for
-                  <select
-                    data-guide="theme-scope"
-                    value={themeScope}
-                    onChange={(e) => {
-                      const scope = e.target.value;
-                      setThemeScope(scope);
-                      if (["navigator", "player", "host"].includes(scope))
-                        setRole(scope);
-                      if (scope.startsWith("slot-"))
-                        setSlot(Number(scope.slice(5)));
-                    }}
-                  >
-                    <option value="control" disabled={!active}>
-                      Selected control
-                    </option>
-                    <option value="base">Controller base</option>
-                    <option value="mode">This mode</option>
-                    <option value="navigator">Navigator</option>
-                    <option value="player">Other players</option>
-                    {[1, 2, 3, 4].map((p) => (
-                      <option key={p} value={"slot-" + p}>
-                        Player {p} override
-                      </option>
-                    ))}
-                    <option value="host">Host preview</option>
-                  </select>
-                </label>
-                {themeScope === "control" && active?.theme.backgroundImage && (
-                  <button
-                    onClick={() => {
-                      commit((d) => {
-                        const m = d.controller.modes.find(
-                            (m) => m.id === mode.id,
-                          )!,
-                          c = m.controls.find((c) => c.id === active.id)!;
-                        m.theme.backgroundImage = c.theme.backgroundImage;
-                        delete c.theme.backgroundImage;
-                      });
-                      setThemeScope("mode");
-                    }}
-                  >
-                    Use existing image as mode background
-                  </button>
-                )}
-                <ThemeFields
-                  value={themeValue()}
-                  effective={resolveTheme(
-                    game.controller,
-                    mode,
-                    role === "navigator",
-                    slot,
-                    themeScope === "control" ? active : undefined,
-                  )}
-                  controlOnly={themeScope === "control"}
-                  partial={themeScope !== "base"}
-                  onChange={setTheme}
-                />
-                {themeScope === "control" ? (
-                  <p className="builder-hint">
-                    Button fill colors this control. To add an image to a
-                    button, use Button content.{" "}
-                    <button onClick={() => setThemeScope("mode")}>
-                      Edit mode background
-                    </button>
-                  </p>
-                ) : (
-                  <div className="builder-actions">
-                    <button onClick={() => void upload(false, true)}>
-                      Background image
-                    </button>
-                    <button
-                      onClick={() => {
-                        const next = { ...themeValue() };
-                        delete next.backgroundImage;
-                        setTheme(next);
+              <details className="studio-theme-advanced">
+                <summary>Role &amp; player themes</summary>{" "}
+                <Panel title="Theme target">
+                  <label className="builder-field">
+                    Edit theme for
+                    <select
+                      data-guide="theme-scope"
+                      value={themeScope}
+                      onChange={(e) => {
+                        const scope = e.target.value;
+                        setThemeScope(scope);
+                        if (["navigator", "player", "host"].includes(scope))
+                          setRole(scope);
+                        if (scope.startsWith("slot-"))
+                          setSlot(Number(scope.slice(5)));
                       }}
                     >
-                      Clear background
-                    </button>
-                  </div>
-                )}
-                <small>
-                  Role colors follow the current Navigator. Player identity and
-                  permissions remain separate.
-                </small>
-              </Panel>
+                      <option value="control" disabled={!active}>
+                        Selected control
+                      </option>
+                      <option value="base">Controller base</option>
+                      <option value="mode">This mode</option>
+                      <option value="navigator">Navigator</option>
+                      <option value="player">Other players</option>
+                      {[1, 2, 3, 4].map((p) => (
+                        <option key={p} value={"slot-" + p}>
+                          Player {p} override
+                        </option>
+                      ))}
+                      <option value="host">Host preview</option>
+                    </select>
+                  </label>
+                  {themeScope === "control" &&
+                    active?.theme.backgroundImage && (
+                      <button
+                        onClick={() => {
+                          commit((d) => {
+                            const m = d.controller.modes.find(
+                                (m) => m.id === mode.id,
+                              )!,
+                              c = m.controls.find((c) => c.id === active.id)!;
+                            m.theme.backgroundImage = c.theme.backgroundImage;
+                            delete c.theme.backgroundImage;
+                          });
+                          setThemeScope("mode");
+                        }}
+                      >
+                        Use existing image as mode background
+                      </button>
+                    )}
+                  <ThemeFields
+                    {...picker("theme:" + themeScope)}
+                    key={themeScope}
+                    value={themeValue()}
+                    effective={resolveTheme(
+                      game.controller,
+                      mode,
+                      role === "navigator",
+                      slot,
+                      themeScope === "control" ? active : undefined,
+                    )}
+                    controlOnly={themeScope === "control"}
+                    partial={themeScope !== "base"}
+                    onChange={(value) => setTheme(value)}
+                  />
+                  <small>
+                    Text color changes labels. Icon color changes built-in icons
+                    and direction symbols. Uploaded images keep their original
+                    colors. Pressed colors apply while held.
+                  </small>
+                  {themeScope === "control" ? (
+                    <p className="builder-hint">
+                      Button fill colors this control. To add an image to a
+                      button, use Button content.{" "}
+                      <button onClick={() => setThemeScope("mode")}>
+                        Edit mode background
+                      </button>
+                    </p>
+                  ) : (
+                    <div className="builder-actions">
+                      <button onClick={() => void upload(false, true)}>
+                        Background image
+                      </button>
+                      <button
+                        onClick={() => {
+                          const next = { ...themeValue() };
+                          delete next.backgroundImage;
+                          setTheme(next);
+                        }}
+                      >
+                        Clear background
+                      </button>
+                    </div>
+                  )}
+                  <small>
+                    Role colors follow the current Navigator. Player identity
+                    and permissions remain separate.
+                  </small>
+                </Panel>{" "}
+              </details>
             </>
           ) : active ? (
             <>
@@ -1808,7 +1906,13 @@ export function ControllerStudio({
           onClose={() => setCrop(null)}
           onApply={(art) => {
             if ((crop as any).background)
-              setTheme({ ...themeValue(), backgroundImage: art.asset });
+              setTheme(
+                {
+                  ...themeValue((crop as any).backgroundScope),
+                  backgroundImage: art.asset,
+                },
+                (crop as any).backgroundScope,
+              );
             else if (crop.pressed)
               patchControl({
                 pressedImage: art.asset,
