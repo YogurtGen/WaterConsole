@@ -117,11 +117,17 @@ export function resolveTheme(
   slot: number,
   control?: StudioControl,
 ): Theme {
-  return {
+  const base = {
     ...def.theme,
     ...mode.theme,
     ...(navigator ? def.roleThemes.navigator : def.roleThemes.player),
     ...def.playerThemes[slot],
+  };
+  return {
+    ...base,
+    ...(control?.appearance === "primary"
+      ? { button: base.accent, text: base.background, border: base.accent }
+      : {}),
     ...control?.theme,
   };
 }

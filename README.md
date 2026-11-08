@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-Setup-0.5.0-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-0.5.0-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.5.0](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Core-Source-0.5.0.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/WaterConsole-Optional-Controller-Tools-0.5.0.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.0/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-Setup-0.5.1-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-0.5.1-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-Source-0.5.1.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Optional-Controller-Tools-0.5.1.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## Edit or delete an added game
 
@@ -36,21 +36,19 @@ The cover has no extra menu button. Delete asks for confirmation and keeps the i
 
 For a banner that fills the Home panel, open **Edit game → Artwork → Banner → Display → Fill**. **Fit** displays the entire image and may leave space. See [the artwork and controller guide](docs/CONTROLLER-STUDIO.md).
 
+## Arrange your Studio workspace
+
+Drag the panel dividers to resize Controls, Inspector and the bottom tools. **Reset layout** restores panel sizes without changing your controller. Use **Ctrl+C / Ctrl+V** to copy selected controls or **Ctrl+D** to duplicate; bindings and visual settings are preserved. [Studio guide](docs/CONTROLLER-STUDIO.md).
+
+![Controller Studio with resizable panels and the refreshed Standard preset](docs/media/controller-studio.png)
+
+New Menu, Standard, Fight and Race templates follow the console interface. Saved designs remain unchanged; apply a preset explicitly to refresh one mode.
+
 ## Import your installed games
 
 Open **Add game → Scan Steam & Epic** to fill an editable setup from local installations. Missing official details and artwork download when online and stay cached. Review the executable, player count and bindings before saving. See [store import](docs/STORE-IMPORT.md).
 
 Controller Studio edits the actual phone layout using the same controller frame and geometry. Left/right anchors keep controls near your thumbs; exact-composition and full-canvas modes remain available. Choose soft console buttons and the petal D-pad, then customize them.
-
-![WaterConsole custom phone controller with hand-anchored layout and petal D-pad](docs/media/studio-phone-layout.png)
-
-*Original documentation fixture; browser preview, not a physical-phone comfort test.*
-
-## Import your installed games
-
-Open **Add game → Scan Steam & Epic** to fill an editable setup from local installations. Missing official details and artwork download when online and stay cached. Review the executable, player count and bindings before saving. See [store import](docs/STORE-IMPORT.md).
-
-Controller Studio and phones share the same controller frame and geometry. Left/right anchors keep controls near your thumbs; exact-composition and full-canvas modes remain available. Choose soft console buttons and the petal D-pad, then customize them.
 
 ![WaterConsole custom phone controller with hand-anchored layout and petal D-pad](docs/media/studio-phone-layout.png)
 
@@ -65,7 +63,7 @@ Controller Studio and phones share the same controller frame and geometry. Left/
 - **Per-phone vibration:** an on/off preference, a Test button, and bounded touch feedback on supported browsers. An extension can forward real native game rumble.
 - **Local operation:** bundled fonts, graphics, audio synthesis, and scripts; an app-managed HTTP/WebSocket server; reconnect and input recovery.
 - **Add your games without code or paid AI:** pick an original `.exe`, edit title/description/tags and player/connection labels, and upload separate cover/banner artwork with reversible crops.
-- **Controller Studio:** Menu/Standard/Fight/Race presets, draggable analog and cross D-pad, adjustable shapes/sizes/colors, 6,257 offline icons, text/images, grid/snap, undo, player themes, and safe phone previews.
+- **Controller Studio:** Menu/Standard/Fight/Race presets, draggable analog and petal/cross/disc D-pad, adjustable shapes/sizes/colors, 6,257 offline icons, text/images, grid/snap, undo, player themes, and safe phone previews.
 - **A guide when you need it:** skippable spotlight tutorials for setup, crop and controller design, with a **?** button to replay.
 - **Linked actions:** hold Drift + Throttle from one button, keep separately held sources active, and let each phone choose Classic or Assisted.
 - **An extension foundation:** semantic input contracts, an empty native adapter registry, and an optional Windows virtual-gamepad toolkit.

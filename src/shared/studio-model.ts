@@ -369,27 +369,31 @@ function defaultActions(mode: string): ActionBindings {
 }
 export function createController(): ControllerDefinition {
   const menu = [
-    control("dpad", "Navigate", 70, 100, 230, 230),
-    control("button", "Confirm", 660, 130, 160, 120, ["a"]),
-    control("button", "Back", 480, 130, 130, 120, ["b"]),
-    control("button", "Start", 420, 330, 170, 60, ["start"]),
+    control("dpad", "Navigate", 64, 136, 264, 264),
+    control("button", "Confirm", 552, 88, 352, 112, ["a"]),
+    control("button", "Back", 552, 220, 352, 72, ["b"]),
+    control("button", "LB", 552, 316, 164, 64, ["l"]),
+    control("button", "RB", 740, 316, 164, 64, ["r"]),
+    control("button", "Start", 552, 404, 164, 56, ["start"]),
+    control("button", "X", 740, 404, 164, 56, ["x"]),
   ];
   const fight = [
-    control("dpad", "Move", 60, 100, 240, 240),
-    control("button", "X", 550, 100, 125, 105, ["x"]),
-    control("button", "B", 700, 100, 125, 105, ["b"]),
-    control("button", "A", 550, 235, 275, 85, ["a"]),
-    control("button", "LT", 550, 350, 125, 65, ["lt"]),
-    control("button", "RB", 700, 350, 125, 65, ["r"]),
+    control("dpad", "Move", 56, 160, 264, 264),
+    control("button", "X", 570, 112, 144, 108, ["x"]),
+    control("button", "B", 738, 112, 144, 108, ["b"]),
+    control("button", "A", 570, 244, 312, 96, ["a"]),
+    control("button", "LT", 570, 364, 144, 64, ["lt"]),
+    control("button", "RB", 738, 364, 144, 64, ["r"]),
+    control("button", "Start", 396, 80, 112, 56, ["start"]),
   ];
   const race = [
-    control("stick", "Steer", 60, 100, 240, 240),
-    control("button", "RT", 690, 190, 160, 185, ["rt"]),
-    control("button", "B", 510, 190, 150, 185, ["b"]),
-    control("button", "RT + B", 630, 190, 220, 185, ["rt", "b"]),
-    control("button", "A", 510, 90, 340, 70, ["a"]),
-    control("button", "LT", 510, 400, 150, 58, ["lt"]),
-    control("button", "Pause", 350, 350, 120, 58, ["start"]),
+    control("stick", "Steer", 64, 148, 248, 248),
+    control("button", "RT", 736, 184, 168, 220, ["rt"]),
+    control("button", "B", 560, 184, 152, 220, ["b"]),
+    control("button", "RT + B", 560, 184, 344, 220, ["rt", "b"]),
+    control("button", "A", 560, 84, 344, 72, ["a"]),
+    control("button", "LT", 560, 428, 152, 64, ["lt"]),
+    control("button", "Pause", 372, 380, 124, 60, ["start"]),
   ];
   race[1].variant = "classic";
   race[2].variant = "classic";
@@ -422,6 +426,22 @@ export function createController(): ControllerDefinition {
   standard[1].axisY = "look-y";
   standard[8].axisX = "lt";
   standard[10].axisX = "rt";
+  for (const controls of [menu, standard, fight, race]) {
+    for (const c of controls) {
+      c.appearance = "console";
+      if (c.kind === "dpad") c.dpadStyle = "petals";
+      if (c.kind === "button" && c.h <= 72) c.shape = "pill";
+      if (c.kind === "button" && c.shape === "rounded") c.radius = 24;
+    }
+  }
+  // Keep each hand's composition together when a phone has extra horizontal room.
+  for (const c of menu.slice(1)) c.anchor = "right";
+  for (const c of fight.slice(1, 6)) c.anchor = "right";
+  for (const c of race.slice(1, 6)) c.anchor = "right";
+  menu[1].appearance = "primary";
+  fight[3].appearance = "primary";
+  race[1].appearance = "primary";
+  race[3].appearance = "primary";
   return {
     version: 1,
     revision: 1,

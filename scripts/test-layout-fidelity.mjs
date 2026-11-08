@@ -122,7 +122,7 @@ try {
     await host
       .getByLabel("View", { exact: true })
       .selectOption(`${width}x${height}`);
-    for (const modeId of ["standard", "menu"]) {
+    for (const modeId of ["standard", "menu", "fight", "race"]) {
       await host
         .locator(".studio-editor-header")
         .getByRole("button", {
@@ -162,8 +162,8 @@ try {
             `${width} ${modeId} ${item.id} ${k}: ${item[k]} != ${other[k]}`,
           );
       }
-      if (width === 780 && modeId === "standard")
-        await phone.screenshot({ path: out + "/phone-standard.png" });
+      if (width === 780)
+        await phone.screenshot({ path: out + "/phone-" + modeId + ".png" });
     }
     checks.push(
       `Studio and phone use identical visual geometry at ${width}×${height}`,
@@ -181,8 +181,14 @@ try {
   await expect(phone.locator(".studio-phone-modes .selected")).toHaveText(
     "Standard",
   );
-  for(const display of await host.locator(".studio-widget:not(.kind-dpad) .studio-widget-body").evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).display)))assert.notEqual(display,"none");
-  assert.equal(await host.locator(".studio-pad-model .pad-arrow").count(),4);
+  for (const display of await host
+    .locator(".studio-widget:not(.kind-dpad) .studio-widget-body")
+    .evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n).display)))
+    assert.notEqual(display, "none");
+  assert.equal(
+    await host.locator(".studio-surface .studio-pad-model .pad-arrow").count(),
+    4,
+  );
   const id = game.controller.modes
     .find((m) => m.id === "standard")
     .controls.find((c) => c.label === "Y").id;

@@ -1,3 +1,10 @@
+import { useStudioWorkspace } from "./studio-workspace";
+import { ConsoleModelPreview } from "./console-model-preview";
+import {
+  copyControls,
+  pasteControls,
+  type ControlClipboard,
+} from "../shared/studio-clipboard";
 import { CONSOLE_MODELS, consoleControl } from "../shared/controller-models";
 import { VisualBinding } from "./visual-binding";
 import { EditorBoundary } from "./editor-boundary";
@@ -44,6 +51,7 @@ import {
 import { IconPicker } from "./icon-picker";
 import { CropEditor } from "./crop-editor";
 import { StudioDeviceFrame } from "./studio-phone-frame";
+let controlClipboard: ControlClipboard | null = null;
 interface Props {
   game: LocalGameRecord;
   onChange: (game: LocalGameRecord) => void;
@@ -104,6 +112,12 @@ export function ControllerStudio({
     redo = useRef<LocalGameRecord[]>([]);
   const canvasHost = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(700);
+  const [canvasHeight, setCanvasHeight] = useState(480);
+  const [clipboard, setClipboard] = useState<ControlClipboard | null>(
+    () => controlClipboard,
+  );
+  const [clipboardMessage, setClipboardMessage] = useState("");
+  const pasteSequence = useRef(0);
   const [surfaceLayout, setSurfaceLayout] = useState<ReturnType<
     typeof fitControls
   > | null>(null);
@@ -115,6 +129,10 @@ export function ControllerStudio({
     ids: string[];
     original: StudioControl[];
   } | null>(null);
+  const workspace = useStudioWorkspace(() => {
+    gesture.current = null;
+    setTestTouches(false);
+  });
   const mode =
     game.controller.modes.find((m) => m.id === modeId) ??
     game.controller.modes[0];
@@ -186,9 +204,10 @@ export function ControllerStudio({
   useEffect(() => {
     const el = canvasHost.current;
     if (!el) return;
-    const observer = new ResizeObserver(([e]) =>
-      setCanvasWidth(Math.max(260, e.contentRect.width - 32)),
-    );
+    const observer = new ResizeObserver(([e]) => {
+      setCanvasWidth(Math.max(1, e.contentRect.width));
+      setCanvasHeight(Math.max(1, e.contentRect.height));
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -222,35 +241,77 @@ export function ControllerStudio({
     });
     setSelected([]);
   }
+  function copySelection() {
+    try {
+      controlClipboard = copyControls(game, mode.id, selected);
+      setClipboard(controlClipboard);
+      pasteSequence.current = 0;
+      setClipboardMessage(
+        "Copied " +
+          controlClipboard.controls.length +
+          (controlClipboard.controls.length === 1 ? " control" : " controls") +
+          " · paste in any mode",
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+  function pasteSelection(value = controlClipboard, repeat?: number) {
+    if (!value) return;
+    try {
+      const number = repeat ?? pasteSequence.current + 1;
+      const result = pasteControls(game, mode.id, value, number);
+      commit((d) => Object.assign(d, result.game));
+      setSelected(result.ids);
+      pasteSequence.current = number;
+      setClipboardMessage(
+        "Pasted " +
+          result.ids.length +
+          (result.ids.length === 1 ? " control" : " controls"),
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
   function duplicate() {
     if (!selected.length) return;
-    const ids: string[] = [];
-    commit((d) => {
-      const m = d.controller.modes.find((m) => m.id === mode.id)!;
-      for (const c of m.controls.filter((c) => selected.includes(c.id))) {
-        if (m.controls.length >= 64) break;
-        const next = {
-          ...structuredClone(c),
-          id: "ctl-" + crypto.randomUUID().slice(0, 8),
-          x: clamp(c.x + 24, 0, 960 - c.w),
-          y: clamp(c.y + 24, 0, 540 - c.h),
-          group: undefined,
-        };
-        ids.push(next.id);
-        m.controls.push(next);
-      }
-    });
-    setSelected(ids);
+    try {
+      pasteSelection(copyControls(game, mode.id, selected), 1);
+    } catch (e) {
+      setError((e as Error).message);
+    }
   }
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
+      if (iconOpen || crop || visualOpen || guide.open) return;
       if (
         (e.target as HTMLElement).closest(
-          "input,textarea,select,[contenteditable]",
+          'input,textarea,select,[contenteditable],[role="separator"]',
         )
       )
         return;
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "c" &&
+        selected.length
+      ) {
+        e.preventDefault();
+        copySelection();
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "v" &&
+        controlClipboard
+      ) {
+        e.preventDefault();
+        pasteSelection();
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "d" &&
+        selected.length
+      ) {
+        e.preventDefault();
+        duplicate();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         e.preventDefault();
         history(!e.shiftKey);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
@@ -303,10 +364,13 @@ export function ControllerStudio({
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [selected, game, mode]);
+  }, [selected, game, mode, clipboard, iconOpen, crop, visualOpen, guide.open]);
   function begin(e: PE<HTMLDivElement>, c: StudioControl, resize = false) {
     e.preventDefault();
     e.stopPropagation();
+    e.currentTarget
+      .closest<HTMLElement>(".studio-edit-control")
+      ?.focus({ preventScroll: true });
     let ids = e.shiftKey
       ? selected.includes(c.id)
         ? selected.filter((id) => id !== c.id)
@@ -387,7 +451,7 @@ export function ControllerStudio({
           : kind === "stick"
             ? "Analog"
             : kind === "trigger"
-              ? "Throttle"
+              ? "Trigger"
               : "Label",
       360,
       190,
@@ -683,7 +747,8 @@ export function ControllerStudio({
       : { w: Number(size.split("x")[0]), h: Number(size.split("x")[1]) };
   const viewScale = Math.min(
     canvasWidth / device.w,
-    size === "design" ? 1 : 500 / device.h,
+    canvasHeight / device.h,
+    size === "design" ? 1 : 1.5,
   );
   return (
     <section
@@ -717,6 +782,13 @@ export function ControllerStudio({
           </button>
         </nav>
         <div className="builder-actions">
+          <button
+            data-workspace-tool
+            title="Reset panel sizes only. Your controller stays unchanged."
+            onClick={workspace.reset}
+          >
+            Reset layout
+          </button>
           <button
             className="guide-help"
             aria-label="Replay controller studio guide"
@@ -758,7 +830,11 @@ export function ControllerStudio({
           <button onClick={() => setError("")}>×</button>
         </div>
       )}
-      <div className="studio-editor-body">
+      <div
+        ref={workspace.ref}
+        className="studio-editor-body studio-resizable-workspace"
+        style={workspace.style}
+      >
         <aside className="studio-palette">
           <Panel title="Add a control">
             {(
@@ -793,8 +869,8 @@ export function ControllerStudio({
                     setSelected([c.id]);
                   }}
                 >
-                  <span className={"studio-model-sample " + model.id} />
-                  {model.name}
+                  <ConsoleModelPreview model={model.id} theme={visibleTheme} />
+                  <span className="studio-model-name">{model.name}</span>
                 </button>
               ))}
             </div>
@@ -821,7 +897,7 @@ export function ControllerStudio({
                 </option>
                 {["menu", "standard", "fight", "race"].map((x) => (
                   <option key={x} value={x}>
-                    Phone canvas · {x.replace("x", " × ")}
+                    {x.charAt(0).toUpperCase() + x.slice(1)}
                   </option>
                 ))}
               </select>
@@ -846,9 +922,17 @@ export function ControllerStudio({
             {[...mode.controls].reverse().map((c) => (
               <button
                 key={c.id}
+                data-layer-id={c.id}
+                aria-pressed={selected.includes(c.id)}
                 className={selected.includes(c.id) ? "selected" : ""}
-                onClick={() => {
-                  setSelected([c.id]);
+                onClick={(e) => {
+                  setSelected(
+                    e.shiftKey
+                      ? selected.includes(c.id)
+                        ? selected.filter((id) => id !== c.id)
+                        : [...selected, c.id]
+                      : [c.id],
+                  );
                   if (c.variant !== "all") setVariant(c.variant);
                 }}
               >
@@ -859,7 +943,8 @@ export function ControllerStudio({
             ))}
           </Panel>
         </aside>
-        <div className="studio-canvas-column" ref={canvasHost}>
+        <div {...workspace.separator("left")} />
+        <div className="studio-canvas-column">
           <div className="studio-canvas-tools">
             <label>
               View
@@ -881,7 +966,7 @@ export function ControllerStudio({
                   "1024x768",
                 ].map((x) => (
                   <option key={x} value={x}>
-                    Phone preview · {x.replace("x", " × ")}
+                    Phone canvas · {x.replace("x", " × ")}
                   </option>
                 ))}
               </select>
@@ -924,7 +1009,7 @@ export function ControllerStudio({
               </select>
             </label>
           </div>
-          <div className="studio-canvas-scroll">
+          <div className="studio-canvas-scroll" ref={canvasHost}>
             <div
               className="studio-stage-shell"
               style={{
@@ -997,6 +1082,15 @@ export function ControllerStudio({
                               (c.locked ? " locked" : "")
                             }
                             data-edit-control={c.id}
+                            tabIndex={0}
+                            role="button"
+                            aria-label={"Edit " + (c.label || c.kind)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelected([c.id]);
+                              }
+                            }}
                             style={{
                               left: rect.x,
                               top: rect.y,
@@ -1038,148 +1132,177 @@ export function ControllerStudio({
               </div>
             </div>
           </div>
-          <div className="studio-grid-toolbar">
-            <label>
-              <input
-                type="checkbox"
-                checked={game.controller.grid.visible}
-                onChange={(e) =>
+          <div {...workspace.separator("bottom")} />
+          <div className="studio-bottom-panel">
+            <div className="studio-grid-toolbar">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={game.controller.grid.visible}
+                  onChange={(e) =>
+                    commit((d) => {
+                      d.controller.grid.visible = e.target.checked;
+                    })
+                  }
+                />
+                Show grid
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={game.controller.grid.snap}
+                  onChange={(e) =>
+                    commit((d) => {
+                      d.controller.grid.snap = e.target.checked;
+                    })
+                  }
+                />
+                Snap to grid
+              </label>
+              <NumberField
+                label="Grid spacing"
+                value={game.controller.grid.size}
+                min={1}
+                max={128}
+                onChange={(v) =>
                   commit((d) => {
-                    d.controller.grid.visible = e.target.checked;
+                    d.controller.grid.size = Math.round(v);
                   })
                 }
               />
-              Show grid
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={game.controller.grid.snap}
-                onChange={(e) =>
-                  commit((d) => {
-                    d.controller.grid.snap = e.target.checked;
-                  })
-                }
-              />
-              Snap to grid
-            </label>
-            <NumberField
-              label="Grid spacing"
-              value={game.controller.grid.size}
-              min={1}
-              max={128}
-              onChange={(v) =>
-                commit((d) => {
-                  d.controller.grid.size = Math.round(v);
-                })
-              }
-            />
-            <span>Shift-click: multi-select · Arrow keys: nudge</span>
-          </div>
-          <div className="studio-selection-tools">
-            <button disabled={!selected.length} onClick={duplicate}>
-              Duplicate
-            </button>
-            <button disabled={!selected.length} onClick={removeSelected}>
-              Delete
-            </button>
-            <button
-              disabled={selected.length < 2}
-              onClick={() =>
-                commit((d) => {
-                  const id = "group-" + crypto.randomUUID().slice(0, 8);
-                  d.controller.modes
-                    .find((m) => m.id === mode.id)!
-                    .controls.filter((c) => selected.includes(c.id))
-                    .forEach((c) => (c.group = id));
-                })
-              }
-            >
-              Group
-            </button>
-            <button
-              disabled={!selected.length}
-              onClick={() =>
-                commit((d) => {
-                  d.controller.modes
-                    .find((m) => m.id === mode.id)!
-                    .controls.filter((c) => selected.includes(c.id))
-                    .forEach((c) => delete c.group);
-                })
-              }
-            >
-              Ungroup
-            </button>
-            <button
-              disabled={!selected.length}
-              onClick={() =>
-                commit((d) => {
-                  const next = !active?.locked;
-                  d.controller.modes
-                    .find((m) => m.id === mode.id)!
-                    .controls.filter((c) => selected.includes(c.id))
-                    .forEach((c) => (c.locked = next));
-                })
-              }
-            >
-              {active?.locked ? "Unlock" : "Lock"}
-            </button>
-            <select
-              aria-label="Align selected controls"
-              value=""
-              disabled={selected.length < 2}
-              onChange={(e) => align(e.target.value)}
-            >
-              <option value="" disabled>
-                Align / distribute
-              </option>
-              {[
-                "left",
-                "center",
-                "right",
-                "top",
-                "middle",
-                "bottom",
-                "horizontal",
-                "vertical",
-              ].map((a) => (
-                <option key={a} value={a}>
-                  {actionLabel(a, actionMap, "xbox")}
-                </option>
-              ))}
-            </select>
-          </div>
-          <footer className="studio-canvas-footer">
-            {size !== "design" && (
+              <span>
+                Shift-click: multi-select · Ctrl+C / Ctrl+V: copy & paste ·
+                Ctrl+D: duplicate
+              </span>
+            </div>
+            <div className="studio-selection-tools">
               <button
-                aria-pressed={testTouches}
-                onClick={() => setTestTouches((v) => !v)}
+                disabled={!selected.length}
+                title="Copy selected controls (Ctrl+C)"
+                onClick={copySelection}
               >
-                {testTouches ? "Back to editing" : "Test controls"}
+                Copy
               </button>
-            )}
-            <button onClick={() => void togglePreview()}>
-              {preview ? "End phone preview" : "Preview on my phone"}
-            </button>
-            <button
-              onClick={() =>
-                void task(async () => {
-                  await libraryCall({ type: "end-preview" });
-                  setPreview(false);
-                  await onTest();
-                })
-              }
-              disabled={busy}
-            >
-              Save & test in game
-            </button>
-            <small>
-              {size === "design"
-                ? "Raw coordinates · advanced design space. Choose a Phone canvas to edit the actual phone layout."
-                : "Edit the same layout your phone uses · drag to move, use the corner to resize. Test controls tries touches without running a game."}
+              <button
+                disabled={!clipboard}
+                title="Paste controls (Ctrl+V)"
+                onClick={() => pasteSelection()}
+              >
+                Paste
+              </button>
+              <button
+                disabled={!selected.length}
+                title="Duplicate selected controls (Ctrl+D)"
+                onClick={duplicate}
+              >
+                Duplicate
+              </button>
+              <button disabled={!selected.length} onClick={removeSelected}>
+                Delete
+              </button>
+              <button
+                disabled={selected.length < 2}
+                onClick={() =>
+                  commit((d) => {
+                    const id = "group-" + crypto.randomUUID().slice(0, 8);
+                    d.controller.modes
+                      .find((m) => m.id === mode.id)!
+                      .controls.filter((c) => selected.includes(c.id))
+                      .forEach((c) => (c.group = id));
+                  })
+                }
+              >
+                Group
+              </button>
+              <button
+                disabled={!selected.length}
+                onClick={() =>
+                  commit((d) => {
+                    d.controller.modes
+                      .find((m) => m.id === mode.id)!
+                      .controls.filter((c) => selected.includes(c.id))
+                      .forEach((c) => delete c.group);
+                  })
+                }
+              >
+                Ungroup
+              </button>
+              <button
+                disabled={!selected.length}
+                onClick={() =>
+                  commit((d) => {
+                    const next = !active?.locked;
+                    d.controller.modes
+                      .find((m) => m.id === mode.id)!
+                      .controls.filter((c) => selected.includes(c.id))
+                      .forEach((c) => (c.locked = next));
+                  })
+                }
+              >
+                {active?.locked ? "Unlock" : "Lock"}
+              </button>
+              <select
+                aria-label="Align selected controls"
+                value=""
+                disabled={selected.length < 2}
+                onChange={(e) => align(e.target.value)}
+              >
+                <option value="" disabled>
+                  Align / distribute
+                </option>
+                {[
+                  "left",
+                  "center",
+                  "right",
+                  "top",
+                  "middle",
+                  "bottom",
+                  "horizontal",
+                  "vertical",
+                ].map((a) => (
+                  <option key={a} value={a}>
+                    {actionLabel(a, actionMap, "xbox")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <footer className="studio-canvas-footer">
+              {size !== "design" && (
+                <button
+                  aria-pressed={testTouches}
+                  onClick={() => setTestTouches((v) => !v)}
+                >
+                  {testTouches ? "Back to editing" : "Test controls"}
+                </button>
+              )}
+              <button onClick={() => void togglePreview()}>
+                {preview ? "End phone preview" : "Preview on my phone"}
+              </button>
+              <button
+                onClick={() =>
+                  void task(async () => {
+                    await libraryCall({ type: "end-preview" });
+                    setPreview(false);
+                    await onTest();
+                  })
+                }
+                disabled={busy}
+              >
+                Save & test in game
+              </button>
+              <small>
+                {size === "design"
+                  ? "Raw coordinates · advanced design space. Choose a Phone canvas to edit the actual phone layout."
+                  : "Edit the same layout your phone uses · drag to move, use the corner to resize. Test controls tries touches without running a game."}
+              </small>
+            </footer>
+            <small className="studio-clipboard-status" role="status">
+              {clipboardMessage ||
+                "Drag panel dividers to resize · Double-click a divider to reset it"}
             </small>
-          </footer>
+          </div>
         </div>
+        <div {...workspace.separator("right")} />
         <aside className="studio-inspector">
           <div className="studio-inspector-title">
             <span className="builder-kicker">INSPECTOR</span>

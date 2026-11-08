@@ -7,7 +7,7 @@ export const CONSOLE_MODELS = [
   { id: "petals", name: "Petal D-pad" },
   { id: "analog", name: "Analog disc" },
 ] as const;
-export function consoleControl(model: string, theme: Theme): StudioControl {
+export function consoleControl(model: string, _theme: Theme): StudioControl {
   let c: StudioControl;
   if (model === "petals") {
     c = control("dpad", "Navigate", 80, 140, 240, 240);
@@ -33,11 +33,5 @@ export function consoleControl(model: string, theme: Theme): StudioControl {
     c.radius = 24;
   }
   c.appearance = model === "primary" ? "primary" : "console";
-  if (model === "primary")
-    c.theme = {
-      button: theme.accent,
-      text: theme.background,
-      border: theme.accent,
-    };
   return c;
 }

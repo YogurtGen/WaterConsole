@@ -1,6 +1,6 @@
 {
   "name": "waterconsole-core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "Open-source local multiplayer console. Playing together should be free.",
   "author": "WaterConsole contributors",
@@ -39,7 +39,7 @@
   "build": {
     "appId": "org.waterconsole.core",
     "productName": "WaterConsole Core",
-    "copyright": "Copyright \u00a9 2026 WaterConsole contributors",
+    "copyright": "Copyright © 2026 WaterConsole contributors",
     "directories": {
       "output": "dist",
       "buildResources": "assets"

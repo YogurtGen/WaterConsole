@@ -96,7 +96,7 @@ Virtual gamepads need the separately installed optional PC driver described in [
 
 **Preview on my phone** sends a sanitized draft to approved phones. It does not inject input into a game. Editing remains on the PC. End preview or choose **Save & test in game** to launch explicitly.
 
-Layouts use a logical 960 × 540 canvas. The phone reserves its toolbar and safe areas, preserves control proportions, and chooses a generated compact arrangement if normal scaling would make targets too small. If there is still insufficient space, it shows an actionable rotate/simplify message instead of clipping controls. Check your layout on the actual phone, especially with many controls. Do not place dozens of required controls in a tiny viewport and expect them all to remain comfortable.
+Layouts use a logical 960 × 540 canvas. The phone reserves its toolbar and safe areas, preserves control proportions, using the selected fit mode without rearranging your controls. Small visuals receive larger invisible touch targets. If there is still insufficient space, it shows an actionable rotate/simplify message instead of clipping controls. Check your layout on the actual phone, especially with many controls. Do not place dozens of required controls in a tiny viewport and expect them all to remain comfortable.
 
 On each phone, use **Controller settings → Vibration → Test vibration**. Press feedback is configurable up to 100 ms per control and can be disabled per phone. Native feedback is forwarded only from a real controller rumble callback for the matching active slot/epoch. A button pulse is not collision detection. Browser/device support varies; physical vibration requires a real-phone check.
 
@@ -126,3 +126,31 @@ The **Console models** palette adds soft action/primary/face/shoulder buttons, a
 Studio opens on a **Phone canvas**. Select, drag and resize controls directly on the same header/layout used by the phone. Choose the phone size in **View**. **Test controls** temporarily switches from editing to local touch testing; **Back to editing** restores the edit handles. **Preview on my phone** sends the current draft to approved phones without running a game. The advanced **Raw coordinates · 960×540** view remains available. Phone settings → Adjust layout → Reset → Done restores the host layout if a previously saved personal adjustment is getting in the way. Never erase personal adjustments silently.
 
 The custom header follows WaterConsole's existing controller interface: game/player identity, connection/latency, Return Home, settings, fullscreen and segmented modes. See [store import](STORE-IMPORT.md) for filling an editable game setup from Steam or Epic.
+
+## Resize your Studio workspace
+
+Drag the divider beside **Controls**, beside the **Inspector**, or above the bottom tools to share space with the neighboring canvas. The preview scales to its available area. Each pane scrolls independently, and model cards adapt to the width. Panel sizes are remembered on this PC.
+
+Double-click a divider to restore that pane, or press **Reset layout** in the header to restore all panel sizes. This never resets buttons, images, bindings or your game. A focused divider also supports arrow keys, Shift for a larger step, Home/End for its limits and Enter to restore its default size. Escape cancels a resize.
+
+## Copy, paste and duplicate controls
+
+Select a control, then press **Ctrl+C** and **Ctrl+V**, or use **Copy / Paste** in the tools area. **Ctrl+D** duplicates the selection immediately. Shift-click controls or Layers to select several. Paste works in another mode or another game setup in the same app session. It keeps the selected controls' settings and all players' gamepad/keyboard bindings. Inherited colors continue to follow the destination theme.
+
+Copies have new control, binding and group identities, so editing their binding does not overwrite the original. Related copied controls keep their spacing; new copies are unlocked. Undo/Redo covers the entire paste. Control/analog limits are checked before changing the design.
+
+The controller clipboard stays inside WaterConsole and clears when the app closes. Text fields retain their usual text-copy shortcuts. **Reset layout** affects workspace panels only.
+
+## Built-in starting templates
+
+New controllers and **Start from preset** use the refreshed Menu, Standard, Fight and Race layouts: soft buttons, petal directions, consistent spacing and hand anchors. Primary actions follow the player accent; explicit control colors still take priority. Race offers separate RT/B or a simultaneous RT+B hold. These are physical bindings, not promises about a game's controls. Check and edit them against the original game.
+
+Saved layouts are preserved. To refresh one mode, choose its template under **Start from preset**. This replaces that mode's controls and bindings; Undo restores the previous design. Other modes stay unchanged. **Reset layout** only restores workspace panels.
+
+Original browser previews of the starting templates:
+
+![Menu template with petal navigation and Confirm/Back](media/studio-menu.png)
+
+![Fight template with separated movement and action controls](media/studio-fight.png)
+
+![Race template with the optional linked RT+B hold](media/studio-race.png)

@@ -32,3 +32,5 @@ The optional driver archive has its own provenance and checksums. A checksum est
 Original WaterConsole hardware schematics (`device-models.ts`, `visual-binding.tsx`) and documentation captures of those diagrams: MIT. Physical layout/names are referenced in docs/validation/controller-usability-0.4.md. No manufacturer reference photographs/logos are redistributed.
 
 Store-imported artwork belongs to its respective publisher. It is downloaded only to a user-selected local library for that user's cards and previews; it is not part of this repository, source archive, installer or documentation screenshots. Automatic import does not grant redistribution rights.
+
+Console-model SVG previews and Studio workspace documentation screenshots are original WaterConsole work, MIT. Screenshots use only generic fixtures from scripts/test-studio-workspace.mjs and scripts/test-layout-fidelity.mjs; no publisher game art or personal paths are included.
