@@ -34,3 +34,5 @@ Original WaterConsole hardware schematics (`device-models.ts`, `visual-binding.t
 Store-imported artwork belongs to its respective publisher. It is downloaded only to a user-selected local library for that user's cards and previews; it is not part of this repository, source archive, installer or documentation screenshots. Automatic import does not grant redistribution rights.
 
 Console-model SVG previews and Studio workspace documentation screenshots are original WaterConsole work, MIT. Screenshots use only generic fixtures from scripts/test-studio-workspace.mjs and scripts/test-layout-fidelity.mjs; no publisher game art or personal paths are included.
+
+`docs/media/game-session.png` is an original screenshot from scripts/test-game-session.mjs using the bundled MIT lab-world illustration, fictional players and nonconnectable example connection details. No publisher artwork or live pairing invitation is included.

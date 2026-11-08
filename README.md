@@ -20,11 +20,11 @@ Turn your Windows PC into a local console. Connect up to four phones, approve th
 
 | Package | Use |
 | --- | --- |
-| [Windows Setup · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-Setup-0.5.1-x64.exe) | Install WaterConsole Core on Windows x64. |
-| [Portable ZIP · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-0.5.1-x64.zip) | Extract the complete application and run it. |
-| [Source ZIP · v0.5.1](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Core-Source-0.5.1.zip) | Build or extend the core yourself. |
-| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/WaterConsole-Optional-Controller-Tools-0.5.1.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
-| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.1/SHA256SUMS.txt) | Verify downloaded release files. |
+| [Windows Setup · v0.5.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.2/WaterConsole-Core-Setup-0.5.2-x64.exe) | Install WaterConsole Core on Windows x64. |
+| [Portable ZIP · v0.5.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.2/WaterConsole-Core-0.5.2-x64.zip) | Extract the complete application and run it. |
+| [Source ZIP · v0.5.2](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.2/WaterConsole-Core-Source-0.5.2.zip) | Build or extend the core yourself. |
+| [Optional controller tools](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.2/WaterConsole-Optional-Controller-Tools-0.5.2.zip) | Added games using virtual gamepads and native adapter development; includes the separately installed, retired ViGEmBus driver. **Not needed for phone vibration or Controller Lab.** |
+| [SHA-256 checksums](https://github.com/YogurtGen/WaterConsole/releases/download/v0.5.2/SHA256SUMS.txt) | Verify downloaded release files. |
 
 ## Edit or delete an added game
 
@@ -53,6 +53,14 @@ Controller Studio edits the actual phone layout using the same controller frame 
 ![WaterConsole custom phone controller with hand-anchored layout and petal D-pad](docs/media/studio-phone-layout.png)
 
 *Original documentation fixture; browser preview, not a physical-phone comfort test.*
+
+## A familiar game session
+
+Added games use the console session layout: your banner on the left, launch/focus status and controller modes on the right, and supported player slots below. Change the artwork through **Edit game → Artwork → Banner**; cover art is the fallback.
+
+![Configured-game session with artwork, status panel and four player slots](docs/media/game-session.png)
+
+*Original fixture with illustrative players and connection details; no commercial game is bundled.*
 
 ## What is included
 

@@ -4077,3 +4077,17 @@ a {
 .studio-edit-control:focus-visible{outline:2px solid #9cf0bf;outline-offset:1px}
 @container (max-width:270px){.studio-inspector .builder-two{grid-template-columns:minmax(0,1fr)}.studio-inspector .studio-action-checks{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){.studio-panel-divider{transition:none}}
+
+/* Configured games share the built-in game's session presentation. */
+.configured-game-screen .native-heading > div,.configured-game-screen .native-session,.configured-game-screen .native-player > div{min-width:0}
+.configured-game-screen .native-heading h1{overflow-wrap:anywhere}
+.configured-game-screen .native-heading > .button{flex-shrink:0}
+.configured-game-screen .native-art > .custom-art-placeholder{position:absolute;inset:0}
+.configured-game-screen .native-art::after{content:"";position:absolute;inset:auto 0 0;height:80px;background:linear-gradient(transparent,#08150bc9);pointer-events:none}
+.configured-game-screen .native-art > span{z-index:1;color:#edf5ed;padding:0 16px;line-height:1.7}
+.configured-game-screen .native-mode-buttons{flex-wrap:wrap}
+.configured-game-screen .native-mode-buttons button{flex:1 1 100px;min-width:0;overflow-wrap:anywhere}
+.configured-game-screen .native-player strong,.configured-game-screen .native-player small{overflow-wrap:anywhere}
+.configured-game-screen .native-player > svg,.configured-game-screen .native-player > .avatar,.configured-game-screen .native-footnote > svg{flex-shrink:0}
+.configured-game-players{grid-template-columns:repeat(var(--native-player-count),minmax(0,1fr))}
+@media(max-width:900px){.configured-game-players{grid-template-columns:repeat(min(var(--native-player-count),2),minmax(0,1fr))}}

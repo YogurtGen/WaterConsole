@@ -1,3 +1,4 @@
+import { ConfiguredGameScreen } from "./configured-game-screen";
 import { GameShelf } from "./game-shelf";
 import { LibraryCardMenu, type CardMenuAnchor } from "./library-card-menu";
 import { LibraryWorkspace } from "./library-workspace";
@@ -1071,117 +1072,24 @@ function NativeGame({
   send: (command: HostCommand) => void;
   openPair: () => void;
 }) {
-  const native = state.native;
   const game = (state.catalog ?? GAMES).find(
-    (game) => game.id === native.gameId,
+    (game) => game.id === (state.native.gameId || state.selectedGameId),
   );
-  const active =
-    native.status === "running" && native.focused && !native.quitting;
   return (
-    <main className="native-screen">
-      <div className="native-heading">
-        <div>
-          <span className="eyebrow">PC ADAPTER</span>
-          <h1>
-            {game?.title ?? "Native game"}
-            <span className="mint">.</span>
-          </h1>
-        </div>
-        <button
-          className="button"
-          disabled={native.quitting}
-          onClick={() => send({ type: "stopGame" })}
-        >
-          <Icon name="back" />
-          {native.quitting ? "Closing game..." : "Stop & return Home"}
-        </button>
-      </div>
-      <section className="native-session">
-        <span className={`native-status ${active ? "is-active" : ""}`}>
-          <span className="status-dot" />
-          {active ? "GAME IN FOCUS" : "INPUT PAUSED"}
-        </span>
-        <h2>
-          {native.quitting
-            ? "Closing your game..."
-            : native.status === "starting"
-              ? "Starting your game..."
-              : active
-                ? "Your controllers are ready."
-                : "Check the host PC."}
-        </h2>
-        <p>
-          {native.message ??
-            (game?.local
-              ? "Input is released when the game loses focus. Select the matching input device in your game, then test menus and gameplay separately."
-              : "Input is released when the game loses focus. Native support requires an explicitly registered PC adapter.")}
-        </p>
-        <button
-          className="button primary"
-          disabled={native.quitting || native.status === "starting"}
-          onClick={() => send({ type: "nativeFocus" })}
-        >
-          Focus game
-        </button>
-        <div
-          className="native-mode-buttons"
-          role="group"
-          aria-label="Native controller mode"
-        >
-          {state.studio
-            ? state.studio.definition.modes.map((mode) => (
-                <button
-                  key={mode.id}
-                  aria-pressed={mode.id === state.studio?.modeId}
-                  disabled={native.quitting}
-                  onClick={() => send({ type: "studioMode", modeId: mode.id })}
-                >
-                  {mode.name}
-                </button>
-              ))
-            : (["menu", "game"] as const).map((mode) => (
-                <button
-                  key={mode}
-                  aria-pressed={native.controls === mode}
-                  disabled={native.quitting}
-                  onClick={() => send({ type: "nativeControls", mode })}
-                >
-                  {mode === "menu" ? "Menu controls" : "Game controls"}
-                </button>
-              ))}
-        </div>
-      </section>
-      <section
-        className="native-players players-4"
-        aria-label="Native game players"
-      >
-        {Array.from({ length: native.maxPlayers ?? 0 }, (_, i) => i + 1).map(
-          (slot) => {
-            const player = state.players.find((p) => p.slot === slot);
-            return (
-              <div key={slot} className="native-player">
-                <span>P{slot}</span>
-                {player ? (
-                  <>
-                    <Avatar name={player.name} color={player.color} small />
-                    <strong>{player.name}</strong>
-                    <small>
-                      {player.connected
-                        ? active
-                          ? "Controller ready"
-                          : "Input paused"
-                        : "Reconnecting..."}
-                    </small>
-                  </>
-                ) : (
-                  <button onClick={openPair}>Connect a phone</button>
-                )}
-              </div>
-            );
-          },
-        )}
-      </section>
-    </main>
+    <ConfiguredGameScreen
+      state={state}
+      game={game}
+      send={send}
+      openPair={openPair}
+      artwork={
+        <GameArtwork
+          gameId={game?.id ?? state.selectedGameId}
+          art={game?.banner ?? game?.cover}
+          variant="hero"
+          alt={game ? game.title + " library artwork" : ""}
+        />
+      }
+    />
   );
 }
 function HostApp() {

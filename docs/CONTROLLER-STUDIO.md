@@ -154,3 +154,7 @@ Original browser previews of the starting templates:
 ![Fight template with separated movement and action controls](media/studio-fight.png)
 
 ![Race template with the optional linked RT+B hold](media/studio-race.png)
+
+## Game session on the PC
+
+After Start game, the PC shows your saved banner beside the launch/focus status and controller-mode selector. Cover artwork is used if no banner is set; without either, an original placeholder is shown. The saved image Fill/Fit choice is respected. Player cards follow the configured player limit and empty slots can open phone pairing. Focus game brings the original game window forward. Choosing a phone mode changes its layout, not the game scene.
